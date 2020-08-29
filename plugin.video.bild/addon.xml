@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <addon id="plugin.video.bild"
-version="0.3.1"
+version="0.4.0"
 name="Bild.de"
 provider-name="ostvanc">
 <requires>
@@ -26,6 +26,7 @@ provider-name="ostvanc">
 	0.2.0 - 06/03/2020 - Fixed due to changes
 	0.3.0 - 09/03/2020 - Added Livestream
 	0.3.1 - 13/04/2020 - Refactored Screenshot Directory
+	0.4.0 - 29/08/2020 - Fixed due to changes, added Livestream and Replay
   </news>
 </extension>
 </addon>

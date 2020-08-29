@@ -2,6 +2,8 @@
 # Module: default
 # Author: ostvanc
 # Created on: 21.11.2019
+# Last modified: 29.08.2020
+# Version: 0.4.0
 # License: GPL v.3 https://www.gnu.org/copyleft/gpl.html
 
 # Imported libraries
@@ -25,7 +27,7 @@ import xbmcplugin
 # Global variables
 
 BASE_URL = 'https://www.bild.de'
-ENTRY_URL = BASE_URL + '/video'
+ENTRY_URL = BASE_URL
 LOGO_URL = 'https://bilder.bild.de/fotos/bild-logo-35166394/Bild/43.bild.png'
 
 FANART_URL = 'https://media.diepresse.com/images/q45/uploads_1120/e/1/f/1408543/bild-zeitung_1369233061139760.jpg'
@@ -76,6 +78,7 @@ def get_json_data(url):
     return data
 
 def get_html_document(url):
+    xbmc.log('url: ' + url, xbmc.LOGNOTICE)
     request = Request(url, headers={'User-Agent' : 'Mozilla/5.0'})
     response = urlopen(request)
     document = response.read()
@@ -103,53 +106,36 @@ def list_categories():
     
     html_document = get_html_document(BASE_URL)
     soup = BeautifulSoup(html_document, 'html.parser')
-    livestream = soup.find('div', {'class' : 'cms-video-02'})
-    if livestream:
-        div = livestream.div
-        json_url = BASE_URL + div['data-media']
-        json_data = get_json_data(json_url)
-        
-        label = 'Livestream'
-        title = reformat_unichars(json_data['title'])
-        description = reformat_unichars(json_data['description'])
-        info = {'title' : title, 'plot' : description}
-        art = {'poster' : json_data['poster'], 'fanart' : FANART_URL}
-        video_url = json_data['clipList'][0]['srces'][0]['src']
-        is_playable = True
-        list_item = create_list_item(label, info, art, is_playable)
-        is_folder = not(is_playable)
-        url = get_url(action='play', url=video_url)
-        xbmcplugin.addDirectoryItem(_handle, url, list_item, is_folder)
+    
+    # Wir fügen als erstes den aktuellen und den letzten Livestream ins Menü hinzu:
+    streams = {'cms-video-02' : 'Livestream', 'cms-video-03' : 'Replay'}
+    for key, value in streams.items():
+        livestream = soup.find('div', {'class' : key})
+        if livestream:
+            div = livestream.div
+            json_url = BASE_URL + div['data-media']
+            json_data = get_json_data(json_url)
+            
+            label = value
+            title = reformat_unichars(json_data['title'])
+            description = reformat_unichars(json_data['description'])
+            info = {'title' : title, 'plot' : description}
+            art = {'poster' : json_data['poster'], 'fanart' : FANART_URL}
+            video_url = json_data['clipList'][0]['srces'][0]['src']
+            is_playable = True
+            list_item = create_list_item(label, info, art, is_playable)
+            is_folder = not(is_playable)
+            url = get_url(action='play', url=video_url)
+            xbmcplugin.addDirectoryItem(_handle, url, list_item, is_folder)
     
     html_document = get_html_document(ENTRY_URL)
     soup = BeautifulSoup(html_document, 'html.parser')
     
-    #Zuerst brauchen wir die Context-ID, diese steht im allerersten Kommentar
-    comment = soup.find(string=lambda text: isinstance(text, Comment))
-    pattern = re.compile(CONTEXT_ID_PATTERN)
-    match = pattern.search(comment)
-    context_id = match.group(1)
-    
-    
-    nav_bars = soup.find('ul', {'class' : 'nav-ressorts clearfix'})
-    data_drop_cid = None
-    
-    for li in nav_bars.find_all('li'):
-        if li.has_attr('data-drop-cid'):
-            a = li.a
-            if a.text == 'Video':
-                data_drop_cid = li.get('data-drop-cid')
-                break
-                
-    request_url = REQUEST_URL_FORMAT.format(data_drop_cid, context_id)
-    html_document = get_html_document(request_url)
-    soup = BeautifulSoup(html_document, 'html.parser')
-    
-    #Danach erzeugen wir eine Liste mit li-Items aus drei verschiedenen Quellen
+    #Danach erzeugen wir eine Liste mit li-Items aus den Nav-Bars
     li_list = []
     
-    content = soup.find('div', {'class' : 'content s3'})
-    for li in content.find_all('li'):
+    content = soup.find('li', {'class' : 'nav_bars'}).div.ul.find_all('li')
+    for li in content:
         li_list.append(li)
     
     # Jetzt ist die Liste mit den lis fertig und wir können loslegen
@@ -168,8 +154,6 @@ def list_categories():
         url = get_url(action='list', url=content_url)
         is_folder = not(is_playable)
         xbmcplugin.addDirectoryItem(_handle, url, list_item, is_folder)
-    
-    #xbmcgui.Dialog().ok("Debug", image_url)
     
     # Add a sort method for the virtual folder items (alphabetically, ignore articles)
     #xbmcplugin.addSortMethod(_handle, xbmcplugin.SORT_METHOD_LABEL_IGNORE_THE)
