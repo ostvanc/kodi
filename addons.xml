@@ -26,16 +26,17 @@
       <news>0.0.1 - 01/12/2019 - Initial version - added random tv show 0.0.2 - 03/12/2019 - added search tv show 0.1.0 - 04/12/2019 - added Cloudflare protection bypass 0.2.0 - 08/03/2020 - added JavaScript evaluation 0.3.0 - 18/03/2020 - added search by genre 0.3.1 - 13/04/2020 - refactored screenshot directory</news> 
     </extension> 
   </addon>
-  <addon id="plugin.video.amazon-test" name="Amazon VOD" version="0.8.2" provider-name="Sandmann79, Varstahl"> 
+  <addon id="plugin.video.amazon-test" name="Amazon VOD" version="0.8.9~beta" provider-name="Sandmann79, Varstahl"> 
     <requires> 
       <import addon="xbmc.python" version="2.24.0"/>  
       <import addon="script.module.beautifulsoup4" version="4.6.2"/>  
       <import addon="script.module.mechanicalsoup" version="0.12.0"/>  
       <import addon="script.module.pydes" version="2.0.1"/>  
       <import addon="script.module.pyxbmct" version="1.1.7"/>  
-      <import addon="script.module.inputstreamhelper" version="0.2.4"/>  
+      <import addon="script.module.inputstreamhelper" version="0.4.4"/>  
       <import addon="script.module.requests" version="2.9.1"/>  
-      <import addon="script.module.kodi-six" version="0.0.5"/> 
+      <import addon="script.module.kodi-six" version="0.0.5"/>  
+      <import addon="script.module.pyautogui" version="0.9.49"/> 
     </requires>  
     <extension point="xbmc.python.pluginsource" library="default.py"> 
       <provides>video</provides> 
@@ -44,15 +45,20 @@
     <extension point="xbmc.addon.metadata"> 
       <platform>all</platform>  
       <reuselanguageinvoker>true</reuselanguageinvoker>  
-      <summary lang="en">Amazon Prime Video Streaming</summary>  
-      <summary lang="de">Amazon Prime Instant Video</summary>  
-      <description lang="en">Movies and Television Shows for Prime Members</description>  
-      <description lang="de">Filme und Serien für Amazon Prime Mitglieder</description>  
-      <disclaimer lang="en">Some parts of this addon may not be legal in your country of residence - please check with your local laws before installing. This Addon uses pyDes by Todd Whiteman</disclaimer>  
-      <disclaimer lang="de">Möglicherweise sind einge Teile dieses Addons in Ihrem Land illegal, Sie sollten dies unbedingt vor der Installation überprüfen. Diese Addon verwendet pyDes von Todd Whiteman</disclaimer>  
-      <license>GNU GENERAL PUBLIC LICENSE. Version 3, 29 June 2007</license>  
+      <summary lang="en_GB">Amazon Prime Video Streaming</summary>  
+      <summary lang="de_DE">Amazon Prime Instant Video</summary>  
+      <description lang="en_GB">Movies and Television Shows for Prime Members</description>  
+      <description lang="de_DE">Filme und Serien für Amazon Prime Mitglieder</description>  
+      <disclaimer lang="en_GB">Some parts of this addon may not be legal in your country of residence - please check with your local laws before installing. This Addon uses pyDes by Todd Whiteman</disclaimer>  
+      <disclaimer lang="de_DE">Möglicherweise sind einge Teile dieses Addons in Ihrem Land illegal, Sie sollten dies unbedingt vor der Installation überprüfen. Diese Addon verwendet pyDes von Todd Whiteman</disclaimer>  
       <forum>http://www.kodinerds.net/index.php/Thread/44211-Release-Amazon-Prime-Instant-Video</forum>  
-      <source>https://github.com/Sandmann79/xbmc</source> 
+      <source>https://github.com/Sandmann79/xbmc</source>  
+      <license>GPL-3.0-or-later</license>  
+      <assets> 
+        <icon>icon.png</icon>  
+        <fanart>fanart.png</fanart>  
+        <clearlogo>clearlogo.png</clearlogo> 
+      </assets> 
     </extension> 
   </addon>
   <addon id="plugin.video.bild" version="0.4.0" name="Bild.de" provider-name="ostvanc"> 
@@ -99,9 +105,9 @@
       <news>0.0.1 - 12/02/2020 - Initial version 0.0.2 - 13/04/2020 - refactored screenshot directory</news> 
     </extension> 
   </addon>
-  <addon id="plugin.video.mediasetplay" name="Mediaset Play" version="1.2.2" provider-name="kodi-bino, cttynul"> 
+  <addon id="plugin.video.mediasetplay" name="Mediaset Play" version="1.2.3" provider-name="kodi-bino, cttynul"> 
     <requires> 
-      <import addon="xbmc.python" version="2.14.0"/>  
+      <import addon="xbmc.python" version="2.25.0"/>  
       <import addon="script.module.requests" version="2.9.1"/>  
       <import addon="script.module.beautifulsoup4" version="4.3.1"/>  
       <import addon="inputstream.adaptive" version="2.0.19"/> 
@@ -122,16 +128,13 @@
       <assets> 
         <icon>icon.png</icon> 
       </assets>  
-      <news>1.2.0 - 21/12/2018 - Cambiato approccio per canali Live (i link usati in precedenza non ritornano ora 404), i nuovi link sembrano bloccati dall'estero 1.2.1 - 02/01/2019 - Fix riproduzione video su Android con versioni di Kodi superiori alla 17 (ora utilizza InputStreamAdactive sempre su Android) 1.2.2 - 11/06/2019 - Aggiunta compatibilita' Python 3 e retrocompatibilita' Python 2.</news> 
+      <news>1.2.1 - 02/01/2019 - Fix riproduzione video su Android con versioni di Kodi superiori alla 17 (ora utilizza InputStreamAdactive sempre su Android) 1.2.2 - 11/06/2019 - Aggiunta compatibilita' Python 3 e retrocompatibilita' Python 2 (thanks to cttynul) 1.2.3 - 26/11/2019 - Fixato problema con mancanza di thumbnail in canali "Informazione" - Richiesta nuova versione di Python 2.25.0 per migliore compatibilità</news> 
     </extension> 
   </addon>
-  <addon id="plugin.video.mediathekview" name="MediathekView" version="0.6.2" provider-name="MediathekView.de, Leo Moll"> 
+  <addon id="plugin.video.mediathekview" name="MediathekView" version="0.6.4" provider-name="MediathekView.de, Leo Moll"> 
     <requires> 
       <import addon="xbmc.python" version="2.25.0"/>  
-      <import addon="script.module.requests" version="2.12.4"/>  
-      <import addon="script.module.myconnpy" version="1.1.7"/>  
-      <import addon="script.module.ijson" version="2.3"/>  
-      <import addon="script.module.defusedxml" version="0.5.0"/> 
+      <import addon="script.module.myconnpy" version="1.1.7"/> 
     </requires>  
     <extension point="xbmc.python.pluginsource" library="addon.py"> 
       <provides>video</provides> 
@@ -144,7 +147,7 @@
       <description lang="de_DE">Ermöglicht den Zugriff auf fast alle deutschen Mediatheken der öffentlich Rechtlichen basierend auf der Datenbank von MediathekView.de</description>  
       <description lang="en_GB">Gives access to most video-platforms from German public service broadcasters using the database of MediathekView.de</description>  
       <description lang="it_IT">Fornisce l'accesso a gran parte delle piattaforme video operate dalle emittenti pubbliche tedesche usando la banca dati di MediathekView.de</description>  
-      <news>v.0.6.2 (2019-03-10): - Bugfix: Entpacken von GZ-Archiven auf FireTV 4K und ähnliche Geräte funktioniert nun wieder - Bugfix: mvupdate funktioniert nun wieder - Compliance: Code Kompatibilität für zukünftige Kodi Versionen mit Python 3 v.0.6.1 (2019-03-08): - Bugfix: Fixed module exception due to case error v0.6.0 (2019-03-01): - Feature: Cache der Anfragen für lokale Datenbanken - Feature: Natives ultraschnelles Update für SQLite - Bugfix: Live Streams konnten heruntergeladen werden - Bugfix: Auf Kodi 18 hat der automatische Aktualisierungsmodus nicht mehr funktioniert - Feature: Neue option --full um ein vollstndiges Update zu erzwingen - Feature: Neue Aktualisierungsmethode "Zeitgesteuert" - Bugfix: Es war nicht möglich, den Aktualisierungsintervall bei der Methode "Automatisch" einzustellen - Feature: Passende Symbole für alle Menü-Einträge</news>  
+      <news>v.0.6.4 (2020-05-26): [fix] - #143 ijson issue on FireTvStick - #136 MySql caching_sha2_password issue - #135 HTTPMessage Header issue - #134 ijson issue - #124 Corrupt database - #166 Sorttitle missing in shows and channel list - #168 Added urlopen timeout - Fixed heading on DB-Status-Dialog [new] - #140 / #131 Datenbank check interval - #71 Default Sort - #95 Sort by time, date - #147 Show error message for 8 sec [others] - Update 3rd party code for Py3 (subtitles SRT-Files) - Update cache for sqlListe for invalidate after DB update - RBTV logo add - Python 3 compat - Kodi loglevel change (notice to info) - Add User Agent String for all request to fix issue with ORF v.0.6.2 (2019-03-10): - [fix] Implemented Workaround for broken gzip module support in Kodi 18 running on Android - [fix] Fixed crash in mvupdate tool when invoked with MySQL support - [new] Improved compatibility with future Kodi versions with Python 3 support</news>  
       <platform>all</platform>  
       <language>de fr</language>  
       <license>MIT License</license>  
@@ -158,9 +161,96 @@
         <screenshot>resources/screenshot1.png</screenshot>  
         <screenshot>resources/screenshot2.png</screenshot>  
         <screenshot>resources/screenshot3.png</screenshot>  
-        <screenshot>resources/screenshot4.png</screenshot>  
-        <screenshot>resources/screenshot5.png</screenshot> 
+        <screenshot>resources/screenshot4.png</screenshot> 
       </assets> 
+    </extension> 
+  </addon>
+  <addon id="plugin.video.netflix" name="Netflix" version="1.9.0" provider-name="libdev + jojo + asciidisco + caphm + castagnait"> 
+    <requires> 
+      <import addon="xbmc.python" version="2.26.0"/>  
+      <import addon="script.module.addon.signals" version="0.0.3"/>  
+      <import addon="script.module.future" version="0.17.1"/>  
+      <import addon="script.module.inputstreamhelper" version="0.3.3"/>  
+      <import addon="script.module.pycryptodome" version="3.4.3"/>  
+      <import addon="script.module.requests" version="2.12.4"/> 
+    </requires>  
+    <extension point="xbmc.python.pluginsource" library="addon.py"> 
+      <provides>video</provides> 
+    </extension>  
+    <extension point="xbmc.service" library="service.py"/>  
+    <extension point="xbmc.python.module" library="packages/mysql-connector-python"/>  
+    <extension point="xbmc.addon.metadata"> 
+      <reuselanguageinvoker>true</reuselanguageinvoker>  
+      <summary lang="cs_CZ">Netflix</summary>  
+      <description lang="cs_CZ">Plugin pro sledování filmů, seriálů online z Netflixu</description>  
+      <disclaimer lang="cs_CZ">Použití tohoto doplňku nemusí být ve vaší zemi pobytu legální - před instalací dbejte na vaše zákony.</disclaimer>  
+      <summary lang="de_DE">Netflix</summary>  
+      <description lang="de_DE">Addon für Netflix VOD-Dienste</description>  
+      <disclaimer lang="de_DE">Möglicherweise ist die Verwendung dieses Addons in Ihrem Land illegal, Sie sollten dies unbedingt vor der Installation überprüfen.</disclaimer>  
+      <summary lang="en_GB">Netflix</summary>  
+      <description lang="en_GB">Netflix VOD Services Add-on</description>  
+      <disclaimer lang="en_GB">The use of this add-on may not be legal in your country of residence - please check with your local laws before installing.</disclaimer>  
+      <summary lang="el_GR">Νέτφλιξ</summary>  
+      <description lang="el_GR">Πρόσθετο υπηρεσιών κατά παραγγελία του Νέτφλιξ</description>  
+      <disclaimer lang="el_GR">Η χρήση αυτού του προσθέτου μπορεί να μην είναι νόμιμη στην χώρα που κατοικείτε - παρακαλώ ελέγξτε τους τοπικούς νόμους πριν την εγκατάσταση.</disclaimer>  
+      <summary lang="nl_NL">Netflix</summary>  
+      <description lang="nl_NL">Bekijk Netflix films en tvprogramma's in Kodi.</description>  
+      <disclaimer lang="nl_NL">Sommige delen van deze add-on zijn mogelijk onwettig in jouw land - raadpleeg de lokale wetgeving alvorens deze add-on te installeren.</disclaimer>  
+      <summary lang="ja_JP">Netflix</summary>  
+      <description lang="ja_JP">Netflix VOD サービスアドオン</description>  
+      <disclaimer lang="ja_JP">一部の国では、このアドオンを使用するのが不法でありますので、設置する前に必ず関連法律を確認してください</disclaimer>  
+      <summary lang="ko_KR">Netflix</summary>  
+      <description lang="ko_KR">Netflix VOD 서비스애드온</description>  
+      <disclaimer lang="ko_KR">일부 국가에서는 이 애드온을 사용하는 것이 불법일 수도 있으니, 설치하기전 관련 법을 확인하기 바랍니다.</disclaimer>  
+      <description lang="it_IT">Netflix Add-on servizi VOD</description>  
+      <disclaimer lang="it_IT">L'utilizzo di questo add-on potrebbe non essere legale nel vostro paese di residenza - si prega di verificare le leggi in vigore prima dell'installazione.</disclaimer>  
+      <summary lang="es_ES">Netflix</summary>  
+      <description lang="es_ES">Complemento para los Servicios VOD de Netflix</description>  
+      <disclaimer lang="es_ES">El uso de este complemento puede no ser legal en su país de residencia - Por favor, consulte las leyes locales antes de instalarlo.</disclaimer>  
+      <summary lang="hu_HU">Netflix</summary>  
+      <description lang="hu_HU">Netflix VOD kiegészítő a Kodihoz</description>  
+      <disclaimer lang="hu_HU">Előfordulhat, hogy a kiegészítő használata nem törvényes az Ön országában - telepítés előtt tájékozódjon a helyi törvényekről</disclaimer>  
+      <summary lang="pt_BR">Netflix</summary>  
+      <description lang="pt_BR">Add-on para os serviços VOD do Netflix</description>  
+      <disclaimer lang="pt_BR">O uso deste addon pode não ser legal no seu país de residência - por favor, verifique as suas leis locais antes de instalar.</disclaimer>  
+      <summary lang="tr_TR">Netflix</summary>  
+      <description lang="tr_TR">Netflix VOD Hizmetleri Eklentisi</description>  
+      <disclaimer lang="tr_TR">Bu eklentinin bazı bölümleri ikamet ettiğiniz ülkede yasal olmayabilir - lütfen yüklemeden önce yerel yasalarınıza bakın.</disclaimer>  
+      <summary lang="ro_RO">Netflix</summary>  
+      <description lang="ro_RO">Add-on pentru servicii video la cerere Netflix</description>  
+      <disclaimer lang="ro_RO">Utilizarea acestui add-on ar putea fi ilegală în țara în care locuiți - vă rugăm să verificați legile locale înainte de instalare.</disclaimer>  
+      <summary lang="sv_SE">Netflix</summary>  
+      <description lang="sv_SE">Netflix VOD Service-tillägg</description>  
+      <disclaimer lang="sv_SE">Användandet av detta tillägg kanske inte är lagligt i ditt hemland - kontrollera med dina lokala lagar innan du installerar.</disclaimer>  
+      <summary lang="zh_CN">Netflix</summary>  
+      <description lang="zh_CN">Netflix VOD服务附加组件</description>  
+      <disclaimer lang="zh_CN">此附加组件在您的居住国可能不合法-请在安装前与您当地的法律核对。</disclaimer>  
+      <summary lang="fr_FR">Netflix</summary>  
+      <description lang="fr_FR">Extension Netflix SVoD</description>  
+      <disclaimer lang="fr_FR">L'utilisation de cette extension n'est peut-être pas légale dans votre pays de résidence - renseignez-vous avant de l'installer</disclaimer>  
+      <summary lang="pl_PL">Netflix</summary>  
+      <description lang="pl_PL">Wtyczka dla usług VOD serwisu Netflix</description>  
+      <disclaimer lang="pl_PL">Korzystanie z tego dodatku może być niezgodne z prawem w twoim kraju zamieszkania - przed zainstalowaniem zapoznaj się z lokalnymi przepisami.</disclaimer>  
+      <summary lang="he_IL">Netflix</summary>  
+      <description lang="he_IL">תוסף VOD לשירות של Netflix</description>  
+      <disclaimer lang="he_IL">השימוש בתוסף זה עלול להיות לא חוקי במדינת מגוריך - אנא בדוק את החוק ברשות המקומית לפני ההתקנה</disclaimer>  
+      <assets> 
+        <icon>resources/media/icon.png</icon>  
+        <fanart>resources/media/fanart.jpg</fanart>  
+        <screenshot>resources/media/screenshot-01.jpg</screenshot>  
+        <screenshot>resources/media/screenshot-02.jpg</screenshot>  
+        <screenshot>resources/media/screenshot-03.jpg</screenshot>  
+        <screenshot>resources/media/screenshot-04.jpg</screenshot>  
+        <screenshot>resources/media/screenshot-05.jpg</screenshot> 
+      </assets>  
+      <language>en cs de es fr he hr hu it ja ko nl pl pt ro sv tr zh</language>  
+      <platform>all</platform>  
+      <license>MIT</license>  
+      <website>https://www.netflix.com</website>  
+      <email/>  
+      <forum>https://forum.kodi.tv/showthread.php?tid=329767</forum>  
+      <source>https://github.com/CastagnaIT/plugin.video.netflix</source>  
+      <news>v1.9.0 (2020-09-06) -New login method "Authentication key" details on GitHub readme -Add possibility to import library from a different folder -Add flatted tvshow for single season (depends from kodi setting) -Big speedup improvement for Kodi 18 in service loading and opening profiles page -Fixed a problem that could cause the addon to not start after login unexpected errors -Fixed a wrong behaviour that caused timeout error after credentials login fails -Fixed context menus issues after add a new search -Updated translations de, it, fr, pl, zh_ch, pt_br, hu, jp, kr, el_gr, es</news> 
     </extension> 
   </addon>
   <addon id="plugin.video.pilot.wp" name="WP Pilot" version="0.1.3" provider-name="c0d34fun"> 
@@ -188,10 +278,11 @@
       </assets> 
     </extension> 
   </addon>
-  <addon id="plugin.video.raitv" name="Rai Play" version="3.4.8" provider-name="Nightflyer, cttynul, maxbambi, fabpolli"> 
+  <addon id="plugin.video.raitv" name="Rai Play" version="3.5.0.1" provider-name="Nightflyer, cttynul, maxbambi, fabpolli"> 
     <requires> 
       <import addon="xbmc.python" version="2.25.0"/>  
-      <import addon="script.common.plugin.cache" version="2.6.0"/> 
+      <import addon="script.common.plugin.cache" version="2.6.0"/>  
+      <import addon="script.module.inputstreamhelper"/> 
     </requires>  
     <extension point="xbmc.python.pluginsource" library="default.py"> 
       <provides>video audio</provides> 
@@ -207,7 +298,7 @@
       <forum>https://forum.kodi.tv/showthread.php?tid=155922</forum>  
       <website>https://github.com/maxbambi/plugin.video.raitv/</website>  
       <email/>  
-      <news>[B]3.4.8[/B] - Translations - Added new items for viewing all elements of a category. - On air menu shows also current programs. - Added new section from home page of Raiplay.</news>  
+      <news>[B]3.5.0[/B] - Plugin works with Widevine DRM [B]3.4.8[/B] - Updated User-Agent - Plugin can stream mpd [B]3.4.7[/B] - Translations - Added new items for viewing all elements of a category. - On air menu shows also current programs. - Added new section from home page of Raiplay.</news>  
       <source>https://github.com/maxbambi/plugin.video.raitv/</source>  
       <assets> 
         <icon>resources/icon.png</icon>  
@@ -215,11 +306,11 @@
       </assets> 
     </extension> 
   </addon>
-  <addon id="plugin.video.rivedila7" name="La7-La7d" version="4.2.0" provider-name="Luivit, Testato"> 
+  <addon id="plugin.video.rivedila7" name="La7-La7d" version="4.4.1" provider-name="Luivit, Testato"> 
     <requires> 
-      <import addon="xbmc.python" version="2.26.0"/>  
-      <import addon="script.module.requests"/>  
-      <import addon="script.module.inputstreamhelper"/>  
+      <import addon="xbmc.python" version="2.25.0"/>  
+      <import addon="script.module.requests" version="2.22.0"/>  
+      <import addon="script.module.inputstreamhelper" version="0.5.0"/>  
       <import addon="script.module.beautifulsoup4" version="4.5.3"/>  
       <import addon="script.module.html5lib" version="0.999.0"/> 
     </requires>  
@@ -235,14 +326,17 @@
       <platform>all</platform>  
       <license>GNU General Public License v3.0</license>  
       <forum>https://forum.kodi.tv/showthread.php?tid=331064</forum>  
-      <website>http://www.la7.it</website>  
-      <email>luivit39@gmail.com</email>  
+      <website>https://www.la7.it</website>  
+      <email>luivit39@gmail.com, speednpower@gmail.com</email>  
       <source>https://github.com/luivit/plugin.video.rivedila7</source>  
       <assets> 
         <icon>resources/icon.png</icon>  
-        <fanart>resources/fanart.jpg</fanart> 
+        <fanart>resources/fanart.jpg</fanart>  
+        <screenshot>resources/screenshots/screenshot-00.jpg</screenshot>  
+        <screenshot>resources/screenshots/screenshot-01.jpg</screenshot>  
+        <screenshot>resources/screenshots/screenshot-02.jpg</screenshot> 
       </assets>  
-      <news>4.2.0 (2020-02-08) - Fixed Week video scraping for On-Demand - Fixed episodes thumbnail - Moved some program to Landpage scraping</news> 
+      <news>4.4.1 (2020-09-12) - fix for Kodi repo</news> 
     </extension> 
   </addon>
   <addon id="plugin.video.TVP.pl" name="TVP.pl" version="2.2.3" provider-name="mbebe"> 
@@ -321,7 +415,7 @@
       <news>0.0.1 - 21/11/2019 - Initial version - added TV Livestream 0.1.0 - 23/11/2019 - added Videos and Magazines 0.1.1 - 24/11/2019 - added 'Magazyn wojskowy' and 'Zawod zolnierz' 0.1.2 - 26/11/2019 - workaround for certificate erros 0.2.0 - 01/12/2019 - refactoring due to complete youtube video hosting by TVR</news> 
     </extension> 
   </addon>
-  <addon id="plugin.video.youtube" name="YouTube" version="6.7.0" provider-name="anxdpanic, bromix"> 
+  <addon id="plugin.video.youtube" name="YouTube" version="6.8.4" provider-name="anxdpanic, bromix"> 
     <requires> 
       <import addon="xbmc.python" version="2.20.0"/>  
       <import addon="script.module.six" version="1.11.0"/>  
@@ -334,7 +428,7 @@
     <extension point="xbmc.service" library="resources/lib/startup.py" start="login"/>  
     <extension point="xbmc.python.module" library="resources/lib/"/>  
     <extension point="xbmc.addon.metadata"> 
-      <news>[add] send PlaybackInit, PlaybackStarted, PlaybackStopped notifications containing video id, channel id, and the status of the playing video [fix] allow playback regardless of API status - fixes playback for strm, playlists, other add-ons, and sharing videos from devices [fix] finding player config, allow playback to continue when not found if possible [fix] fix possible loop due to invalid keys and login information [fix] fix playback of mpeg-dash streams if HTTP Server - Listen on IP is blank [upd] use a dialog to notify users of API key requirements with link to wiki - https://ytaddon.page.link/keys [rem] remove provided api keys [lang] de_de strings |contrib: tweimer| [lang] el_gr strings |contrib: twilight0| [lang] hu_hu strings |contrib: thelacesz| [lang] pl_pl strings |contrib: drrak|</news>  
+      <news>[fix] next page now ignores sorting, remains at the end of the directory [fix] searching, no longer require remote safe search [fix] notifications for some languages [chg] only log http server ping failures [lang] zh_cn strings |contrib: yureng, xiaojun|</news>  
       <assets> 
         <icon>icon.png</icon>  
         <fanart>fanart.jpg</fanart> 
@@ -351,7 +445,7 @@
       <summary lang="hu_HU">YouTube kiegészítő</summary>  
       <description lang="hu_HU">A YouTube világ egyik legnagyobb videómegosztó weboldala.</description>  
       <summary lang="es_ES">Plugin para YouTube</summary>  
-      <description lang="es_ES">YouTube es uno de los sitios web para compartir videos más grande del mundo.</description>  
+      <description lang="es_ES">YouTube es uno de los sitios web más grande del mundo para compartir vídeos.</description>  
       <disclaimer lang="es_ES">Este add-on no está respaldado por Google</disclaimer>  
       <summary lang="es_MX">Plugin para YouTube</summary>  
       <description lang="es_MX">YouTube es uno de los más grandes sitios web de intercambio de videos del mundo.</description>  
@@ -382,10 +476,9 @@
       <disclaimer lang="tr_TR">Bu eklenti Google tarafından üretilmemiştir</disclaimer>  
       <platform>all</platform>  
       <license>GPL-2.0-only</license>  
-      <forum>https://forum.kodi.tv/showthread.php?tid=348464</forum>  
+      <forum>https://ytaddon.page.link/forum</forum>  
       <website>https://www.youtube.com</website>  
-      <email>ytplugin at datanet dot ws</email>  
-      <source>https://github.com/jdf76/plugin.video.youtube</source>  
+      <source>https://github.com/anxdpanic/plugin.video.youtube</source>  
       <reuselanguageinvoker>true</reuselanguageinvoker> 
     </extension> 
   </addon>
@@ -399,7 +492,23 @@
       <summary lang="en">ostvanc addon repository</summary>  
       <description lang="en">A Kodi addon repository including 4Anime.to, Bild.de, Focus Online and Telewizja Republika</description>  
       <platform>all</platform>  
-      <news>1.1.1 (29-08-2020) - Bild.de updated to 0.4.0</news> 
+      <news>1.1.2 (13-09-2020) - Added Netflix addon</news> 
+    </extension> 
+  </addon>
+  <addon id="script.module.addon.signals" name="Addon Signals" version="0.0.6" provider-name="Rick Phillips (ruuk)"> 
+    <requires> 
+      <import addon="xbmc.python" version="2.14.0"/> 
+    </requires>  
+    <extension point="xbmc.python.module" library="lib"/>  
+    <extension point="xbmc.addon.metadata"> 
+      <summary lang="en_GB">Inter-addon signalling</summary>  
+      <description lang="en_GB">Provides signal/slot mechanism for inter-addon communication</description>  
+      <platform>all</platform>  
+      <license>LGPL-2.1-only</license>  
+      <source>https://github.com/ruuk/script.module.addon.signals</source>  
+      <assets> 
+        <icon>icon.png</icon> 
+      </assets> 
     </extension> 
   </addon>
   <addon id="script.module.cloudscraper" name="cloudscraper" version="1.2.36" provider-name="VeNoMouS (venom@gen-x.co.nz)"> 
@@ -434,6 +543,20 @@
       <assets> 
         <icon>icon.png</icon> 
       </assets> 
+    </extension> 
+  </addon>
+  <addon id="script.module.future" name="future" version="0.17.1" provider-name="Ed Schofield"> 
+    <requires> 
+      <import addon="xbmc.python" version="2.14.0"/> 
+    </requires>  
+    <extension point="xbmc.python.module" library="libs"/>  
+    <extension point="xbmc.addon.metadata"> 
+      <summary lang="en">Clean single-source support for Python 3 and 2</summary>  
+      <description lang="en">future is the missing compatibility layer between Python 2 and Python 3. It allows you to use a single, clean Python 3.x-compatible codebase to support both Python 2 and Python 3 with minimal overhead.</description>  
+      <platform>all</platform>  
+      <license>MIT</license>  
+      <source>https://github.com/PythonCharmers/python-future</source>  
+      <website>http://python-future.org</website> 
     </extension> 
   </addon>
   <addon id="script.module.ijson" name="ijson" version="2.5" provider-name="Rodrigo Tobar, Ivan Sagalaev"> 
@@ -566,6 +689,18 @@
       <license>see LICENSE.txt</license>  
       <platform>all</platform>  
       <source>https://github.com/asweigart/pyautogui</source> 
+    </extension> 
+  </addon>
+  <addon id="script.module.pycryptodome" name="PyCryptodome" version="3.9.8" provider-name="Legrandin"> 
+    <requires> 
+      <import addon="xbmc.python" version="2.14.0"/> 
+    </requires>  
+    <extension point="xbmc.python.module" library="lib"/>  
+    <extension point="xbmc.addon.metadata"> 
+      <summary>Cryptographic library for Python</summary>  
+      <source>http://www.pycryptodome.org</source>  
+      <platform>all</platform>  
+      <license>Public domain</license> 
     </extension> 
   </addon>
   <addon id="script.module.pydes" name="pyDes" version="2.0.1" provider-name="Todd Whiteman"> 

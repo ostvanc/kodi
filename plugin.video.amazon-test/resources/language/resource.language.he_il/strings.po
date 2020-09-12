@@ -28,7 +28,7 @@ msgstr "סרטים וסדרות מראה עבור חברים"
 
 msgctxt "Addon Disclaimer"
 msgid ""
-"Some parts of this addon may not be legal in your country of residence - please check with your local laws before installing.\n"
+"Some parts of this addon may not be legal in your country of residence – please check with your local laws before installing.\n"
 "This Addon uses pyDes by Todd Whiteman"
 msgstr ""
 "ייתכן ועל פי החוק חלקים מסוימים של התוכן אינן מותרים לצפייה במחוז מגוריך - אנא בדוק עם החוקים המקומיים לפני התקנת.\n"
@@ -51,8 +51,8 @@ msgid "Stream Bitrate (0 - Ask)"
 msgstr "זרם קצב סיביות (0 - לשאול)"
 
 msgctxt "#30005"
-msgid "Enable Subtitles"
-msgstr "אפשר כתוביות"
+msgid "Audio descriptions (disables 5.1/7.1)"
+msgstr ""
 
 msgctxt "#30006"
 msgid "Store Credentials instead of using the Cookie?"
@@ -65,6 +65,14 @@ msgstr "הסר את האישורים והעוגיות"
 msgctxt "#30008"
 msgid "Sign In…"
 msgstr "כניסה לחשבון."
+
+msgctxt "#30009"
+msgid "Multi User Support"
+msgstr ""
+
+msgctxt "#30010"
+msgid "Remove all Users"
+msgstr ""
 
 # empty strings from id 30009 to 30010
 msgctxt "#30011"
@@ -107,9 +115,27 @@ msgctxt "#30020"
 msgid "Enable DRM check"
 msgstr "אפשר בדיקתDRM"
 
-msgctxt "#30022"
+#, fuzzy
+msgctxt "#30021"
 msgid "Language"
 msgstr "שפה"
+
+msgctxt "#30022"
+msgid "Keep me logged in"
+msgstr ""
+
+msgctxt "#30023"
+msgid "Use android app for 4K videos"
+msgstr ""
+
+# empty strings from id 30024 to id 30026
+msgctxt "#30027"
+msgid "Stretch factor"
+msgstr ""
+
+msgctxt "#30028"
+msgid "Stretching"
+msgstr ""
 
 # empty strings from id 30023 to 30028
 msgctxt "#30029"
@@ -127,6 +153,15 @@ msgstr "תצוגת עונות"
 msgctxt "#30032"
 msgid "Episode View"
 msgstr "תצוגת פרקים"
+
+msgctxt "#30033"
+msgid "Audio"
+msgstr ""
+
+#, fuzzy
+msgctxt "#30034"
+msgid "Subtitles"
+msgstr "אפשר כתוביות"
 
 # empty strings from id 30033 to 30034
 msgctxt "#30035"
@@ -286,30 +321,34 @@ msgid "Title Descending"
 msgstr "כותרת בסדר יורד"
 
 msgctxt "#30080"
-msgid "Choose Country"
-msgstr "בחירת מדינה"
+msgid "Automatically Watchlist export"
+msgstr ""
 
 msgctxt "#30081"
-msgid "Germany"
-msgstr "גרמניה"
+msgid "Intro/Recap scenes processing"
+msgstr ""
 
 msgctxt "#30082"
-msgid "United Kingdom"
-msgstr "אנגליה"
+msgid "Do nothing"
+msgstr ""
 
 msgctxt "#30083"
-msgid "USA"
-msgstr "ארצות הברית"
+msgid "Show Skip Button"
+msgstr ""
 
 msgctxt "#30084"
-msgid "Japan"
-msgstr "יפן"
+msgid "Autoskip Intro"
+msgstr ""
 
 msgctxt "#30085"
-msgid "Other (primevideo.com)"
-msgstr "אחר (primevideo.com)"
+msgid "Autoskip Recap"
+msgstr ""
 
-# empty strings from id 30086 to 30099
+msgctxt "#30086"
+msgid "Autoskip All"
+msgstr ""
+
+# empty strings from id 30087 to 30099
 msgctxt "#30100"
 msgid "Library"
 msgstr "ספרייה"
@@ -383,6 +422,37 @@ msgctxt "#30127"
 msgid "No content found"
 msgstr "לא נמצא תוכן"
 
+# empty strings from id 30128 to 30129
+msgctxt "#30130"
+msgid "Add User…"
+msgstr ""
+
+msgctxt "#30131"
+msgid "Delete User…"
+msgstr ""
+
+msgctxt "#30132"
+msgid "Rename User"
+msgstr ""
+
+msgctxt "#30133"
+msgid "Choose User"
+msgstr ""
+
+msgctxt "#30134"
+msgid "Current User: {0}"
+msgstr ""
+
+#, fuzzy
+msgctxt "#30135"
+msgid "Display Name"
+msgstr "הצג תוכן בתשלום"
+
+#, fuzzy
+msgctxt "#30136"
+msgid "Recently watched"
+msgstr "נוספו לאחרונה"
+
 # empty strings from id 30128 to 30142
 msgctxt "#30143"
 msgid "All Movies"
@@ -441,6 +511,11 @@ msgctxt "#30183"
 msgid "Get Similarities"
 msgstr "השג דומים"
 
+#, fuzzy
+msgctxt "#30184"
+msgid "Remove {} from List"
+msgstr "הסר את %s מרשימת הצפייה"
+
 # empty string with id 30184
 msgctxt "#30185"
 msgid "Export %s"
@@ -455,16 +530,8 @@ msgid "Source folders added/changed"
 msgstr "תיקיות המקור נוספו או שונו"
 
 msgctxt "#30188"
-msgid "To complete the setup:"
-msgstr "כדי להשלים את ההגדרות:"
-
-msgctxt "#30189"
-msgid " 1) Restart Kodi"
-msgstr " 1) אתחל את קודי"
-
-msgctxt "#30190"
-msgid " 2) Set the content type of added folders"
-msgstr " 2) להגדיר את סוג התוכן של תיקיות שנוספו"
+msgid "To complete the setup restart Kodi and set the content type of added folders."
+msgstr ""
 
 msgctxt "#30191"
 msgid "Restart"
@@ -474,7 +541,19 @@ msgctxt "#30192"
 msgid "Do you want to restart Kodi now?"
 msgstr "האם ברצונך להפעיל מחדש את קודי עכשיו?"
 
-# empty strings from id 30193 to 30197
+msgctxt "#30193"
+msgid "Skip Intro"
+msgstr ""
+
+msgctxt "#30194"
+msgid "Skip Recap"
+msgstr ""
+
+msgctxt "#30195"
+msgid "Skipping Scene…"
+msgstr ""
+
+# empty strings from id 30196 to 30197
 msgctxt "#30198"
 msgid "Browser or Script not found. Please check settings."
 msgstr "לא נמצא דפדפן או סקריפט. נא בדוק את הגדרות."
@@ -559,3 +638,110 @@ msgid ""
 msgstr ""
 "בשל השינויים בהצפנת ה-DRM של אמזון, זה לא ניתן להשתמש Inputstream עבור וידאו זה.\n"
 "נא להגדיר את אפשרות השיחזור בהגדרות, כדי להשתמש בשיטת השמעה אחרת."
+
+msgctxt "#30219"
+msgid "Unable to retrieve Amazon's territorial configuration."
+msgstr ""
+
+# empty strings from id 30221 to 30241
+msgctxt "#30242"
+msgid "Page {}"
+msgstr ""
+
+msgctxt "#30243"
+msgid "Pagination"
+msgstr ""
+
+msgctxt "#30244"
+msgid "Everything"
+msgstr ""
+
+# empty strings from id 30174 to 30179
+#, fuzzy
+msgctxt "#30245"
+msgid "Watchlist"
+msgstr "הוסף את %s לרשימת הצפייה"
+
+#, fuzzy
+msgctxt "#30246"
+msgid "Collections"
+msgstr "חיבור"
+
+#, fuzzy
+msgctxt "#30247"
+msgid "Search"
+msgstr "חיפוש"
+
+# empty strings from id 30220 to 30247
+msgctxt "#30248"
+msgid "Proxy MPD alteration"
+msgstr ""
+
+msgctxt "#30249"
+msgid "Prefer episode thumbnails to posters"
+msgstr ""
+
+msgctxt "#30250"
+msgid "PrimeVideo"
+msgstr "PrimeVideo"
+
+#, fuzzy
+msgctxt "#30251"
+msgid "Connection error"
+msgstr "חיבור"
+
+msgctxt "#30252"
+msgid "Loading page {0}…"
+msgstr ""
+
+msgctxt "#30253"
+msgid "{0} seasons"
+msgstr ""
+
+msgctxt "#30254"
+msgid "userinput.exe not found"
+msgstr ""
+
+msgctxt "#30255"
+msgid "Please download it from GitHub and manually install it in the addon directory"
+msgstr ""
+
+msgctxt "#30256"
+msgid "Error: servers returned no content (check logs for more information)"
+msgstr ""
+
+msgctxt "#30257"
+msgid "Catalog cache expiration time"
+msgstr ""
+
+msgctxt "#30258"
+msgid "1 hour"
+msgstr ""
+
+msgctxt "#30259"
+msgid "6 hours"
+msgstr ""
+
+msgctxt "#30260"
+msgid "12 hours"
+msgstr ""
+
+msgctxt "#30261"
+msgid "1 day"
+msgstr ""
+
+msgctxt "#30262"
+msgid "3 days"
+msgstr ""
+
+msgctxt "#30263"
+msgid "7 days"
+msgstr ""
+
+msgctxt "#30264"
+msgid "15 days"
+msgstr ""
+
+msgctxt "#30265"
+msgid "30 days"
+msgstr ""

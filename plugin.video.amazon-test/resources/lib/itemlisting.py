@@ -5,6 +5,7 @@ from kodi_six import xbmcplugin, xbmcgui
 from kodi_six.utils import py2_encode
 from .common import Globals, Settings
 from .l10n import *
+import sys
 
 try:
     from urllib.parse import urlencode
@@ -53,7 +54,7 @@ def addDir(name, mode='', url='', infoLabels=None, opt='', catalog='Browse', cm=
     if None is thumb:
         thumb = s.DefaultFanart
     u = {'mode': mode, 'url': py2_encode(url), 'page': page, 'opt': opt, 'cat': catalog}
-    url = '{}?{}'.format(g.pluginid, urlencode(u))
+    url = '{}?{}'.format(g.pluginid, urlencode(u)) if mode != 'text' else sys.argv[0]
 
     if not mode:
         url = g.pluginid
@@ -80,7 +81,7 @@ def addDir(name, mode='', url='', infoLabels=None, opt='', catalog='Browse', cm=
 
     if cm:
         item.addContextMenuItems(cm)
-    xbmcplugin.addDirectoryItem(g.pluginhandle, url, item, isFolder=mode != 'switchUser')
+    xbmcplugin.addDirectoryItem(g.pluginhandle, url, item, isFolder=mode not in ['switchUser', 'text'])
 
 
 def addVideo(name, asin, infoLabels, cm=None, export=False):
@@ -89,6 +90,7 @@ def addVideo(name, asin, infoLabels, cm=None, export=False):
     u = {'asin': asin, 'mode': 'PlayVideo', 'name': py2_encode(name), 'adult': infoLabels['isAdult']}
     url = '{}?{}'.format(g.pluginid, urlencode(u))
     bitrate = '0'
+    streamtypes = {'live': 2}
 
     item = xbmcgui.ListItem(name)
     item.setArt({'fanart': infoLabels['Fanart'], 'poster': infoLabels['Thumb'], 'thumb': infoLabels['Thumb']})
@@ -98,20 +100,20 @@ def addVideo(name, asin, infoLabels, cm=None, export=False):
     if 'Poster' in infoLabels.keys():
         item.setArt({'tvshow.poster': infoLabels['Poster']})
 
-    if infoLabels['isHD']:
-        item.addStreamInfo('video', {'width': 1920, 'height': 1080})
-    else:
-        item.addStreamInfo('video', {'width': 720, 'height': 480})
-
     if infoLabels['TrailerAvailable']:
         infoLabels['Trailer'] = url + '&trailer=1&selbitrate=0'
 
-    url += '&trailer=2' if "live" in infoLabels['contentType'] else '&trailer=0'
-    
+    url += '&trailer=%s' % streamtypes.get(infoLabels['contentType'], 0)
+
     if [k for k in ['4k', 'uhd', 'ultra hd'] if k in (infoLabels.get('TVShowTitle', '') + name).lower()]:
         bitrate = '-1'
+        item.addStreamInfo('video', {'width': 3840, 'height': 2160})
         if s.uhdAndroid:
             item.setProperty('IsPlayable', 'false')
+    elif infoLabels['isHD']:
+        item.addStreamInfo('video', {'width': 1920, 'height': 1080})
+    else:
+        item.addStreamInfo('video', {'width': 720, 'height': 480})
 
     if export:
         url += '&selbitrate=' + bitrate

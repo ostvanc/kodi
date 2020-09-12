@@ -9,8 +9,8 @@
 		<summary lang="en">ostvanc addon repository</summary>
 		<description lang="en">A Kodi addon repository including 4Anime.to, Bild.de, Focus Online and Telewizja Republika</description>
 		<platform>all</platform>
-		<news>1.1.1  (29-08-2020)
-			- Bild.de updated to 0.4.0
+		<news>1.1.2  (13-09-2020)
+			- Added Netflix addon
 		</news>
 	</extension>
 </addon>

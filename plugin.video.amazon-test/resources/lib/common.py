@@ -173,9 +173,11 @@ class Settings(Singleton):
         elif 'ms_mov' == name: ms_mov = self._gs('mediasource_movie'); return ms_mov if ms_mov else 'Amazon Movies'
         elif 'ms_tv' == name: ms_tv = self._gs('mediasource_tv'); return ms_tv if ms_tv else 'Amazon TV'
         elif 'multiuser' == name: return self._gs('multiuser') == 'true'
-        elif 'DefaultFanart' == name: return OSPJoin(self._g.PLUGIN_PATH, 'fanart.jpg')
-        elif 'NextIcon' == name: return OSPJoin(self._g.PLUGIN_PATH, 'resources', 'next.png')
-        elif 'HomeIcon' == name: return OSPJoin(self._g.PLUGIN_PATH, 'resources', 'home.png')
+        elif 'DefaultFanart' == name: return OSPJoin(self._g.PLUGIN_PATH, 'fanart.png')
+        elif 'ThumbIcon' == name: return OSPJoin(self._g.PLUGIN_PATH, 'resources', 'art', 'thumb.png')
+        elif 'NextIcon' == name: return OSPJoin(self._g.PLUGIN_PATH, 'resources', 'art', 'next.png')
+        elif 'HomeIcon' == name: return OSPJoin(self._g.PLUGIN_PATH, 'resources', 'art', 'home.png')
+        elif 'PrimeVideoEntitlement' == name: return OSPJoin(self._g.PLUGIN_PATH, 'resources', 'art', 'prime.png')
         elif 'wl_order' == name: return ['DATE_ADDED_DESC', 'TITLE_DESC', 'TITLE_ASC'][int('0' + self._gs('wl_order'))]
         elif 'verifySsl' == name: return self._gs('ssl_verif') == 'false'
         elif 'OfferGroup' == name: return '' if self.payCont else '&OfferGroups=B0043YVHMY'
@@ -187,8 +189,18 @@ class Settings(Singleton):
             return [24 / 23.976, 23.976 / 24, 25 / 23.976, 23.976 / 25, 25.0 / 24.0, 24.0 / 25.0][int(self._gs('sub_stretch_factor'))]
         elif 'audioDescriptions' == name: return self._gs('audio_description') == 'true'
         elif 'removePosters' == name: return self._gs('pv_episode_thumbnails') == 'true'
+        elif 'useEpiThumbs' == name: return self._gs('tld_episode_thumbnails') == 'true'
         elif 'bypassProxy' == name: return self._gs('proxy_mpdalter') == 'false'
         elif 'uhdAndroid' == name: return self._gs('uhd_android') == 'true'
+        elif 'skip_scene' == name: return int('0' + self._gs('skip_scene'))
+        elif 'pagination' == name: return {
+            'all': self._gs('paginate_everything') == 'true',
+            'watchlist': self._gs('paginate_watchlist') == 'true',
+            'collections': self._gs('paginate_collections') == 'true',
+            'search': self._gs('paginate_search') == 'true'
+        }
+        elif 'catalogCacheExpiry' == name:
+            return [3600, 21600, 43200, 86400, 259200, 604800, 1296000, 2592000][int(self._gs('catalog_cache_expiry'))]
 
 
 def jsonRPC(method, props='', param=None):
@@ -224,3 +236,25 @@ def sleep(sec):
         import sys
         Log('Abort requested - exiting addon')
         sys.exit()
+
+
+def key_exists(dictionary, *keys):
+    """ Check if a nested list of keys exists """
+    _p = dictionary
+    for key in keys:
+        try:
+            _p = _p[key]
+        except:
+            return False
+    return True
+
+
+def return_item(dictionary, *keys):
+    """ Returns an item nested in the dictionary, or the dictionary itself """
+    _p = dictionary
+    for key in keys:
+        try:
+            _p = _p[key]
+        except:
+            return dictionary
+    return _p

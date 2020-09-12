@@ -34,10 +34,12 @@ class AmazonTLD(Singleton):
         if self._s.multiuser:
             addDir(getString(30134).format(loadUser('name')), 'switchUser', '', cm=self._g.CONTEXTMENU_MULTIUSER)
         addDir('Watchlist', 'getListMenu', self._g.watchlist, cm=cm_wl)
-        self.getRootNode()
+        self.listCategories(0)
+        addDir('Channels', 'Channel', '/gp/video/storefront/ref=nav_shopall_nav_sa_aos?filterId=OFFER_FILTER%3DSUBSCRIPTIONS', opt='root')
         addDir(getString(30136), 'Recent', '')
         addDir(getString(30108), 'Search', '')
         addDir(getString(30100), 'getListMenu', self._g.library, cm=cm_lb)
+        # addDir('[B]{}[/B]'.format(getString(5)), 'openSettings', self._g.addon.getAddonInfo('id'))
         xbmcplugin.endOfDirectory(self._g.pluginhandle, updateListing=False)
 
     @staticmethod
@@ -172,12 +174,13 @@ class AmazonTLD(Singleton):
         if source_added:
             with closing(xbmcvfs.File(source_path, 'w')) as fo:
                 fo.write(bytearray(et.tostring(root, 'utf-8')))
-            self._g.dialog.ok(getString(30187), getString(30188), getString(30189), getString(30190))
+            self._g.dialog.ok(getString(30187), getString(30188))
             if self._g.dialog.yesno(getString(30191), getString(30192)):
                 xbmc.executebuiltin('RestartApp')
 
-    def Search(self):
-        searchString = self._g.dialog.input(getString(24121)).encode('utf-8')
+    def Search(self, searchString=None):
+        if searchString is None:
+            searchString = self._g.dialog.input(getString(24121)).encode('utf-8')
         if searchString:
             url = 'searchString=%s%s' % (quote_plus(searchString), self._s.OfferGroup)
             self.listContent('Search', url, 1, 'search')
@@ -198,13 +201,15 @@ class AmazonTLD(Singleton):
         all_rec, rec = self.getRecents()
         asins = ','.join(rec)
         url = 'asinlist=' + asins
-        self.listContent('GetASINDetails', url, 1, 'recent', export)
+        self.listContent('Browse', url, 1, 'recent', export)
 
     def updateRecents(self, asin, rem=0):
         all_rec, rec = self.getRecents()
         if rem == 0:
-            content = getATVData('GetASINDetails', 'ASINList=' + asin)['titles'][0]
-            ct, Info = g.amz.getInfos(content, False)
+            content = getATVData('GetASINDetails', 'ASINList=' + asin)['titles']
+            if len(content) < 1:
+                return
+            ct, Info = g.amz.getInfos(content[0], False)
             asin = Info.get('SeasonAsin', Info.get('SeriesAsin', asin))
         if asin in rec:
             rec.remove(asin)
@@ -223,22 +228,31 @@ class AmazonTLD(Singleton):
         if rem == 1:
             xbmc.executebuiltin('Container.Update("%s", replace)' % xbmc.getInfoLabel('Container.FolderPath'))
 
-    def _createDB(self, menu=False):
-        if menu:
-            c = self._menuDb.cursor()
-            c.execute('drop table if exists menu')
-            c.execute('''CREATE TABLE menu(
+    def _createDB(self, table):
+        c = self._menuDb.cursor()
+        if table == self._menu_tbl:
+            c.execute('drop table if exists %s' % self._menu_tbl)
+            c.execute('''CREATE TABLE %s(
                         node TEXT,
                         title TEXT,
                         category TEXT,
                         content TEXT,
                         id TEXT,
                         infolabel TEXT
-                        );''')
+                        );''' % self._menu_tbl)
             self._menuDb.commit()
-        else:
+        elif table == self._chan_tbl:
+            c.execute('drop table if exists %s' % self._chan_tbl)
+            c.execute('''CREATE TABLE %s(
+                        uid TEXT,
+                        data JSON,
+                        time TIMESTAMP,
+                        ref TEXT
+                        );''' % self._chan_tbl)
+            self._menuDb.commit()
+        elif table == self._art_tbl:
             c = self._db.cursor()
-            c.execute('''CREATE TABLE IF NOT EXISTS art(
+            c.execute('''CREATE TABLE IF NOT EXISTS %s(
                         asin TEXT,
                         season INTEGER,
                         poster TEXT,
@@ -246,7 +260,7 @@ class AmazonTLD(Singleton):
                         fanart TEXT,
                         lastac DATE,
                         PRIMARY KEY(asin, season)
-                        );''')
+                        );''' % self._art_tbl)
             c.execute('''CREATE TABLE IF NOT EXISTS miss(
                         asins TEXT,
                         title TEXT,
@@ -259,11 +273,14 @@ class AmazonTLD(Singleton):
 
     def _initialiseDB(self):
         from sqlite3 import dbapi2 as sqlite
+        self._menu_tbl = 'menu'
+        self._chan_tbl = 'channels'
+        self._art_tbl = 'art'
         self._dbFile = os.path.join(self._g.DATA_PATH, 'art.db')
         self._db = sqlite.connect(self._dbFile)
-        self._createDB()
         self._menuFile = os.path.join(self._g.DATA_PATH, 'menu-%s.db' % self._g.MarketID)
         self._menuDb = sqlite.connect(self._menuFile)
+        self._createDB(self._art_tbl)
 
     def loadCategories(self, force=False):
         if xbmcvfs.exists(self._menuFile) and not force:
@@ -279,7 +296,7 @@ class AmazonTLD(Singleton):
             jsonfile = os.path.join(self._g.PLUGIN_PATH, 'resources', 'menu', self._g.MarketID + '.json')
             jsonfile = jsonfile.replace(self._g.MarketID, 'ATVPDKIKX0DER') if not xbmcvfs.exists(jsonfile) else jsonfile
             data = json.load(open(jsonfile))
-        self._createDB(True)
+        self._createDB(self._menu_tbl)
         self.parseNodes(data)
         self.updateTime()
         self._menuDb.commit()
@@ -288,7 +305,7 @@ class AmazonTLD(Singleton):
     def updateTime(self, savetime=True):
         c = self._menuDb.cursor()
         if savetime:
-            self.wMenuDB(['last_update', '', '', str(time.time()), str(self._g.DBVersion), ''])
+            self.wMenuDB(['last_update', '', '', str(time.time()), str(self._g.DBVersion), ''], self._menu_tbl)
         else:
             try:
                 result = c.execute('select content, id from menu where node = ("last_update")').fetchone()
@@ -302,16 +319,6 @@ class AmazonTLD(Singleton):
             return 0
         c.close()
 
-    def getRootNode(self):
-        c = self._menuDb.cursor()
-        st = 'all' if self._s.payCont else 'prime'
-        for title, nodeid, id in c.execute('select title, content, id from menu where node = (0)').fetchall():
-            result = c.execute('select content from menu where node = (?) and id = (?)', (nodeid, st)).fetchone()
-            nodeid = result[0] if result else nodeid
-            addDir(title, 'listCategories', str(nodeid), opt=id)
-        c.close()
-        return
-
     def parseNodes(self, data, node_id=''):
         if type(data) != list:
             data = [data]
@@ -323,21 +330,22 @@ class AmazonTLD(Singleton):
                 content = '%s%s' % (node_id, count)
                 category = 'node'
             else:
-                for e in ['query', 'play']:
+                for e in ['query', 'play', 'link']:
                     if e in entry.keys():
                         content = entry[e]
                         category = e
             if category:
-                self.wMenuDB([node_id, entry.get('title', ''), category, content, entry.get('id', ''), json.dumps(entry.get('infolabel', ''))])
+                self.wMenuDB([node_id, entry.get('title', ''), category, content, entry.get('id', ''), json.dumps(entry.get('infolabel', ''))], self._menu_tbl)
 
-    def wMenuDB(self, menudata):
+    def wMenuDB(self, menudata, table):
+        asterix = '?,' * len(menudata)
         c = self._menuDb.cursor()
-        c.execute('insert or ignore into menu values (?,?,?,?,?,?)', menudata)
+        c.execute('insert or ignore into %s values (%s)' % (table, asterix[:-1]), menudata)
         c.close()
 
-    def getNode(self, node):
+    def getNode(self, node, dist='distinct *', opt=''):
         c = self._menuDb.cursor()
-        result = c.execute('select distinct * from menu where node = (?)', (node,)).fetchall()
+        result = c.execute('select {} from menu where node = (?){}'.format(dist, opt), (node,)).fetchall()
         c.close()
         return result
 
@@ -350,7 +358,7 @@ class AmazonTLD(Singleton):
             url = 'OrderBy=Title%s&contentType=%s' % (self._s.OfferGroup, all_vid[root][1])
             addDir(getString(all_vid[root][0]), 'listContent', url, opt=all_vid[root][2])
 
-        for node, title, category, content, menu_id, infolabel in cat:
+        for n, title, category, content, menu_id, infolabel in cat:
             infolabel = json.loads(infolabel)
             mode = None
             info = None
@@ -360,59 +368,80 @@ class AmazonTLD(Singleton):
                 info.update(infolabel)
 
             if category == 'node':
-                mode = 'listCategories'
                 url = content
+                mode = 'listCategories'
+                if menu_id in all_vid.keys() and node == 0:
+                    st = 'all' if self._s.payCont else 'prime'
+                    url = self.getNode(content, 'content', ' and id = "{}"'.format(st))
+                    url = url[0][0] if url else content
+                    opt = menu_id
+                if menu_id == 'channels' and node == 0:
+                    continue
             elif category == 'query':
                 mode = 'listContent'
                 opt = 'listcat'
                 url = re.sub('\n|\\n', '', content)
             elif category == 'play':
                 addVideo(info['Title'], info['Asins'], info)
+            elif category == 'link':
+                mode = 'Channel'
+                opt = 'root'
+                url = content
             if mode:
                 addDir(title, mode, url, info, opt)
-        xbmcplugin.endOfDirectory(self._g.pluginhandle)
+        if node != 0:
+            xbmcplugin.endOfDirectory(self._g.pluginhandle)
 
     def listContent(self, catalog, url, page, parent, export=0):
         oldurl = url
-        ResPage = 240 if export else self._s.MaxResults
+        titlelist = []
+        ResPage = self._s.MaxResults
+
+        if export:
+            ResPage = 240
+            self.SetupLibrary()
+
         if catalog in (self._g.watchlist, self._g.library):
             titles, parent = self.getList(catalog, export, url, page)
             ResPage = 60
         else:
             url = '%s&NumberOfResults=%s&StartIndex=%s&Detailed=T' % (url, ResPage, (page - 1) * ResPage)
             titles = getATVData(catalog, url)
-        titlelist = []
         if page != 1 and not export:
             addDir(' --= %s =--' % getString(30112), thumb=self._s.HomeIcon)
 
-        if not titles or not len(titles['titles']):
+        if not titles or not len(titles.get('titles', [])):
             if 'search' in parent:
                 self._g.dialog.ok(self._g.__plugin__, getString(30202))
             else:
                 xbmcplugin.endOfDirectory(self._g.pluginhandle)
             return
 
-        if catalog in (self._g.watchlist, self._g.library):
-            endIndex = 0 if len(titles['titles']) < ResPage else 1
+        endIndex = titles['endIndex']
+        numItems = len(titles['titles'])
+        if 'approximateSize' not in titles.keys():
+            if numItems > self._s.MaxResults:
+                endIndex = 0
         else:
-            endIndex = titles['endIndex']
-            numItems = len(titles['titles'])
-            if 'approximateSize' not in titles.keys():
-                if numItems > self._s.MaxResults:
-                    endIndex = 0
-            else:
-                if endIndex == 0:
-                    if (page * ResPage) <= titles['approximateSize']:
-                        endIndex = 1
+            if endIndex == 0:
+                if (page * ResPage) <= titles['approximateSize']:
+                    endIndex = 1
 
         for item in titles['titles']:
             url = ''
             if 'title' not in item:
                 continue
             wl_asin = item['titleId']
-            if '_show' in parent and item.get('ancestorTitles'):
-                item.update(item['ancestorTitles'][0])
-                url = 'SeriesASIN=%s&ContentType=TVSeason&IncludeBlackList=T' % item['titleId']
+            if item.get('ancestorTitles'):
+                if '_show' in parent:
+                    item.update(item['ancestorTitles'][0])
+                    url = 'SeriesASIN=%s&ContentType=TVSeason&IncludeBlackList=T' % item['titleId']
+                elif re.search('(?i)rolluptoseason=t|contenttype=tvseason', oldurl):
+                    for i in item['ancestorTitles']:
+                        if i['contentType'] == 'SEASON':
+                            item.update(i)
+                            url = 'SeasonASIN=%s&ContentType=TVEpisode&IncludeBlackList=T' % item['titleId']
+
             contentType, infoLabels = self.getInfos(item, export)
             if export and catalog == "Browse" and not infoLabels['isPrime'] and not self._s.payCont and self._g.library not in parent:
                 continue
@@ -420,9 +449,7 @@ class AmazonTLD(Singleton):
             asin = item['titleId']
             wlmode = 1 if self._g.watchlist in parent else 0
             simiUrl = quote_plus('ASIN=' + asin + self._s.OfferGroup)
-            cm = [(getString(30183),
-                   'Container.Update(%s?mode=listContent&cat=GetSimilarities&url=%s&page=1&opt=gs)' % (self._g.pluginid, simiUrl)),
-                  (getString(wlmode + 30180) % getString(self._g.langID[contentType]),
+            cm = [(getString(wlmode + 30180) % getString(self._g.langID[contentType]),
                    'RunPlugin(%s?mode=WatchList&url=%s&opt=%s)' % (self._g.pluginid, wl_asin, wlmode)),
                   (getString(30185) % getString(self._g.langID[contentType]),
                    'RunPlugin({}?mode=listContent&cat=GetASINDetails&url=asinList%3D{}&export=1)'.format(self._g.pluginid, asin)),
@@ -435,7 +462,7 @@ class AmazonTLD(Singleton):
                 addVideo(name, asin, infoLabels, cm, export)
             else:
                 mode = 'listContent'
-                url = url if '_show' in parent and url else item['childTitles'][0]['feedUrl']
+                url = url if url != '' else item['childTitles'][0]['feedUrl']
 
                 if self._g.watchlist in parent:
                     url += self._s.OfferGroup
@@ -507,43 +534,36 @@ class AmazonTLD(Singleton):
         Log('Export: ' + filename)
 
     def WatchList(self, asin, remove):
-        action = 'remove' if remove else 'add'
         cookie = MechanizeLogin()
-
         if not cookie:
             return
 
-        par = self.getParams(asin, cookie)
-        data = getURL(par['data-%s-url' % action],
-                      postdata={'itemId': par['data-title-id'],
-                                'dataType': 'json',
-                                'csrfToken': par['data-csrf-token'],
-                                'action': action,
-                                'pageType': par['data-page-type'],
-                                'subPageType': par['data-sub-page-type']},
-                      useCookie=cookie, headers={'x-requested-with': 'XMLHttpRequest'})
-
-        if data['success'] == 1:
-            Log(asin + ' ' + data['status'])
-            if remove:
-                cPath = xbmc.getInfoLabel('Container.FolderPath').replace(asin, '').replace('opt=' + self._g.watchlist,
-                                                                                            'opt=rem_%s' % self._g.watchlist)
-                xbmc.executebuiltin('Container.Update("%s", replace)' % cPath)
-            elif self._s.wl_export:
-                self.listContent('GetASINDetails', 'asinList%3D' + asin, 1, '_show' if self._s.dispShowOnly else '', 1)
-                xbmc.executebuiltin('UpdateLibrary(video)')
+        if asin.startswith('{'):
+            endp = json.loads(asin)
+            asin = endp['query']['titleID']
+            remove = endp['query']['tag'].lower() == 'remove'
         else:
-            Log(data['status'] + ': ' + data['reason'])
+            params = '[{"titleID":"%s","watchlist":true}]' % asin
+            data = getURL('%s/gp/video/api/enrichItemMetadata?itemsToEnrich=%s' % (self._g.BaseUrl, quote_plus(params)), useCookie=cookie)
+            endp = self.findKey('endpoint', data)
 
-    def getParams(self, asin, cookie):
-        url = self._g.BaseUrl + '/gp/video/hover/%s?format=json&refTag=dv-hover&requesterPageType=Detail' % asin
-        data = getURL(url, useCookie=cookie, rjson=False)
-        if data:
-            data = data.encode('utf-8').decode('unicode_escape')
-            data = re.compile('(<form.*</form>)').findall(data)[0]
-            form = BeautifulSoup(data, 'html.parser')
-            return form.button
-        return ''
+        if endp:
+            action = 'Remove' if remove else 'Add'
+            url = self._g.BaseUrl + endp.get('partialURL')
+            query = endp.get('query')
+            query['tag'] = action
+            data = getURL(url, postdata=query, useCookie=cookie, allow_redirects=False, check=True)
+            if data:
+                Log(action + ' ' + asin)
+                if remove:
+                    cPath = xbmc.getInfoLabel('Container.FolderPath').replace(asin, '').replace('opt=' + self._g.watchlist,
+                                                                                                'opt=rem_%s' % self._g.watchlist)
+                    xbmc.executebuiltin('Container.Update("%s", replace)' % cPath)
+                elif self._s.wl_export:
+                    self.listContent('GetASINDetails', 'asinList%3D' + asin, 1, '_show' if self._s.dispShowOnly else '', 1)
+                    xbmc.executebuiltin('UpdateLibrary(video)')
+            else:
+                Log(data['status'] + ': ' + data['reason'])
 
     def getArtWork(self, infoLabels, contentType):
         if contentType == 'movie' and self._s.tmdb_art == '0':
@@ -557,7 +577,7 @@ class AmazonTLD(Singleton):
         season = -1 if contentType == 'series' else -2
 
         if contentType == 'season' or contentType == 'episode':
-            asins = infoLabels['SeriesAsin']
+            asins = infoLabels.get('SeriesAsin', asins)
         if 'Season' in infoLabels.keys():
             season = int(infoLabels['Season'])
 
@@ -611,7 +631,7 @@ class AmazonTLD(Singleton):
         c.execute('drop table if exists miss')
         c.close()
         self._db.commit()
-        self._createDB()
+        self._createDB(self._art_tbl)
         Log('Finished Fanart Update')
 
     def loadArtWork(self, asins, title, year, contentType):
@@ -733,7 +753,7 @@ class AmazonTLD(Singleton):
         name = ''
         season = infoLabels['Season']
         if parent:
-            if infoLabels['Title'].lower().split('[')[0].strip() != infoLabels['TVShowTitle'].lower().split('[')[0].strip():
+            if infoLabels['Title'].lower().strip() != infoLabels['TVShowTitle'].lower().strip():
                 return infoLabels['DisplayTitle']
             name = infoLabels['Title'] + ' - '
         if season != 0 and season < 100:
@@ -758,34 +778,57 @@ class AmazonTLD(Singleton):
             addDir(getString(30107), 'listContent', 'TV', catalog=listing, export=export)
             xbmcplugin.endOfDirectory(self._g.pluginhandle, updateListing=False)
 
+    def findKey(self, key, obj):
+        if key in obj.keys():
+            return obj[key]
+        for v in obj.values():
+            if isinstance(v, dict):
+                res = self.findKey(key, v)
+                if res: return res
+            elif isinstance(v, list):
+                for d in v:
+                    if isinstance(d, dict):
+                        res = self.findKey(key, d)
+                        if res:
+                            return res
+        return []
+
     def _scrapeAsins(self, aurl, cj):
         asins = []
         url = self._g.BaseUrl + aurl
-        json = getURL(url, useCookie=cj)
+        json = getURL(url, useCookie=cj, binary=True)
         WriteLog(str(json), 'watchlist')
+        cont = self.findKey('content', json)
+        info = {'approximateSize': cont.get('totalItems', 0),
+                'endIndex': cont.get('nextPageStartIndex', 0)}
 
-        for item in json['content'].get('items', []):
+        for item in cont.get('items', []):
             asins.append(item['titleID'])
-        return ','.join(asins)
+        return info, ','.join(asins)
 
     def getList(self, listing, export, cont, page=1):
+        info = {}
         if listing in [self._g.watchlist, self._g.library]:
             cj = MechanizeLogin()
             if not cj:
                 return
-            url = '/gp/video/api/%s/?ie=UTF8&sort=%s&contentType=%s&startIndex=%s' % (listing, self._s.wl_order, cont, (page - 1) * 60)
-            if listing in self._g.library:
-                url += '&libraryType=Items'
-            asins = self._scrapeAsins(url, cj)
+            args = {listing: {'sort': self._s.wl_order,
+                              'libraryType': 'Items',
+                              'primeOnly': False,
+                              'startIndex': (page - 1) * 60,
+                              'contentType': cont},
+                    'shared': {'isPurchaseRow': 0}}
+
+            url = '/gp/video/api/myStuff{}?viewType={}&args={}'.format(listing.capitalize(), listing, json.dumps(args, separators=(',', ':')))
+            info, asins = self._scrapeAsins(url, cj)
         else:
             asins = listing
 
-        if export:
-            self.SetupLibrary()
-
-        url = 'asinList=%s&NumberOfResults=60StartIndex=0&Detailed=T&mobileClient=true' % asins
+        url = 'asinlist=%s&StartIndex=0&Detailed=T' % asins
         listing += '_show' if (self._s.dispShowOnly and not (export and asins == listing)) or cont == '_show' else ''
-        return getATVData('GetASINDetails', url), listing
+        titles = getATVData('Browse', url)
+        titles.update(info)
+        return titles, listing
 
     @staticmethod
     def getAsins(content, crIL=True):
@@ -834,14 +877,14 @@ class AmazonTLD(Singleton):
         infoLabels['TrailerAvailable'] = item.get('trailerAvailable', False)
         infoLabels['Fanart'] = item.get('heroUrl')
         infoLabels['isAdult'] = 1 if 'ageVerificationRequired' in str(item.get('restrictions')) else 0
-        infoLabels['Genre'] = ' / '.join(item.get('genres', '')).replace('_', ' & ').replace('Musikfilm & Tanz',
-                                                                                             'Musikfilm, Tanz')
-        if 'formats' in item and'images' in item['formats'][0].keys():
+        infoLabels['Genre'] = ' / '.join(item.get('genres', ''))\
+            .replace('_', ' & ')\
+            .replace('Musikfilm & Tanz', 'Musikfilm, Tanz')\
+            .replace('ã–', 'ö')
+
+        if 'formats' in item and 'images' in item['formats'][0].keys():
             try:
-                thumbnailUrl = item['formats'][0]['images'][0]['uri']
-                thumbnailFilename = thumbnailUrl.split('/')[-1]
-                thumbnailBase = thumbnailUrl.replace(thumbnailFilename, '')
-                infoLabels['Thumb'] = thumbnailBase + thumbnailFilename.split('.')[0] + '.jpg'
+                infoLabels['Thumb'] = self.cleanIMGurl(item['formats'][0]['images'][0]['uri'])
             except:
                 pass
 
@@ -865,21 +908,20 @@ class AmazonTLD(Singleton):
         if contentType == 'series':
             infoLabels['mediatype'] = 'tvshow'
             infoLabels['TVShowTitle'] = item['title']
-            infoLabels['TotalSeasons'] = item['childTitles'][0]['size'] if 'childTitles' in item else None
+            infoLabels['TotalSeasons'] = item['childTitles'][0]['size'] if item.get('childTitles') else None
 
         elif contentType == 'season':
             infoLabels['mediatype'] = 'season'
             infoLabels['Season'] = item['number']
             if item['ancestorTitles']:
-                try:
-                    infoLabels['TVShowTitle'] = item['ancestorTitles'][0]['title']
-                    infoLabels['SeriesAsin'] = item['ancestorTitles'][0]['titleId']
-                except:
-                    pass
+                for content in item['ancestorTitles']:
+                    if content['contentType'] == 'SERIES':
+                        infoLabels['SeriesAsin'] = content['titleId'] if 'titleId' in content else None
+                        infoLabels['TVShowTitle'] = content['title'] if 'title' in content else None
             else:
                 infoLabels['SeriesAsin'] = infoLabels['Asins'].split(',')[0]
                 infoLabels['TVShowTitle'] = item['title']
-            if 'childTitles' in item:
+            if item.get('childTitles'):
                 infoLabels['TotalSeasons'] = 1
                 infoLabels['Episode'] = item['childTitles'][0]['size']
 
@@ -920,5 +962,218 @@ class AmazonTLD(Singleton):
                 infoLabels['Fanart'] = self._s.DefaultFanart
             if not infoLabels['isPrime'] and not contentType == 'series':
                 infoLabels['DisplayTitle'] = '[COLOR %s]%s[/COLOR]' % (self._g.PayCol, infoLabels['DisplayTitle'])
-
         return contentType, infoLabels
+
+    @staticmethod
+    def cleanIMGurl(img):
+        # r'\.[^/]+(\.[^/]+$)', '\\1'
+        return re.sub(r'\._.*_\.', r'.', img) if img else None
+
+    def Channel(self, url, uid):
+        def getInfos(item):
+            # runtime: de "1 Std. 26 Min." uk "1h 22min"
+            if isinstance(item.get('title'), dict):
+                item['link'] = {'url': item['title'].get('url')}
+                for p in ['title', 'synopsis', 'year']:
+                    item[p] = item.get(p, {}).get('text', '')
+            n = item.get('facetAlternateText', '')
+            wl = item.get('watchlistAction', item.get('watchlistButton'))
+            title = item.get('text', item.get('title', ''))
+            num = item.get('episodeNumber')
+            live = item.get('liveInfo')
+            contr = item.get('contributors', {})
+            rating = item.get('customerReviews', item.get('amazonRating'))
+            runtime = item.get('runtime')
+            livestate = item.get('liveState')
+            il = self.getAsins(item, True)
+            il['Title'] = '%s - %s' % (n, title) if n else title
+            il['Plot'] = item.get('synopsis', '').strip()
+            il['contentType'] = item.get('titleType', '')
+            il['Duration'] = item.get('duration')
+            il['MPAA'] = item.get('ratingBadge', {}).get('simplifiedId')
+            il['isPrime'] = item.get('isPrime', True)
+            il['Genre'] = ' / '.join(i.get('text', '') for i in item.get('genres', []))
+            il['Studio'] = ', '.join(item.get('studios', []))
+            il['Director'] = ', '.join(i['name'] for i in contr.get('directors', []))
+            il['Cast'] = [i['name'] for i in contr.get('starringActors', []) + contr.get('supportingActors', [])]
+            il['Year'] = item.get('releaseYear')
+            if num:
+                il['Episode'] = item.get('episodeNumber')
+                il['Title'] = '%s - %s' % (num, il['Title'])
+            if wl:
+                il['contentType'] = wl['endpoint']['query'].get('titleType', '')
+            if 'images' in item:
+                img = item['images']
+                il['Thumb'] = self.cleanIMGurl(img.get('packshot', img.get('titleshot')))
+                il['Fanart'] = self.cleanIMGurl(img.get('heroshot'))
+            else:
+                il['Thumb'] = self.cleanIMGurl(item.get('image', {}).get('url', item.get('facetImage')))
+            if rating and rating.get('value'):
+                il['Rating'] = float(rating['value']) * 2
+                il['Votes'] = str(rating['count'])
+            if live:
+                il['Plot'] += '\n\n' if il['Plot'] else ''
+                il['contentType'] = 'live'
+                il['Plot'] += ' - '.join([live.get('timeBadge', live.get('label', '')), live.get('venue', '')])
+            if livestate:
+                il['Plot'] += '\n\n' if il['Plot'] else ''
+                il['contentType'] = livestate.get('id', il['contentType'])
+                if livestate.get('isLive', False):
+                    il['contentType'] = 'live'
+                il['Plot'] += ' - '.join([livestate.get('text', ''), item.get('pageDateTimeBadge', '')])
+            if not il['Title']:
+                il['Title'] = item.get('image', {}).get('alternateText', '')
+                il['contentType'] = 'thumbnail'
+            if item.get('itemType', '').lower() == 'label':
+                il['Plot'] = il['Title']
+                il['Title'] = '-= %s =-' % item['link']['label']
+                il['Thumb'] = self._s.NextIcon
+            if not il['Duration'] and runtime:
+                t = re.findall(r'\d+', runtime)
+                t = ['0'] * (2 - len(t)) + t
+                il['Duration'] = sum(map(lambda a, b: int(a) * b, t, (3600, 60)))
+            if 'playbackActions' in item:
+                il['contentType'] = self.findKey('videoMaterialType', item['playbackActions'])
+            elif 'notificationActions' in item:
+                il['contentType'] = 'nostream'
+                il['Title'] = '%s (%s)' % (il['Title'], item['notificationActions'][0]['message']['string'])
+            il['DisplayTitle'] = self.cleanTitle(il['Title'])
+            il['contentType'] = il['contentType'].lower()
+            # il = self.getArtWork(il, il['contentType'])
+            return il, il['contentType']
+
+        def getcache(uid):
+            j = {}
+            c = self._menuDb.cursor()
+            for data in c.execute('select data from channels where uid = (?)', (uid,)).fetchall():
+                j = json.loads(data[0])
+            c.close()
+            return j
+
+        def remref(url):
+            f = re.findall('ref=[^?^&]*', url)
+            return url.replace(f[0], '') if f else url
+
+        def crctxmenu(item):
+            cm = []
+            wl = item.get('watchlistAction', item.get('watchlistButton'))
+            if wl:
+                cm.append((wl['text']['string'], 'RunPlugin(%s?mode=WatchList&url=%s)' % (self._g.pluginid, quote_plus(json.dumps(wl['endpoint'])))))
+            return cm
+
+        data = getcache(uid) if not url else GrabJSON(url)
+        s = time.time()
+        props = data.get('search', data.get('results', data))
+        # LogJSON(props)
+        vw = ''
+        urls = []
+        num_items = 0
+
+        if 'collections' in props:
+            if uid == 'root':
+                self._createDB(self._chan_tbl)
+                if 'epgIngress' in props:
+                    title = props['epgIngress'].get('label', 'Channel Guide')
+                    url = props['epgIngress'].get('url')
+                    addDir(title, 'Channel', url)
+
+            for col in props.get('collections', []):
+                if col.get('collectionType', '') in ['TwinHero', 'Carousel']:
+                    num_items += 1
+                    il, ct = getInfos(col)
+                    vw = ct if ct else vw
+                    uid = col['webUid']
+                    cm = crctxmenu(col)
+                    addDir(il['DisplayTitle'], 'Channel', '', infoLabels=il, opt=uid, cm=cm)
+                    self.wMenuDB([uid, json.dumps(col), time.time(), ''], self._chan_tbl)
+            self._menuDb.commit()
+        elif 'items' in props:
+            items = props.get('items', [])
+            num_items = len(items)
+            for item in items:
+                il, ct = getInfos(item)
+                chid = item.get('playbackAction', item).get('channelId')
+                playable = item.get('properties', {}).get('isIdPlayable', False)
+                if chid:
+                    ct = 'live'
+                    il['contentType'] = item.get('playbackAction', item).get('videoMaterialType', ct).lower()
+                cm = crctxmenu(item)
+                if playable or chid:
+                    addVideo(il['DisplayTitle'], chid if chid else item['titleID'], il, cm=cm)
+                else:
+                    url = item['link']['url']
+                    if ct == 'season':
+                        url += '?episodeListSize=999'
+                    if il['Title']:
+                        addDir(il['DisplayTitle'], 'Channel', url, infoLabels=il, opt=ct, cm=cm)
+                    urls.append(remref(url))
+                vw = ct if ct else vw
+        elif 'state' in props:
+            pgid = props['state'].get('pageTitleId', '')
+            act = props['state'].get('action', {})
+            action = act.get('btf', act.get('atf', {}))
+            detail = props['state'].get('detail', {})
+            col = props['state'].get('collections', [])
+            titleids = []
+            if col and len(col.get(pgid, [])) > 0:
+                [titleids.extend(i.get('titleIds', [])) for i in col[pgid] if i.get('collectionType', '') in ['episodes', 'bonus', 'schedule']]
+            if not titleids:
+                titleids.append(pgid)
+            for asin in titleids:
+                item = detail.get('headerDetail', {}).get(pgid, {})
+                item.update(detail.get('detail', {}).get(asin, {}))
+                item.update(action.get(asin, {}))
+                if item:
+                    il, ct = getInfos(item)
+                    vw = ct if ct else vw
+                    cm = crctxmenu(item)
+                    id = self.findKey('playbackID', item.get('playbackActions', {}))
+                    asin = id if id else asin
+                    if 'nostream' in ct:
+                        addDir(il['DisplayTitle'], 'text', infoLabels=il)
+                    else:
+                        addVideo(il['DisplayTitle'], asin, il, cm=cm)
+        elif 'sections' in props:
+            from datetime import datetime
+            channels = props['sections'][0].get('channels', [])
+            # [channels.extend(item.get('channels', [])) for item in props['sections']]
+            for item in channels:
+                il = self.getAsins(item, True)
+                pa = item.get('playbackAction')
+                shed = item.get('schedule')
+                asin = ''
+                il['Title'] = item.get('channelName')
+                il['Thumb'] = self.cleanIMGurl(item.get('logo', ''))
+                il['DisplayTitle'] = self.cleanTitle(il['Title'])
+                il['Plot'] = ''
+                upnext = False
+                if shed:
+                    ts = time.time()
+                    for sh in shed:
+                        us = sh.get('unixStart') / 1000
+                        ue = sh.get('unixEnd') / 1000
+                        if (us <= ts <= ue) or upnext:
+                            il['Plot'] += '{:%H:%M}-{:%H:%M}  {}\n'.format(datetime.fromtimestamp(us), datetime.fromtimestamp(ue), sh.get('title', ''))
+                            if upnext:
+                                break
+                            upnext = True
+                if pa:
+                    il['contentType'] = vw = pa.get('videoMaterialType').lower()
+                    asin = pa.get('channelId')
+                if asin:
+                    addVideo(il['DisplayTitle'], asin, il)
+                else:
+                    addDir(il['DisplayTitle'], 'text', infoLabels=il)
+
+        more = props.get('pagination', props.get('seeMoreLink'))
+        if more and remref(more['url']) not in urls:
+            addDir('-= %s =-' % more['label'], 'Channel', more['url'], thumb=self._s.NextIcon)
+
+        Log('Parsing Channels Page: %ss' % (time.time()-s), Log.DEBUG)
+        '''
+        Log(vw)
+        self._db.commit()
+        xbmc.executebuiltin('RunPlugin(%s?mode=checkMissing)' % self._g.pluginid)
+        '''
+        setContentAndView(vw)
+        return

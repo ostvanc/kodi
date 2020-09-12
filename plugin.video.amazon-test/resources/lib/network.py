@@ -3,16 +3,18 @@
 from __future__ import unicode_literals
 from base64 import b64encode, b64decode
 from kodi_six.utils import py2_decode
-from os.path import join as OSPJoin
 from kodi_six import xbmcgui
+import pickle
 import json
 import mechanicalsoup
-import pickle
 from platform import node
 import pyxbmct
 import re
 import requests
 import uuid
+import ssl
+from urllib3.poolmanager import PoolManager
+from requests.adapters import HTTPAdapter
 from pyDes import *
 from random import randint
 from bs4 import BeautifulSoup
@@ -78,7 +80,6 @@ def mobileUA(content):
 
 
 def getTerritory(user):
-
     area = [{'atvurl': '', 'baseurl': '', 'mid': '', 'pv': False},
             {'atvurl': 'https://atv-ps-eu.amazon.de', 'baseurl': 'https://www.amazon.de', 'mid': 'A1PA6795UKMFR9', 'pv': False},
             {'atvurl': 'https://atv-ps-eu.amazon.co.uk', 'baseurl': 'https://www.amazon.co.uk', 'mid': 'A1F83G8C2ARO7P', 'pv': False},
@@ -109,7 +110,7 @@ def getTerritory(user):
     return user, True
 
 
-def getURL(url, useCookie=False, silent=False, headers=None, rjson=True, attempt=1, check=False, postdata=None):
+def getURL(url, useCookie=False, silent=False, headers=None, rjson=True, attempt=1, check=False, postdata=None, binary=False, allow_redirects=True):
     if not hasattr(getURL, 'sessions'):
         getURL.sessions = {}  # Keep-Alive sessions
 
@@ -118,7 +119,7 @@ def getURL(url, useCookie=False, silent=False, headers=None, rjson=True, attempt
     getURL.lastResponseCode = 0
 
     # Create sessions for keep-alives and connection pooling
-    host = re.search('://([^/]+)/', url)  # Try to extract the host from the URL
+    host = re.search('://([^/]+)(?:/|$)', url)  # Try to extract the host from the URL
     if None is not host:
         host = host.group(1)
         if host not in getURL.sessions:
@@ -150,13 +151,25 @@ def getURL(url, useCookie=False, silent=False, headers=None, rjson=True, attempt
     if 'Accept-Language' not in headers:
         headers['Accept-Language'] = g.userAcceptLanguages
 
-    class TryAgain(Exception): pass  # Try again on temporary errors
-    class NoRetries(Exception): pass  # Fail on permanent errors
+    if 'amazonvideo.com' in host:
+        session.mount('https://', MyTLS1Adapter())
+
+    class TryAgain(Exception):
+        pass  # Try again on temporary errors
+
+    class NoRetries(Exception):
+        pass  # Fail on permanent errors
+
     try:
+        starttime = time.time()
         method = 'POST' if postdata is not None else 'GET'
-        r = session.request(method, url, data=postdata, headers=headers, cookies=cj, verify=s.verifySsl)
+        r = session.request(method, url, data=postdata, headers=headers, cookies=cj, verify=s.verifySsl, stream=True, allow_redirects=allow_redirects)
         getURL.lastResponseCode = r.status_code  # Set last response code
-        response = r.text if not check else 'OK'
+        response = 'OK'
+        if not check:
+            response = r.content.decode('utf-8') if binary else r.text
+        else:
+            rjson = False
         # 408 Timeout, 429 Too many requests and 5xx errors are temporary
         # Consider everything else definitive fail (like 404s and 403s)
         if (408 == r.status_code) or (429 == r.status_code) or (500 <= r.status_code):
@@ -191,9 +204,11 @@ def getURL(url, useCookie=False, silent=False, headers=None, rjson=True, attempt
             Log('Attempt #{0}{1}'.format(attempt, '' if 0 == wait else ' (Too many requests, pause %s seconds…)' % wait))
             if 0 < wait:
                 sleep(wait)
-            return getURL(url, useCookie, silent, headers, rjson, attempt, check, postdata)
+            return getURL(url, useCookie, silent, headers, rjson, attempt, check, postdata, binary)
         return retval
-    return json.loads(response) if rjson else response
+    res = json.loads(response) if rjson else response
+    Log('Download Time: %s' % (time.time() - starttime), Log.DEBUG)
+    return res
 
 
 def getURLData(mode, asin, retformat='json', devicetypeid='AOAGZA014O5RE', version=1, firmware='1', opt='', extra=False,
@@ -226,6 +241,7 @@ def getURLData(mode, asin, retformat='json', devicetypeid='AOAGZA014O5RE', versi
         url += '&videoMaterialType=' + vMT
         url += '&desiredResources=' + dRes
         url += '&supportedDRMKeyScheme=DUAL_KEY' if (not g.platform & g.OS_ANDROID) and ('PlaybackUrls' in dRes) else ''
+
     url += opt
     if retURL:
         return url
@@ -253,29 +269,65 @@ def getATVData(pg_mode, query='', version=2, useCookie=False, site_id=None):
     #                        'All': 'firmware=fmw:22-app:3.0.211.123001&deviceTypeID=A43PXU4ZN2AL1'}
     #                        'All': 'firmware=fmw:045.01E01164A-app:4.7&deviceTypeID=A3VN4E5F7BBC7S'}
     # TypeIDs = {'All': 'firmware=fmw:17-app:2.0.45.1210&deviceTypeID=A2RJLFEH0UEKI9'}
-    _TypeIDs = {'All': 'firmware=fmw:26-app:3.0.265.20347&deviceTypeID=A43PXU4ZN2AL1'}
+    _TypeIDs = {True: ['firmware=fmw:28-app:5.2.3&deviceTypeID=A3SSWQ04XYPXBH', 'firmware=fmw:26-app:3.0.265.20347&deviceTypeID=A1S15DUFSI8AUG',
+                       'firmware=default&deviceTypeID=A1FYY15VCM5WG1'],
+                False: ['firmware=fmw:28-app:5.2.3&deviceTypeID=A1C66CX2XD756O', 'firmware=fmw:26-app:3.0.265.20347&deviceTypeID=A12GXV8XMS007S',
+                        'firmware=fmw:045.01E01164A-app:4.7&deviceTypeID=A3VN4E5F7BBC7S']}
 
     g = Globals()
+    s = Settings()
     if '?' in query:
         query = query.split('?')[1]
     if query:
         query = '&IncludeAll=T&AID=1&' + query.replace('HideNum=T', 'HideNum=F')
-    deviceTypeID = _TypeIDs[pg_mode] if pg_mode in _TypeIDs else _TypeIDs['All']
     pg_mode = pg_mode.split('_')[0]
     if '/' not in pg_mode:
         pg_mode = 'catalog/' + pg_mode
-    parameter = '%s&deviceID=%s&format=json&version=%s&formatVersion=3&marketplaceId=%s' % (
-        deviceTypeID, g.deviceID, version, g.MarketID)
-    if site_id:
-        parameter += '&id=' + site_id
-    jsondata = getURL('%s/cdp/%s?%s%s' % (g.ATVUrl, pg_mode, parameter, query), useCookie=useCookie)
-    if not jsondata:
-        return False
+    rem_pos = False if re.search('(?i)rolluptoseason=t|contenttype=tvseason', query) else s.useEpiThumbs
 
-    if jsondata['message']['statusCode'] != "SUCCESS":
-        Log('Error Code: ' + jsondata['message']['body']['code'], Log.ERROR)
-        return None
-    return jsondata['message']['body']
+    if 'asinlist=&' not in query:
+        titles = 0
+        ids = len(_TypeIDs[rem_pos]) - 1
+        att = 0
+        while titles == 0 and att <= ids:
+            deviceTypeID = _TypeIDs[rem_pos][att]
+            parameter = '%s&deviceID=%s&format=json&version=%s&formatVersion=3&marketplaceId=%s' % (
+                deviceTypeID, g.deviceID, version, g.MarketID)
+            if site_id:
+                parameter += '&id=' + site_id
+            jsondata = getURL('%s/cdp/%s?%s%s' % (g.ATVUrl, pg_mode, parameter, query), useCookie=useCookie)
+            if not jsondata:
+                return False
+            if jsondata['message']['statusCode'] != "SUCCESS":
+                Log('Error Code: ' + jsondata['message']['body']['code'], Log.ERROR)
+                return None
+            titles = len(jsondata['message']['body'].get('titles'))
+            att += 1 if 'StartIndex=0' in query else ids + 1
+
+        result = jsondata['message']['body']
+        return _sortedResult(result, query) if 'asinlist' in query else result
+    return {}
+
+
+def _sortedResult(result, query):
+    try:
+        from urllib.parse import parse_qs
+    except:
+        from urlparse import parse_qs
+
+    asinlist = parse_qs(query.upper(), keep_blank_values=True)['ASINLIST'][0].split(',')
+    sorteditems = ['empty'] * len(asinlist)
+
+    for item in result.get('titles', []):
+        for index, asin in enumerate(asinlist):
+            if asin in str(item):
+                sorteditems[index] = item
+                break
+    if sorteditems.count('empty') > 0:
+        Log('ASINs {} not found'.format([asinlist[n] for n, i in enumerate(sorteditems) if i == 'empty']))
+
+    result['titles'] = sorteditems
+    return result
 
 
 def MechanizeLogin():
@@ -374,9 +426,8 @@ def LogIn(ask=True):
                     br['code'] = ret
                 else:
                     return None
-            msg = soup.find('img', attrs={'alt': 'captcha'})
-            if msg:
-                wnd = _Challenge(msg)
+            if soup.find('img', attrs={'alt': 'captcha'}):
+                wnd = _Challenge(soup)
                 wnd.doModal()
                 if wnd.cap:
                     submit = soup.find('input', value='verifyCaptcha')
@@ -385,6 +436,63 @@ def LogIn(ask=True):
                 else:
                     return None
                 del wnd
+        elif 'validateCaptcha' in uni_soup:
+            wnd = _Challenge(soup)
+            wnd.doModal()
+            if wnd.cap:
+                # MechanicalSoup is using the field names, not IDs
+                # id is captchacharacters, which causes exception to be raised
+                form.set_input({'field-keywords': wnd.cap})
+            else:
+                return None
+            del wnd
+        elif 'pollingForm' in uni_soup:
+            try:
+                from urlparse import urlparse, parse_qs
+            except ImportError:
+                from urllib.parse import urlparse, parse_qs
+
+            msg = soup.find('span', attrs={'class': 'a-size-medium transaction-approval-word-break a-text-bold'}).get_text(strip=True)
+            msg += '\n'
+            rows = soup.find('div', attrs={'id': 'channelDetails'})
+            for row in rows.find_all('div', attrs={'class': 'a-row'}):
+                msg += re.sub('\\s{2,}', ': ', row.get_text())
+            pd = _ProgressDialog(msg)
+            pd.show()
+            refresh = time.time()
+            form_id = form_poll = 'pollingForm'
+            per = 0
+            while True:
+                if per > 99:
+                    val = -5
+                if per < 1:
+                    val = 5
+                per += val
+                pd.sl_progress.setPercent(per)
+                if pd.iscanceled:
+                    br = None
+                    break
+                if time.time() > refresh + 5:
+                    url = br.get_url()
+                    br.select_form('form[id="{}"]'.format(form_id))
+                    br.submit_selected()
+                    response, soup = _parseHTML(br)
+                    form_id = form_poll
+                    WriteLog(response.replace(py2_decode(email), '**@**'), 'login-pollingform')
+                    stat = soup.find('input', attrs={'name': 'transactionApprovalStatus'})['value']
+                    Log(stat)
+                    if stat in ['TransactionCompleted', 'TransactionCompletionTimeout']:
+                        parsed_url = urlparse(url)
+                        query = parse_qs(parsed_url.query)
+                        br.open(query['openid.return_to'][0])
+                        break
+                    elif stat in ['TransactionExpired', 'TransactionResponded']:
+                        form_id = 'resend-approval-form'
+                    else:
+                        refresh = time.time()
+                    br.open(url)
+                sleep(0.1)
+            pd.close()
         return br
 
     def _setLoginPW():
@@ -504,12 +612,15 @@ def LogIn(ask=True):
             response, soup = _parseHTML(br)
             WriteLog(response.replace(py2_decode(email), '**@**'), 'login')
 
-            while any(sp in response for sp in ['auth-mfa-form', 'ap_dcq_form', 'ap_captcha_img_label', 'claimspicker', 'fwcim-form', 'auth-captcha-image-container']):
+            while any(sp in response for sp in
+                      ['auth-mfa-form', 'ap_dcq_form', 'ap_captcha_img_label', 'claimspicker', 'fwcim-form', 'auth-captcha-image-container', 'validateCaptcha',
+                       'pollingForm']):
                 br = _MFACheck(br, email, soup)
                 if br is None:
                     return False
-                useMFA = True if br.get_current_form().form.find('input', {'name': 'otpCode'}) else False
-                br.submit_selected()
+                if not br.get_current_form() is None:
+                    useMFA = True if br.get_current_form().form.find('input', {'name': 'otpCode'}) else False
+                    br.submit_selected()
                 response, soup = _parseHTML(br)
                 WriteLog(response.replace(py2_decode(email), '**@**'), 'login-mfa')
 
@@ -577,7 +688,7 @@ def LogIn(ask=True):
 
 def remLoginData(info=True):
     for fn in xbmcvfs.listdir(g.DATA_PATH)[1]:
-        if fn.startswith('cookie'):
+        if py2_decode(fn).startswith('cookie'):
             xbmcvfs.delete(OSPJoin(g.DATA_PATH, fn))
     writeConfig('accounts', '')
     writeConfig('login_name', '')
@@ -587,6 +698,169 @@ def remLoginData(info=True):
         writeConfig('accounts.lst', '')
         g.addon.setSetting('login_acc', '')
         g.dialog.notification(g.__plugin__, getString(30211), xbmcgui.NOTIFICATION_INFO)
+
+
+def FQify(URL):
+    g = Globals()
+    """ Makes sure to provide correct fully qualified URLs """
+    base = g.BaseUrl
+    if '://' in URL:  # FQ
+        return URL
+    elif URL.startswith('//'):  # Specified domain, same schema
+        return base.split(':')[0] + ':' + URL
+    elif URL.startswith('/'):  # Relative URL
+        return base + URL
+    else:  # Hope and pray we never reach this ¯\_(ツ)_/¯
+        return base + '/' + URL
+
+
+def GrabJSON(url, bRaw=False):
+    """ Extract JSON objects from HTMLs while keeping the API ones intact """
+
+    def Unescape(text):
+        """ Unescape various html/xml entities in dictionary values, courtesy of Fredrik Lundh """
+
+        def fixup(m):
+            """ Unescape entities except for double quotes, lest the JSON breaks """
+            text = m.group(0)  # First group is the text to replace
+
+            # Unescape if possible
+            if text[:2] == "&#":
+                # character reference
+                try:
+                    bHex = ("&#x" == text[:3])
+                    char = int(text[3 if bHex else 2:-1], 16 if bHex else 10)
+                    if 34 == char:
+                        text = u'\\"'
+                    else:
+                        try:
+                            text = unichr(char)
+                        except NameError:
+                            text = chr(char)
+                except ValueError:
+                    pass
+            else:
+                # named entity
+                char = text[1:-1]
+                if 'quot' == char:
+                    text = u'\\"'
+                elif char in name2codepoint:
+                    char = name2codepoint[char]
+                    try:
+                        text = unichr(char)
+                    except NameError:
+                        text = chr(char)
+            return text
+
+        text = re.sub('&#?\\w+;', fixup, text)
+        try:
+            text = text.encode('latin-1').decode('utf-8')
+        except (UnicodeEncodeError, UnicodeDecodeError):
+            pass
+
+        return text
+
+    def Merge(o, n):
+        """ Merge JSON objects with multiple multi-level collisions """
+        if (not n) or (o == n):  # Nothing to do
+            return
+        elif (type(n) == list) or (type(n) == set):  # Insert into list/set
+            for item in n:
+                if item not in o:
+                    if type(n) == list:
+                        o.append(item)
+                    else:
+                        o.add(item)
+        elif type(n) == dict:
+            for k in list(n):  # list() instead of .keys() to avoid py3 iteration errors
+                if k not in o:
+                    o[k] = n[k]  # Insert into dictionary
+                else:
+                    Merge(o[k], n[k])  # Recurse
+        else:
+            # LogJSON(n, optionalName='CollisionNew')
+            # LogJSON(o, optionalName='CollisionOld')
+            Log('Collision detected during JSON objects merging, overwriting and praying (type: {})'.format(type(n)), Log.WARNING)
+            o = n
+
+    def Prune(d):
+        """ Prune some commonly found sensitive info from JSON response bodies """
+        if not d:
+            return
+
+        l = d
+        if isinstance(l, dict):
+            for k in list(l):  # list() instead of .keys() to avoid py3 iteration errors
+                if k == 'strings':
+                    l[k] = {s: l[k][s] for s in ['AVOD_DP_season_selector'] if s in l[k]}
+                if (not l[k]) or (k in ['csrfToken', 'context', 'params', 'playerConfig', 'refine']):
+                    del l[k]
+            l = d.values()
+        for v in l:
+            if isinstance(v, dict) or isinstance(v, list):
+                Prune(v)
+
+    try:
+        from htmlentitydefs import name2codepoint
+        from urlparse import urlparse, parse_qs
+        from urllib import urlencode
+    except:
+        from urllib.parse import urlparse, parse_qs, urlencode
+        from html.entities import name2codepoint
+
+    if url.startswith('/search/'):
+        np = urlparse(url)
+        qs = parse_qs(np.query)
+        if 'from' in list(qs):  # list() instead of .keys() to avoid py3 iteration errors
+            qs['startIndex'] = qs['from']
+            del qs['from']
+        np = np._replace(path='/gp/video/api' + np.path, query=urlencode([(k, v) for k, l in qs.items() for v in l]))
+        url = np.geturl()
+
+    r = getURL(FQify(url), silent=True, useCookie=True, rjson=False)
+    if not r:
+        return None
+    try:
+        r = r.strip()
+        if '{' == r[0:1]:
+            o = json.loads(Unescape(r))
+            if not bRaw:
+                Prune(o)
+            return o
+    except:
+        pass
+    matches = re.findall(r'\s*(?:<script[^>]+type="(?:text/template|application/json)"[^>]*>|state:)\s*({[^\n]+})\s*(?:,|</script>)\s*', r)
+    if not matches:
+        Log('No JSON objects found in the page', Log.ERROR)
+        return None
+
+    # Create a single object containing all the data from the multiple JSON objects in the page
+    o = {}
+    for m in matches:
+        m = json.loads(Unescape(m))
+
+        if ('widgets' in m) and ('Storefront' in m['widgets']):
+            m = m['widgets']['Storefront']
+        elif 'props' in m:
+            m = m['props']
+
+            if not bRaw:
+                # Prune useless/sensitive info
+                for k in list(m):  # list() instead of .keys() to avoid py3 iteration errors
+                    if (not m[k]) or (k in ['copyright', 'links', 'logo', 'params', 'playerConfig', 'refine']):
+                        del m[k]
+                if 'state' in m:
+                    st = m['state']
+                    for k in list(st):  # list() instead of .keys() to avoid py3 iteration errors
+                        if not st[k]:
+                            del st[k]
+                        elif k in ['features', 'customerPreferences']:
+                            del st[k]
+        # Prune sensitive context info and merge into o
+        if not bRaw:
+            Prune(m)
+        Merge(o, m)
+    return o if o else None
 
 
 class _Captcha(pyxbmct.AddonDialogWindow):
@@ -666,28 +940,37 @@ class _Captcha(pyxbmct.AddonDialogWindow):
 
 class _Challenge(pyxbmct.AddonDialogWindow):
     def __init__(self, msg):
-        box = msg.find_parent('div', class_='a-box-inner a-padding-extra-large')
-        self.head = box.find('span', class_='a-size-large').get_text(strip=True)
-        self.hint = box.find('span', class_='a-size-base a-color-secondary').get_text(strip=True)
-        self.task = box.find('label', class_='a-form-label').get_text(strip=True)
+        self.head = msg.find('title').get_text(strip=True)
+        img = msg.find('img', attrs={'alt': 'captcha'})
+        box = img.find_parent('div', class_='a-box-inner a-padding-extra-large') if img else None
+        if box is None:
+            self.hint = msg.find('p', class_='a-last').get_text(strip=True)
+            form = msg.find('form').find('div', class_='a-box-inner')
+            self.task = form.h4.get_text(strip=True)
+            self.img_url = pyxbmct.Image(form.find('img')['src'], aspectRatio=2)
+        else:
+            self.hint = '\n'.join([box.find('span', class_=cl).get_text() for cl in ['a-size-large', 'a-size-base a-color-secondary']
+                                   if box.find('span', class_=cl)])
+            self.task = box.find('label', class_='a-form-label').get_text(strip=True)
+            self.img_url = pyxbmct.Image(img['src'], aspectRatio=2)
+
         super(_Challenge, self).__init__(self.head)
-        self.setGeometry(500, 400, 7, 2)
+        self.setGeometry(500, 450, 8, 2)
         self.cap = ''
         self.tb_hint = pyxbmct.TextBox()
         self.fl_task = pyxbmct.FadeLabel(_alignment=pyxbmct.ALIGN_CENTER)
-        self.img_url = pyxbmct.Image(msg['src'], aspectRatio=2)
         self.ed_cap = pyxbmct.Edit('', _alignment=pyxbmct.ALIGN_LEFT | pyxbmct.ALIGN_CENTER_Y)
         self.btn_submit = pyxbmct.Button('OK')
         self.btn_cancel = pyxbmct.Button(getString(30123))
         self.set_controls()
 
     def set_controls(self):
-        self.placeControl(self.tb_hint, 0, 0, 1, 2)
-        self.placeControl(self.img_url, 1, 0, 3, 2)
-        self.placeControl(self.fl_task, 4, 0, 1, 2)
-        self.placeControl(self.ed_cap, 5, 0, 1, 2)
-        self.placeControl(self.btn_submit, 6, 0)
-        self.placeControl(self.btn_cancel, 6, 1)
+        self.placeControl(self.tb_hint, 0, 0, 2, 2)
+        self.placeControl(self.img_url, 2, 0, 3, 2)
+        self.placeControl(self.fl_task, 5, 0, 1, 2)
+        self.placeControl(self.ed_cap, 6, 0, 1, 2)
+        self.placeControl(self.btn_submit, 7, 0)
+        self.placeControl(self.btn_cancel, 7, 1)
         self.connect(self.btn_cancel, self.close)
         self.connect(self.btn_submit, self.submit)
         self.connect(pyxbmct.ACTION_NAV_BACK, self.close)
@@ -698,3 +981,32 @@ class _Challenge(pyxbmct.AddonDialogWindow):
     def submit(self):
         self.cap = self.ed_cap.getText()
         self.close()
+
+
+class _ProgressDialog(pyxbmct.AddonDialogWindow):
+    def __init__(self, msg):
+        super(_ProgressDialog, self).__init__('Amazon')
+        self.sl_progress = pyxbmct.Slider(textureback=OSPJoin(g.PLUGIN_PATH, 'resources', 'art', 'transp.png'))
+        self.btn_cancel = pyxbmct.Button(getString(30123))
+        self.tb_msg = pyxbmct.TextBox()
+        self.iscanceled = False
+        self.connect(self.btn_cancel, self.cancel)
+        self.setGeometry(500, 400, 6, 3)
+        self.placeControl(self.tb_msg, 0, 0, 4, 3)
+        self.placeControl(self.sl_progress, 4, 0, 0, 3)
+        self.placeControl(self.btn_cancel, 5, 1, 1, 1)
+        self.tb_msg.setText(msg)
+        self.sl_progress.setEnabled(False)
+
+    def cancel(self):
+        self.iscanceled = True
+
+
+class MyTLS1Adapter(HTTPAdapter):
+    def init_poolmanager(self, connections, maxsize, block=False, *args, **kwargs):
+        Log('TLSv1 Adapter', Log.DEBUG)
+        if ssl.OPENSSL_VERSION_INFO[:4] >= (1, 1, 1, 6):  # openssl 1.1.1f
+            context = ssl.create_default_context()
+            context.set_ciphers('DEFAULT@SECLEVEL=1')
+            kwargs['ssl_context'] = context
+        self.poolmanager = PoolManager(num_pools=connections, maxsize=maxsize, block=block, ssl_version=ssl.PROTOCOL_TLSv1, *args, **kwargs)
