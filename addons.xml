@@ -764,7 +764,7 @@
       </assets> 
     </extension> 
   </addon>
-  <addon id="repository.ostvanc" name="ostvanc addon repository" version="1.1.3" provider-name="ostvanc"> 
+  <addon id="repository.ostvanc" name="ostvanc addon repository" version="1.1.4" provider-name="ostvanc"> 
     <extension point="xbmc.addon.repository" name="ostvanc Repository"> 
       <info compressed="false">https://github.com/ostvanc/kodi/raw/master/addons.xml</info>  
       <checksum>https://github.com/ostvanc/kodi/raw/master/addons.xml.md5</checksum>  
@@ -774,7 +774,7 @@
       <summary lang="en">ostvanc addon repository</summary>  
       <description lang="en">A Kodi addon repository including Bild.de, Focus Online and Telewizja Republika</description>  
       <platform>all</platform>  
-      <news>1.1.3 (19-11-2020) - Fixed RaiPlay and removed 4Anime.to</news> 
+      <news>1.1.4 (19-11-2020) - Fixed RaiPlay and Signals, and removed 4Anime.to</news> 
     </extension> 
   </addon>
   <addon id="script.module.pytz" name="pytz" version="2014.2" provider-name="Stuart Bishop, Paul Backhouse"> 
