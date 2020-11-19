@@ -1,63 +1,101 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <addons>
-  <addon id="plugin.video.4anime" version="0.3.1" name="4Anime.to" provider-name="ostvanc"> 
+  <addon id="plugin.video.tvrepublika" version="0.2.0" name="Telewizja Republika" provider-name="ostvanc"> 
     <requires> 
       <import addon="xbmc.python" version="2.25.0"/>  
       <import addon="script.module.beautifulsoup4" version="4.5.3"/>  
-      <import addon="script.module.cloudscraper" version="1.2.23"/>  
-      <import addon="script.module.js2py" version="6.02.2"/>  
-      <import addon="script.module.requests" version="2.22.0"/> 
+      <import addon="plugin.video.youtube" version="6.5.2"/> 
     </requires>  
     <extension point="xbmc.python.pluginsource" library="main.py"> 
       <provides>video</provides> 
     </extension>  
     <extension point="xbmc.addon.metadata"> 
-      <summary lang="en">4Anime Video Addon</summary>  
-      <description lang="en_GB">Kodi video addon for the website 4Anime.to</description>  
-      <website>https://4anime.to</website>  
+      <summary lang="en">Telewizja Republika</summary>  
+      <description lang="en_GB">Kodi video plugin for the Polish TV channel "Telewizja Republika".</description>  
+      <website>https://telewizjarepublika.pl</website>  
       <assets> 
         <icon>icon.png</icon>  
         <fanart>fanart.jpg</fanart>  
-        <screenshot>resources\screenshot-01.jpg</screenshot>  
-        <screenshot>resources\screenshot-02.jpg</screenshot>  
-        <screenshot>resources\screenshot-03.jpg</screenshot> 
+        <screenshot>resources\screenshot-01.jpg</screenshot> 
       </assets>  
-      <news>0.0.1 - 01/12/2019 - Initial version - added random tv show 0.0.2 - 03/12/2019 - added search tv show 0.1.0 - 04/12/2019 - added Cloudflare protection bypass 0.2.0 - 08/03/2020 - added JavaScript evaluation 0.3.0 - 18/03/2020 - added search by genre 0.3.1 - 13/04/2020 - refactored screenshot directory</news> 
+      <news>0.0.1 - 21/11/2019 - Initial version - added TV Livestream 0.1.0 - 23/11/2019 - added Videos and Magazines 0.1.1 - 24/11/2019 - added 'Magazyn wojskowy' and 'Zawod zolnierz' 0.1.2 - 26/11/2019 - workaround for certificate erros 0.2.0 - 01/12/2019 - refactoring due to complete youtube video hosting by TVR</news> 
     </extension> 
   </addon>
-  <addon id="plugin.video.amazon-test" name="Amazon VOD" version="0.8.9~beta" provider-name="Sandmann79, Varstahl"> 
+  <addon id="script.module.tzlocal" name="tzlocal" version="1.5.2" provider-name="Addons4Kodi"> 
     <requires> 
-      <import addon="xbmc.python" version="2.24.0"/>  
-      <import addon="script.module.beautifulsoup4" version="4.6.2"/>  
-      <import addon="script.module.mechanicalsoup" version="0.12.0"/>  
-      <import addon="script.module.pydes" version="2.0.1"/>  
-      <import addon="script.module.pyxbmct" version="1.1.7"/>  
-      <import addon="script.module.inputstreamhelper" version="0.4.4"/>  
-      <import addon="script.module.requests" version="2.9.1"/>  
-      <import addon="script.module.kodi-six" version="0.0.5"/>  
-      <import addon="script.module.pyautogui" version="0.9.49"/> 
+      <import addon="xbmc.python" version="2.25.0"/>  
+      <import addon="script.module.pytz" version="2014.2"/> 
     </requires>  
-    <extension point="xbmc.python.pluginsource" library="default.py"> 
+    <extension point="xbmc.python.module" library="lib"/>  
+    <extension point="xbmc.addon.metadata"> 
+      <summary>Python Module to find out the current time zone</summary>  
+      <description>Packed for Kodi from https://github.com/regebro/tzlocal</description>  
+      <platform>all</platform>  
+      <language/>  
+      <license>MIT</license>  
+      <forum/>  
+      <website>https://github.com/regebro/tzlocal</website>  
+      <source>https://github.com/regebro/tzlocal</source>  
+      <email/> 
+    </extension> 
+  </addon>
+  <addon id="plugin.video.pilot.wp" name="WP Pilot" version="0.1.3" provider-name="c0d34fun"> 
+    <requires> 
+      <import addon="xbmc.python" version="2.25.0"/>  
+      <import addon="script.module.requests" version="2.12.4"/>  
+      <import addon="script.module.inputstreamhelper" version="0.3.3"/>  
+      <import addon="service.cronxbmc" optional="true"/> 
+    </requires>  
+    <extension point="xbmc.python.pluginsource" library="addon.py"> 
       <provides>video</provides> 
     </extension>  
-    <extension point="xbmc.service" library="service.py" start="startup"/>  
     <extension point="xbmc.addon.metadata"> 
+      <description lang="pl">Oglądaj WP Pilot w Kodi!</description>  
+      <disclaimer lang="pl">This is not an official plugin! If the official application is available for your platform, use it instead of this plugin. All rights to the content are reserved by wp.pl.</disclaimer>  
+      <summary lang="en">Watch WP Pilot in Kodi!</summary>  
+      <description lang="en">Watch WP Pilot in Kodi!</description>  
+      <disclaimer lang="en">This is not an official plugin! If the official application is available for your platform, use it instead of this plugin. All rights to the content are reserved by wp.pl.</disclaimer>  
+      <language>pl</language>  
       <platform>all</platform>  
-      <reuselanguageinvoker>true</reuselanguageinvoker>  
-      <summary lang="en_GB">Amazon Prime Video Streaming</summary>  
-      <summary lang="de_DE">Amazon Prime Instant Video</summary>  
-      <description lang="en_GB">Movies and Television Shows for Prime Members</description>  
-      <description lang="de_DE">Filme und Serien für Amazon Prime Mitglieder</description>  
-      <disclaimer lang="en_GB">Some parts of this addon may not be legal in your country of residence - please check with your local laws before installing. This Addon uses pyDes by Todd Whiteman</disclaimer>  
-      <disclaimer lang="de_DE">Möglicherweise sind einge Teile dieses Addons in Ihrem Land illegal, Sie sollten dies unbedingt vor der Installation überprüfen. Diese Addon verwendet pyDes von Todd Whiteman</disclaimer>  
-      <forum>http://www.kodinerds.net/index.php/Thread/44211-Release-Amazon-Prime-Instant-Video</forum>  
-      <source>https://github.com/Sandmann79/xbmc</source>  
-      <license>GPL-3.0-or-later</license>  
+      <license>GNU GENERAL PUBLIC LICENSE. Version 2, June 1991</license>  
+      <website>https://pilot.wp.pl</website>  
       <assets> 
-        <icon>icon.png</icon>  
-        <fanart>fanart.png</fanart>  
-        <clearlogo>clearlogo.png</clearlogo> 
+        <icon>resources/icon.png</icon> 
+      </assets> 
+    </extension> 
+  </addon>
+  <addon id="script.module.mechanicalsoup" name="MechanicalSoup" version="0.12.0" provider-name="Matthew Hickford, Dan Hemberger, Matthieu Moy"> 
+    <requires> 
+      <import addon="xbmc.python" version="2.25.0"/>  
+      <import addon="script.module.requests" version="2.0.0"/>  
+      <import addon="script.module.beautifulsoup4" version="4.4.0"/>  
+      <import addon="script.module.six" version="1.4.0"/> 
+    </requires>  
+    <extension point="xbmc.python.module" library="lib"/>  
+    <extension point="xbmc.addon.metadata"> 
+      <summary lang="en">A Python library for automating interaction with websites.</summary>  
+      <forum/>  
+      <website>https://mechanicalsoup.readthedocs.io/</website>  
+      <license>MIT</license>  
+      <platform>all</platform>  
+      <source>https://github.com/MechanicalSoup/MechanicalSoup</source> 
+    </extension> 
+  </addon>
+  <addon id="script.module.defusedxml" name="defusedxml" version="0.6.0" provider-name="Christian Heimes"> 
+    <requires> 
+      <import addon="xbmc.python" version="2.25.0"/> 
+    </requires>  
+    <extension point="xbmc.python.module" library="lib"/>  
+    <extension point="xbmc.addon.metadata"> 
+      <summary lang="en_GB">defusedxml -- defusing XML bombs and other exploits</summary>  
+      <description lang="en_GB">Packed for KODI from https://github.com/tiran/defusedxml</description>  
+      <platform>all</platform>  
+      <license>PSF</license>  
+      <website>https://pypi.org/project/defusedxml/</website>  
+      <source>https://github.com/tiran/defusedxml</source>  
+      <assets> 
+        <icon>icon.png</icon> 
       </assets> 
     </extension> 
   </addon>
@@ -83,26 +121,92 @@
       <news>0.1.0 - 12/02/2020 - Initial version 0.2.0 - 06/03/2020 - Fixed due to changes 0.3.0 - 09/03/2020 - Added Livestream 0.3.1 - 13/04/2020 - Refactored Screenshot Directory 0.4.0 - 29/08/2020 - Fixed due to changes, added Livestream and Replay</news> 
     </extension> 
   </addon>
-  <addon id="plugin.video.focus" version="0.0.2" name="Focus Online" provider-name="ostvanc"> 
+  <addon id="plugin.video.youtube" name="YouTube" version="6.8.4" provider-name="anxdpanic, bromix"> 
     <requires> 
-      <import addon="xbmc.python" version="2.25.0"/>  
-      <import addon="script.module.beautifulsoup4" version="4.5.3"/> 
+      <import addon="xbmc.python" version="2.20.0"/>  
+      <import addon="script.module.six" version="1.11.0"/>  
+      <import addon="script.module.requests" version="2.12.4"/>  
+      <import addon="script.module.inputstreamhelper" version="0.2.2" optional="true"/> 
     </requires>  
-    <extension point="xbmc.python.pluginsource" library="main.py"> 
+    <extension point="xbmc.python.pluginsource" library="resources/lib/default.py"> 
       <provides>video</provides> 
     </extension>  
+    <extension point="xbmc.service" library="resources/lib/startup.py" start="login"/>  
+    <extension point="xbmc.python.module" library="resources/lib/"/>  
     <extension point="xbmc.addon.metadata"> 
-      <summary lang="en">Focus Online Video Addon</summary>  
-      <description lang="en_GB">Kodi video plugin for the website Focus.de</description>  
-      <website>https://www.focus.de/videos/</website>  
+      <news>[fix] next page now ignores sorting, remains at the end of the directory [fix] searching, no longer require remote safe search [fix] notifications for some languages [chg] only log http server ping failures [lang] zh_cn strings |contrib: yureng, xiaojun|</news>  
       <assets> 
         <icon>icon.png</icon>  
-        <fanart>fanart.jpg</fanart>  
-        <screenshot>resources\screenshot000.jpg</screenshot>  
-        <screenshot>resources\screenshot001.jpg</screenshot>  
-        <screenshot>resources\screenshot002.jpg</screenshot> 
+        <fanart>fanart.jpg</fanart> 
       </assets>  
-      <news>0.0.1 - 12/02/2020 - Initial version 0.0.2 - 13/04/2020 - refactored screenshot directory</news> 
+      <summary lang="en_GB">Plugin for YouTube</summary>  
+      <description lang="en_GB">YouTube is one of the biggest video-sharing websites of the world.</description>  
+      <disclaimer lang="en_GB">This plugin is not endorsed by Google</disclaimer>  
+      <summary lang="he_IL">תוסף עבור YouTube</summary>  
+      <description lang="he_IL">YouTube הוא אחד מאתרי שיתוף הווידאו הגדולים בעולם.</description>  
+      <summary lang="de_DE">Plugin für YouTube</summary>  
+      <description lang="de_DE">YouTube ist eines der größten Video-Sharing-Websites der Welt.</description>  
+      <summary lang="pl_PL">Wtyczka YouTube</summary>  
+      <description lang="pl_PL">YouTube jest jednym z największych na świecie serwisów udostępniania wideo.</description>  
+      <summary lang="hu_HU">YouTube kiegészítő</summary>  
+      <description lang="hu_HU">A YouTube világ egyik legnagyobb videómegosztó weboldala.</description>  
+      <summary lang="es_ES">Plugin para YouTube</summary>  
+      <description lang="es_ES">YouTube es uno de los sitios web más grande del mundo para compartir vídeos.</description>  
+      <disclaimer lang="es_ES">Este add-on no está respaldado por Google</disclaimer>  
+      <summary lang="es_MX">Plugin para YouTube</summary>  
+      <description lang="es_MX">YouTube es uno de los más grandes sitios web de intercambio de videos del mundo.</description>  
+      <disclaimer lang="es_MX">Este add-on no está respaldado por Google</disclaimer>  
+      <summary lang="ru_RU">Видеодополнение YouTube</summary>  
+      <description lang="ru_RU">YouTube - популярнейший видеохостинговый сайт, предоставляющий пользователям услуги хранения, доставки и показа видео.</description>  
+      <summary lang="fr_FR">Plugin pour YouTube</summary>  
+      <description lang="fr_FR">YouTube est l'un des plus grands sites de partage vidéos du monde.</description>  
+      <summary lang="zh_CN">YouTube附加元件</summary>  
+      <description lang="zh_CN">「Youtube」是全世界最大的影片分享網站</description>  
+      <summary lang="zh_TW">YouTube附加元件</summary>  
+      <description lang="zh_TW">「Youtube」是全世界最大的影片分享網站</description>  
+      <disclaimer lang="zh_TW">此附加元件未由Google支持</disclaimer>  
+      <summary lang="bg_BG">Добавка за YouTube</summary>  
+      <description lang="bg_BG">YouTube е един от най-големите уеб сайтове за споделяне на видео в целия свят.</description>  
+      <summary lang="el_GR">Πρόσθετο YouTube</summary>  
+      <description lang="el_GR">Το YouTube είναι μία από τις μεγαλύτερες ιστοσελίδες διαμοιρασμού βίντεο στον κόσμο.</description>  
+      <disclaimer lang="el_GR">Η παρούσα μικροεφαρμογή δεν έχει υϊοθετηθεί από την Google</disclaimer>  
+      <summary lang="nb_NO">Tillegg for YouTube</summary>  
+      <description lang="nb_NO">YouTube er en av verdens største nettsider for videodeling.</description>  
+      <summary lang="ko_KR">유튜브 플러그인</summary>  
+      <description lang="ko_KR">유튜브는 세상에서 가장 큰 동영상 공유 사이트 중의 하나입니다.</description>  
+      <summary lang="cs_CZ">Plugin pro YouTube</summary>  
+      <description lang="cs_CZ">YouTube je jedna z největších webových stránek světa sdílející video.</description>  
+      <disclaimer lang="cs_CZ">Tento plugin není schválen společností Google</disclaimer>  
+      <summary lang="tr_TR">YouTube için eklenti</summary>  
+      <description lang="tr_TR">YouTube, dünya üzerindeki en büyük video paylaşma platformlarından birisidir</description>  
+      <disclaimer lang="tr_TR">Bu eklenti Google tarafından üretilmemiştir</disclaimer>  
+      <platform>all</platform>  
+      <license>GPL-2.0-only</license>  
+      <forum>https://ytaddon.page.link/forum</forum>  
+      <website>https://www.youtube.com</website>  
+      <source>https://github.com/anxdpanic/plugin.video.youtube</source>  
+      <reuselanguageinvoker>true</reuselanguageinvoker> 
+    </extension> 
+  </addon>
+  <addon id="script.module.js2py" name="js2py" provider-name="Piotr Dabkowski" version="7.0.0"> 
+    <requires> 
+      <import addon="xbmc.python" version="2.14.0"/>  
+      <import addon="script.module.six" version="1.11.0"/>  
+      <import addon="script.module.pyjsparser" version="2.7.1"/>  
+      <import addon="script.module.tzlocal" version="1.5.1"/> 
+    </requires>  
+    <extension library="lib" point="xbmc.python.module"/>  
+    <extension point="xbmc.addon.metadata"> 
+      <summary lang="en">js2py+pyjsparser module</summary>  
+      <description lan="en">Pure Python JavaScript Translator/Interpreter</description>  
+      <license>MIT</license>  
+      <platform>all</platform>  
+      <email/>  
+      <website>http://piter.io/projects/js2py</website>  
+      <forum/>  
+      <source>https://github.com/PiotrDabkowski/Js2Py</source>  
+      <language/>  
+      <news>09/03/2020 - Bugfix by ostvanc in version 6.03.0: removed local library "pyjsparser" due to parsing errors</news> 
     </extension> 
   </addon>
   <addon id="plugin.video.mediasetplay" name="Mediaset Play" version="1.2.3" provider-name="kodi-bino, cttynul"> 
@@ -163,6 +267,370 @@
         <screenshot>resources/screenshot3.png</screenshot>  
         <screenshot>resources/screenshot4.png</screenshot> 
       </assets> 
+    </extension> 
+  </addon>
+  <addon id="script.module.pyjsparser" name="pyjsparser" version="2.7.2" provider-name="Addons4Kodi"> 
+    <requires> 
+      <import addon="xbmc.python" version="2.25.0"/> 
+    </requires>  
+    <extension point="xbmc.python.module" library="lib"/>  
+    <extension point="xbmc.addon.metadata"> 
+      <summary>Pure Python JavaScript Translator/Interpreter</summary>  
+      <description>Packed for Kodi from https://github.com/PiotrDabkowski/pyjsparser</description>  
+      <platform>all</platform>  
+      <language/>  
+      <license>MIT</license>  
+      <forum/>  
+      <website>https://github.com/PiotrDabkowski/pyjsparser</website>  
+      <source>https://github.com/PiotrDabkowski/pyjsparser</source>  
+      <email/> 
+    </extension> 
+  </addon>
+  <addon id="script.module.pyautogui" name="PyAutoGUI" version="0.9.49" provider-name="Al Sweigart"> 
+    <requires> 
+      <import addon="xbmc.python" version="2.25.0"/> 
+    </requires>  
+    <extension point="xbmc.python.module" library="lib"/>  
+    <extension point="xbmc.addon.metadata"> 
+      <summary lang="en">PyAutoGUI is a cross-platform GUI automation Python module for human beings. Used to programmatically control the mouse and keyboard.</summary>  
+      <forum/>  
+      <website>https://pyautogui.readthedocs.io/</website>  
+      <license>see LICENSE.txt</license>  
+      <platform>all</platform>  
+      <source>https://github.com/asweigart/pyautogui</source> 
+    </extension> 
+  </addon>
+  <addon id="script.module.pyperclip" name="pyperclip" version="1.7.0" provider-name="asweigart"> 
+    <requires> 
+      <import addon="xbmc.python" version="2.7.0"/> 
+    </requires>  
+    <extension point="xbmc.python.module" library="src"/>  
+    <extension point="xbmc.addon.metadata"> 
+      <summary lang="en_GB">Python clipboard library</summary>  
+      <description lang="en_GB">The purpose of Pyperclip is to provide a cross-platform Python module for copying and pasting text to the clipboard.</description>  
+      <license>MIT</license>  
+      <platform>all</platform>  
+      <website>https://pyperclip.readthedocs.io/en/latest/index.html</website>  
+      <assets> 
+        <icon>icon.png</icon> 
+      </assets> 
+    </extension> 
+  </addon>
+  <addon id="script.module.requests" name="requests" version="2.22.1" provider-name="kennethreitz, beenje"> 
+    <requires> 
+      <import addon="xbmc.python" version="2.1.0"/> 
+    </requires>  
+    <extension point="xbmc.python.module" library="lib"/>  
+    <extension point="xbmc.addon.metadata"> 
+      <summary>Python HTTP for Humans</summary>  
+      <description>Packed for KODI from https://github.com/kennethreitz/requests</description>  
+      <platform>all</platform>  
+      <language/>  
+      <license>Apache2</license>  
+      <forum/>  
+      <website>http://python-requests.org</website>  
+      <source>https://github.com/beenje/script.module.requests</source>  
+      <email>beenje AT gmail.com</email> 
+    </extension> 
+  </addon>
+  <addon id="script.module.ijson" name="ijson" version="2.5" provider-name="Rodrigo Tobar, Ivan Sagalaev"> 
+    <requires> 
+      <import addon="xbmc.python" version="2.25.0"/> 
+    </requires>  
+    <extension point="xbmc.python.module" library="lib"/>  
+    <extension point="xbmc.addon.metadata"> 
+      <summary lang="en_GB">Iterative JSON parser with a standard Python iterator interface</summary>  
+      <description lang="en_GB">Packed for KODI from https://github.com/isagalaev/ijson</description>  
+      <license>BSD-3-Clause</license>  
+      <website>https://pypi.org/project/ijson/</website>  
+      <source>https://github.com/ICRAR/ijson</source>  
+      <assets> 
+        <icon>icon.png</icon> 
+      </assets> 
+    </extension> 
+  </addon>
+  <addon id="script.module.future" name="future" version="0.17.1" provider-name="Ed Schofield"> 
+    <requires> 
+      <import addon="xbmc.python" version="2.14.0"/> 
+    </requires>  
+    <extension point="xbmc.python.module" library="libs"/>  
+    <extension point="xbmc.addon.metadata"> 
+      <summary lang="en">Clean single-source support for Python 3 and 2</summary>  
+      <description lang="en">future is the missing compatibility layer between Python 2 and Python 3. It allows you to use a single, clean Python 3.x-compatible codebase to support both Python 2 and Python 3 with minimal overhead.</description>  
+      <platform>all</platform>  
+      <license>MIT</license>  
+      <source>https://github.com/PythonCharmers/python-future</source>  
+      <website>http://python-future.org</website> 
+    </extension> 
+  </addon>
+  <addon id="script.module.requests-toolbelt" name="requests-toolbelt" version="0.9.1" provider-name="Ian Cordasco, Cory Benfield (graffatcolmingov@gmail.com)"> 
+    <requires> 
+      <import addon="xbmc.python" version="2.7.0"/>  
+      <import addon="script.module.requests" version="2.1.0"/> 
+    </requires>  
+    <extension point="xbmc.python.module" library="lib"/>  
+    <extension point="xbmc.addon.metadata"> 
+      <summary lang="en_GB">Requests toolbet</summary>  
+      <description lang="en_GB">A handy Python module with utilites for the Requests module.</description>  
+      <license>MIT</license>  
+      <platform>all</platform>  
+      <website>https://toolbelt.readthedocs.org/</website>  
+      <assets> 
+        <icon>icon.png</icon> 
+      </assets> 
+    </extension> 
+  </addon>
+  <addon id="script.module.inputstreamhelper" name="InputStream Helper" version="0.4.4" provider-name="emilsvennesson, dagwieers, mediaminister"> 
+    <requires> 
+      <!--py3 compliant-->  
+      <!--<import addon="xbmc.python" version="2.25.0" target="3.0.0"/>-->  
+      <import addon="xbmc.python" version="2.25.0"/>  
+      <import addon="script.module.pysocks" version="1.6.8" optional="true"/> 
+    </requires>  
+    <!-- This is needed to get an add-on icon -->  
+    <extension point="xbmc.python.script" library="default.py"> 
+      <provides>executable</provides> 
+    </extension>  
+    <extension point="xbmc.python.module" library="lib"/>  
+    <extension point="xbmc.addon.metadata"> 
+      <summary lang="en_GB">Kodi InputStream and DRM playback made easy</summary>  
+      <summary lang="de_DE">Kodi InputStream und DRM Wiedergabe einfach gemacht</summary>  
+      <summary lang="el_GR">Βοηθός Inputstream για το Kodi και εύκολη αναπαραγωγή DRM</summary>  
+      <summary lang="fr_FR">La lecture Kodi InputStream et DRM en toute simplicité</summary>  
+      <description lang="en_GB">A simple Kodi module that makes life easier for add-on developers relying on InputStream based add-ons and DRM playback.</description>  
+      <description lang="de_DE">Dieses einfache Kodi-Modul macht das Leben für Addon Entwickler einfacher, die auf InputStream basierte Addons und DRM Wiedergabe angewiesen sind.</description>  
+      <description lang="el_GR">Μία απλή μονάδα για το Kodi η οποία διευκολύνει την ζωή των προγραμματιστών οι οποίοι εξαρτώνται από τα πρόσθετσ InputStream και αναπαραγωγή τύπου DRM.</description>  
+      <description lang="ru_RU">Простой модуль для Kodi, который облегчает жизнь разработчикам дополнений, с использованием InputStream дополнений и воспроизведения DRM контента.</description>  
+      <description lang="fr_FR">Un simple module Kodi qui simplifie la vie des développeurs de modules complémentaires en s’appuyant sur des modules complémentaires basés sur InputStream et sur la lecture de DRM.</description>  
+      <news>v0.4.4 (2020-03-01) - Added option to restore a previously installed Widevine version - Improve progress bar when extracting Widevine on ARM devices - Improve Widevine library version detection - Improve InputStream Helper information - Increase download reliability for Chrome OS on ARM devices - Added Japanese, Korean, Croatian and Hungarian translations - Updated existing translations - Various small bugfixes for Widevine installation on ARM devices</news>  
+      <platform>all</platform>  
+      <license>MIT</license>  
+      <website>https://github.com/emilsvennesson/script.module.inputstreamhelper/wiki</website>  
+      <source>https://github.com/emilsvennesson/script.module.inputstreamhelper</source>  
+      <assets> 
+        <icon>resources/icon.png</icon> 
+      </assets> 
+    </extension> 
+  </addon>
+  <addon id="script.module.six" name="six" version="1.9.0" provider-name="gutworth"> 
+    <requires> 
+      <import addon="xbmc.python" version="2.1.0"/> 
+    </requires>  
+    <extension point="xbmc.python.module" library="lib"/>  
+    <extension point="xbmc.addon.metadata"> 
+      <summary>Python 2 and 3 compatibility utilities.</summary>  
+      <description>Six is a Python 2 and 3 compatibility library. It provides utility functions for smoothing over the differences between the Python versions with the goal of writing Python code that is compatible on both Python versions. See the documentation for more information on what is provided.</description>  
+      <platform>all</platform>  
+      <license>MIT</license>  
+      <source>https://pypi.python.org/pypi/six</source>  
+      <website>https://pypi.python.org/pypi/six</website> 
+    </extension> 
+  </addon>
+  <addon id="plugin.video.tvpsport" name="TVP SPORT" version="0.0.11" provider-name="c0d34fun"> 
+    <requires> 
+      <import addon="xbmc.python" version="2.25.0"/>  
+      <import addon="script.module.requests" version="2.12.4"/>  
+      <import addon="script.module.inputstreamhelper" version="0.3.3"/>  
+      <import addon="script.module.m3u8" version="0.2.10"/> 
+    </requires>  
+    <extension point="xbmc.python.pluginsource" library="addon.py"> 
+      <provides>video</provides> 
+    </extension>  
+    <extension point="xbmc.addon.metadata"> 
+      <description lang="en">Watch TVP SPORT in Kodi!</description>  
+      <disclaimer lang="en">This is not an official plugin! If the official application is available for your platform, use it instead of this plugin. All rights to the content are reserved by ©2018 TELEWIZJA POLSKA S.A.</disclaimer>  
+      <summary lang="en">TVP SPORT</summary>  
+      <description lang="en">Watch TVP SPORT in Kodi!</description>  
+      <disclaimer lang="en">This is not an official plugin! If the official application is available for your platform, use it instead of this plugin. All rights to the content are reserved by ©2018 TELEWIZJA POLSKA S.A.</disclaimer>  
+      <language>pl</language>  
+      <platform>all</platform>  
+      <license>GNU GENERAL PUBLIC LICENSE. Version 2, June 1991</license>  
+      <website>https://sport.tvp.pl</website>  
+      <assets> 
+        <icon>resources/icon.png</icon>  
+        <fanart>resources/fanart.jpg</fanart>  
+        <screenshot>resources/screen01.jpg</screenshot>  
+        <screenshot>resources/screen02.jpg</screenshot>  
+        <screenshot>resources/screen03.jpg</screenshot>  
+        <screenshot>resources/screen04.jpg</screenshot> 
+      </assets> 
+    </extension> 
+  </addon>
+  <addon id="script.module.pycryptodome" name="PyCryptodome" version="3.9.8" provider-name="Legrandin"> 
+    <requires> 
+      <import addon="xbmc.python" version="2.14.0"/> 
+    </requires>  
+    <extension point="xbmc.python.module" library="lib"/>  
+    <extension point="xbmc.addon.metadata"> 
+      <summary>Cryptographic library for Python</summary>  
+      <source>http://www.pycryptodome.org</source>  
+      <platform>all</platform>  
+      <license>Public domain</license> 
+    </extension> 
+  </addon>
+  <addon id="script.module.cloudscraper" name="cloudscraper" version="1.2.36" provider-name="VeNoMouS (venom@gen-x.co.nz)"> 
+    <requires> 
+      <import addon="xbmc.python" version="2.7.0"/>  
+      <import addon="script.module.requests" version="2.9.2"/> 
+    </requires>  
+    <extension point="xbmc.python.module" library="lib"/>  
+    <extension point="xbmc.addon.metadata"> 
+      <summary lang="en_GB">Screen-scraping library</summary>  
+      <description lang="en_GB">A simple Python module to bypass Cloudflare's anti-bot page (also known as "I'm Under Attack Mode", or IUAM), implemented with Requests.</description>  
+      <license>MIT</license>  
+      <platform>all</platform>  
+      <website>https://github.com/venomous/cloudscraper</website>  
+      <assets> 
+        <icon>icon.png</icon> 
+      </assets> 
+    </extension> 
+  </addon>
+  <addon id="plugin.video.amazon-test" name="Amazon VOD" version="0.8.9~beta" provider-name="Sandmann79, Varstahl"> 
+    <requires> 
+      <import addon="xbmc.python" version="2.24.0"/>  
+      <import addon="script.module.beautifulsoup4" version="4.6.2"/>  
+      <import addon="script.module.mechanicalsoup" version="0.12.0"/>  
+      <import addon="script.module.pydes" version="2.0.1"/>  
+      <import addon="script.module.pyxbmct" version="1.1.7"/>  
+      <import addon="script.module.inputstreamhelper" version="0.4.4"/>  
+      <import addon="script.module.requests" version="2.9.1"/>  
+      <import addon="script.module.kodi-six" version="0.0.5"/>  
+      <import addon="script.module.pyautogui" version="0.9.49"/> 
+    </requires>  
+    <extension point="xbmc.python.pluginsource" library="default.py"> 
+      <provides>video</provides> 
+    </extension>  
+    <extension point="xbmc.service" library="service.py" start="startup"/>  
+    <extension point="xbmc.addon.metadata"> 
+      <platform>all</platform>  
+      <reuselanguageinvoker>true</reuselanguageinvoker>  
+      <summary lang="en_GB">Amazon Prime Video Streaming</summary>  
+      <summary lang="de_DE">Amazon Prime Instant Video</summary>  
+      <description lang="en_GB">Movies and Television Shows for Prime Members</description>  
+      <description lang="de_DE">Filme und Serien für Amazon Prime Mitglieder</description>  
+      <disclaimer lang="en_GB">Some parts of this addon may not be legal in your country of residence - please check with your local laws before installing. This Addon uses pyDes by Todd Whiteman</disclaimer>  
+      <disclaimer lang="de_DE">Möglicherweise sind einge Teile dieses Addons in Ihrem Land illegal, Sie sollten dies unbedingt vor der Installation überprüfen. Diese Addon verwendet pyDes von Todd Whiteman</disclaimer>  
+      <forum>http://www.kodinerds.net/index.php/Thread/44211-Release-Amazon-Prime-Instant-Video</forum>  
+      <source>https://github.com/Sandmann79/xbmc</source>  
+      <license>GPL-3.0-or-later</license>  
+      <assets> 
+        <icon>icon.png</icon>  
+        <fanart>fanart.png</fanart>  
+        <clearlogo>clearlogo.png</clearlogo> 
+      </assets> 
+    </extension> 
+  </addon>
+  <addon id="plugin.video.focus" version="0.0.2" name="Focus Online" provider-name="ostvanc"> 
+    <requires> 
+      <import addon="xbmc.python" version="2.25.0"/>  
+      <import addon="script.module.beautifulsoup4" version="4.5.3"/> 
+    </requires>  
+    <extension point="xbmc.python.pluginsource" library="main.py"> 
+      <provides>video</provides> 
+    </extension>  
+    <extension point="xbmc.addon.metadata"> 
+      <summary lang="en">Focus Online Video Addon</summary>  
+      <description lang="en_GB">Kodi video plugin for the website Focus.de</description>  
+      <website>https://www.focus.de/videos/</website>  
+      <assets> 
+        <icon>icon.png</icon>  
+        <fanart>fanart.jpg</fanart>  
+        <screenshot>resources\screenshot000.jpg</screenshot>  
+        <screenshot>resources\screenshot001.jpg</screenshot>  
+        <screenshot>resources\screenshot002.jpg</screenshot> 
+      </assets>  
+      <news>0.0.1 - 12/02/2020 - Initial version 0.0.2 - 13/04/2020 - refactored screenshot directory</news> 
+    </extension> 
+  </addon>
+  <addon id="script.module.addon.signals" name="Addon Signals" version="0.0.6" provider-name="Rick Phillips (ruuk)"> 
+    <requires> 
+      <import addon="xbmc.python" version="2.14.0"/> 
+    </requires>  
+    <extension point="xbmc.python.module" library="lib"/>  
+    <extension point="xbmc.addon.metadata"> 
+      <summary lang="en_GB">Inter-addon signalling</summary>  
+      <description lang="en_GB">Provides signal/slot mechanism for inter-addon communication</description>  
+      <platform>all</platform>  
+      <license>LGPL-2.1-only</license>  
+      <source>https://github.com/ruuk/script.module.addon.signals</source>  
+      <assets> 
+        <icon>icon.png</icon> 
+      </assets> 
+    </extension> 
+  </addon>
+  <addon id="script.module.myconnpy" name="MySQL Connector/Python" version="1.1.7" provider-name="MySQL"> 
+    <requires> 
+      <import addon="xbmc.python" version="2.1.0"/> 
+    </requires>  
+    <extension point="xbmc.python.module" library="lib"/>  
+    <extension point="xbmc.addon.metadata"> 
+      <summary lang="en">MySQL Connector/Python</summary>  
+      <description lang="en">MySQL Connector/Python is implementing the MySQL Client/Server protocol completely in Python. This means you don't have to compile anything or MySQL (client library) doesn't even have to be installed on the machine.</description>  
+      <license>GPLv2</license>  
+      <platform>all</platform>  
+      <website>http://dev.mysql.com/doc/connector-python/en/index.html</website>  
+      <source>http://dev.mysql.com/downloads/connector/python/</source> 
+    </extension> 
+  </addon>
+  <addon id="plugin.video.raitv" name="Rai Play" version="3.5.0.2" provider-name="Nightflyer, cttynul, maxbambi, fabpolli"> 
+    <requires> 
+      <import addon="xbmc.python" version="2.25.0"/>  
+      <import addon="script.common.plugin.cache" version="2.6.0"/>  
+      <import addon="script.module.inputstreamhelper"/> 
+    </requires>  
+    <extension point="xbmc.python.pluginsource" library="default.py"> 
+      <provides>video audio</provides> 
+    </extension>  
+    <extension point="xbmc.addon.metadata"> 
+      <language>it</language>  
+      <platform>all</platform>  
+      <summary lang="it_IT">I programmi delle reti Rai e i servizi interattivi</summary>  
+      <description lang="it_IT">I canali radio e tv in diretta, gli ultimi 7 giorni di programmazione, le puntate integrali, i telegiornali. Source: https://github.com/maxbambi/plugin.video.raitv/</description>  
+      <summary lang="en_GB">The broadcasts of Rai channels and its interactive services</summary>  
+      <description lang="en_GB">Live radio and TV channels, latest 7 days of programming, broadcast archive, news. Source: https://github.com/maxbambi/plugin.video.raitv/</description>  
+      <license>GPL-3.0-or-later</license>  
+      <forum>https://forum.kodi.tv/showthread.php?tid=155922</forum>  
+      <website>https://github.com/maxbambi/plugin.video.raitv/</website>  
+      <email/>  
+      <news>[B]3.5.0.2[/B] - Fix play and relinker [B]3.5.0[/B] - Plugin works with Widevine DRM [B]3.4.8[/B] - Updated User-Agent - Plugin can stream mpd [B]3.4.7[/B] - Translations - Added new items for viewing all elements of a category. - On air menu shows also current programs. - Added new section from home page of Raiplay.</news>  
+      <source>https://github.com/maxbambi/plugin.video.raitv/</source>  
+      <assets> 
+        <icon>resources/icon.png</icon>  
+        <fanart>resources/fanart.jpg</fanart> 
+      </assets> 
+    </extension> 
+  </addon>
+  <addon id="plugin.video.rivedila7" name="La7-La7d" version="4.4.1" provider-name="Luivit, Testato"> 
+    <requires> 
+      <import addon="xbmc.python" version="2.25.0"/>  
+      <import addon="script.module.requests" version="2.22.0"/>  
+      <import addon="script.module.inputstreamhelper" version="0.5.0"/>  
+      <import addon="script.module.beautifulsoup4" version="4.5.3"/>  
+      <import addon="script.module.html5lib" version="0.999.0"/> 
+    </requires>  
+    <extension point="xbmc.python.pluginsource" library="addon.py"> 
+      <provides>video</provides> 
+    </extension>  
+    <extension point="xbmc.addon.metadata"> 
+      <summary lang="en_GB">LA7-LA7d</summary>  
+      <description lang="en_GB">Live Streaming, Replay the last week, On-Demand programs, News and Weather, Teche LA7 - The Protagonists</description>  
+      <summary lang="it_IT">LA7-LA7d</summary>  
+      <description lang="it_IT">Diretta Live, Rivedi ultima settimana, Programmi On-Demand, Telegiornali e Meteo, Teche LA7 - I Protagonisti</description>  
+      <language>it</language>  
+      <platform>all</platform>  
+      <license>GNU General Public License v3.0</license>  
+      <forum>https://forum.kodi.tv/showthread.php?tid=331064</forum>  
+      <website>https://www.la7.it</website>  
+      <email>luivit39@gmail.com, speednpower@gmail.com</email>  
+      <source>https://github.com/luivit/plugin.video.rivedila7</source>  
+      <assets> 
+        <icon>resources/icon.png</icon>  
+        <fanart>resources/fanart.jpg</fanart>  
+        <screenshot>resources/screenshots/screenshot-00.jpg</screenshot>  
+        <screenshot>resources/screenshots/screenshot-01.jpg</screenshot>  
+        <screenshot>resources/screenshots/screenshot-02.jpg</screenshot> 
+      </assets>  
+      <news>4.4.1 (2020-09-12) - fix for Kodi repo</news> 
     </extension> 
   </addon>
   <addon id="plugin.video.netflix" name="Netflix" version="1.9.0" provider-name="libdev + jojo + asciidisco + caphm + castagnait"> 
@@ -253,90 +721,22 @@
       <news>v1.9.0 (2020-09-06) -New login method "Authentication key" details on GitHub readme -Add possibility to import library from a different folder -Add flatted tvshow for single season (depends from kodi setting) -Big speedup improvement for Kodi 18 in service loading and opening profiles page -Fixed a problem that could cause the addon to not start after login unexpected errors -Fixed a wrong behaviour that caused timeout error after credentials login fails -Fixed context menus issues after add a new search -Updated translations de, it, fr, pl, zh_ch, pt_br, hu, jp, kr, el_gr, es</news> 
     </extension> 
   </addon>
-  <addon id="plugin.video.pilot.wp" name="WP Pilot" version="0.1.3" provider-name="c0d34fun"> 
+  <addon id="script.module.kodi-six" name="Kodi Six" version="0.0.5" provider-name="Roman V.M."> 
     <requires> 
-      <import addon="xbmc.python" version="2.25.0"/>  
-      <import addon="script.module.requests" version="2.12.4"/>  
-      <import addon="script.module.inputstreamhelper" version="0.3.3"/>  
-      <import addon="service.cronxbmc" optional="true"/> 
+      <import addon="xbmc.python" version="2.14.0"/> 
     </requires>  
-    <extension point="xbmc.python.pluginsource" library="addon.py"> 
-      <provides>video</provides> 
-    </extension>  
+    <extension point="xbmc.python.module" library="libs"/>  
     <extension point="xbmc.addon.metadata"> 
-      <description lang="pl">Oglądaj WP Pilot w Kodi!</description>  
-      <disclaimer lang="pl">This is not an official plugin! If the official application is available for your platform, use it instead of this plugin. All rights to the content are reserved by wp.pl.</disclaimer>  
-      <summary lang="en">Watch WP Pilot in Kodi!</summary>  
-      <description lang="en">Watch WP Pilot in Kodi!</description>  
-      <disclaimer lang="en">This is not an official plugin! If the official application is available for your platform, use it instead of this plugin. All rights to the content are reserved by wp.pl.</disclaimer>  
-      <language>pl</language>  
+      <summary lang="en">Wrappers around Kodi Python API for seamless Python 2/3 compatibility</summary>  
+      <description lang="en">Wrappers around Kodi Python API that normalize handling of textual and byte strings in Python 2 and 3.</description>  
       <platform>all</platform>  
-      <license>GNU GENERAL PUBLIC LICENSE. Version 2, June 1991</license>  
-      <website>https://pilot.wp.pl</website>  
+      <license>GPL v.3</license>  
+      <forum>https://forum.kodi.tv/showthread.php?tid=327883</forum>  
+      <source>https://github.com/romanvm/kodi.six</source>  
       <assets> 
-        <icon>resources/icon.png</icon> 
-      </assets> 
-    </extension> 
-  </addon>
-  <addon id="plugin.video.raitv" name="Rai Play" version="3.5.0.1" provider-name="Nightflyer, cttynul, maxbambi, fabpolli"> 
-    <requires> 
-      <import addon="xbmc.python" version="2.25.0"/>  
-      <import addon="script.common.plugin.cache" version="2.6.0"/>  
-      <import addon="script.module.inputstreamhelper"/> 
-    </requires>  
-    <extension point="xbmc.python.pluginsource" library="default.py"> 
-      <provides>video audio</provides> 
-    </extension>  
-    <extension point="xbmc.addon.metadata"> 
-      <language>it</language>  
-      <platform>all</platform>  
-      <summary lang="it_IT">I programmi delle reti Rai e i servizi interattivi</summary>  
-      <description lang="it_IT">I canali radio e tv in diretta, gli ultimi 7 giorni di programmazione, le puntate integrali, i telegiornali. Source: https://github.com/maxbambi/plugin.video.raitv/</description>  
-      <summary lang="en_GB">The broadcasts of Rai channels and its interactive services</summary>  
-      <description lang="en_GB">Live radio and TV channels, latest 7 days of programming, broadcast archive, news. Source: https://github.com/maxbambi/plugin.video.raitv/</description>  
-      <license>GPL-3.0-or-later</license>  
-      <forum>https://forum.kodi.tv/showthread.php?tid=155922</forum>  
-      <website>https://github.com/maxbambi/plugin.video.raitv/</website>  
-      <email/>  
-      <news>[B]3.5.0[/B] - Plugin works with Widevine DRM [B]3.4.8[/B] - Updated User-Agent - Plugin can stream mpd [B]3.4.7[/B] - Translations - Added new items for viewing all elements of a category. - On air menu shows also current programs. - Added new section from home page of Raiplay.</news>  
-      <source>https://github.com/maxbambi/plugin.video.raitv/</source>  
-      <assets> 
-        <icon>resources/icon.png</icon>  
-        <fanart>resources/fanart.jpg</fanart> 
-      </assets> 
-    </extension> 
-  </addon>
-  <addon id="plugin.video.rivedila7" name="La7-La7d" version="4.4.1" provider-name="Luivit, Testato"> 
-    <requires> 
-      <import addon="xbmc.python" version="2.25.0"/>  
-      <import addon="script.module.requests" version="2.22.0"/>  
-      <import addon="script.module.inputstreamhelper" version="0.5.0"/>  
-      <import addon="script.module.beautifulsoup4" version="4.5.3"/>  
-      <import addon="script.module.html5lib" version="0.999.0"/> 
-    </requires>  
-    <extension point="xbmc.python.pluginsource" library="addon.py"> 
-      <provides>video</provides> 
-    </extension>  
-    <extension point="xbmc.addon.metadata"> 
-      <summary lang="en_GB">LA7-LA7d</summary>  
-      <description lang="en_GB">Live Streaming, Replay the last week, On-Demand programs, News and Weather, Teche LA7 - The Protagonists</description>  
-      <summary lang="it_IT">LA7-LA7d</summary>  
-      <description lang="it_IT">Diretta Live, Rivedi ultima settimana, Programmi On-Demand, Telegiornali e Meteo, Teche LA7 - I Protagonisti</description>  
-      <language>it</language>  
-      <platform>all</platform>  
-      <license>GNU General Public License v3.0</license>  
-      <forum>https://forum.kodi.tv/showthread.php?tid=331064</forum>  
-      <website>https://www.la7.it</website>  
-      <email>luivit39@gmail.com, speednpower@gmail.com</email>  
-      <source>https://github.com/luivit/plugin.video.rivedila7</source>  
-      <assets> 
-        <icon>resources/icon.png</icon>  
-        <fanart>resources/fanart.jpg</fanart>  
-        <screenshot>resources/screenshots/screenshot-00.jpg</screenshot>  
-        <screenshot>resources/screenshots/screenshot-01.jpg</screenshot>  
-        <screenshot>resources/screenshots/screenshot-02.jpg</screenshot> 
+        <icon>icon.png</icon> 
       </assets>  
-      <news>4.4.1 (2020-09-12) - fix for Kodi repo</news> 
+      <news>0.0.5: - Fixed Unicode decode errors when Kodi API returns non-UTF-8 byte strings. 0.0.4: - Implemented lazy patching of Kodi API functions and classes.</news> 
     </extension> 
   </addon>
   <addon id="plugin.video.TVP.pl" name="TVP.pl" version="2.2.3" provider-name="mbebe"> 
@@ -364,125 +764,7 @@
       </assets> 
     </extension> 
   </addon>
-  <addon id="plugin.video.tvpsport" name="TVP SPORT" version="0.0.11" provider-name="c0d34fun"> 
-    <requires> 
-      <import addon="xbmc.python" version="2.25.0"/>  
-      <import addon="script.module.requests" version="2.12.4"/>  
-      <import addon="script.module.inputstreamhelper" version="0.3.3"/>  
-      <import addon="script.module.m3u8" version="0.2.10"/> 
-    </requires>  
-    <extension point="xbmc.python.pluginsource" library="addon.py"> 
-      <provides>video</provides> 
-    </extension>  
-    <extension point="xbmc.addon.metadata"> 
-      <description lang="en">Watch TVP SPORT in Kodi!</description>  
-      <disclaimer lang="en">This is not an official plugin! If the official application is available for your platform, use it instead of this plugin. All rights to the content are reserved by ©2018 TELEWIZJA POLSKA S.A.</disclaimer>  
-      <summary lang="en">TVP SPORT</summary>  
-      <description lang="en">Watch TVP SPORT in Kodi!</description>  
-      <disclaimer lang="en">This is not an official plugin! If the official application is available for your platform, use it instead of this plugin. All rights to the content are reserved by ©2018 TELEWIZJA POLSKA S.A.</disclaimer>  
-      <language>pl</language>  
-      <platform>all</platform>  
-      <license>GNU GENERAL PUBLIC LICENSE. Version 2, June 1991</license>  
-      <website>https://sport.tvp.pl</website>  
-      <assets> 
-        <icon>resources/icon.png</icon>  
-        <fanart>resources/fanart.jpg</fanart>  
-        <screenshot>resources/screen01.jpg</screenshot>  
-        <screenshot>resources/screen02.jpg</screenshot>  
-        <screenshot>resources/screen03.jpg</screenshot>  
-        <screenshot>resources/screen04.jpg</screenshot> 
-      </assets> 
-    </extension> 
-  </addon>
-  <addon id="plugin.video.tvrepublika" version="0.2.0" name="Telewizja Republika" provider-name="ostvanc"> 
-    <requires> 
-      <import addon="xbmc.python" version="2.25.0"/>  
-      <import addon="script.module.beautifulsoup4" version="4.5.3"/>  
-      <import addon="plugin.video.youtube" version="6.5.2"/> 
-    </requires>  
-    <extension point="xbmc.python.pluginsource" library="main.py"> 
-      <provides>video</provides> 
-    </extension>  
-    <extension point="xbmc.addon.metadata"> 
-      <summary lang="en">Telewizja Republika</summary>  
-      <description lang="en_GB">Kodi video plugin for the Polish TV channel "Telewizja Republika".</description>  
-      <website>https://telewizjarepublika.pl</website>  
-      <assets> 
-        <icon>icon.png</icon>  
-        <fanart>fanart.jpg</fanart>  
-        <screenshot>resources\screenshot-01.jpg</screenshot> 
-      </assets>  
-      <news>0.0.1 - 21/11/2019 - Initial version - added TV Livestream 0.1.0 - 23/11/2019 - added Videos and Magazines 0.1.1 - 24/11/2019 - added 'Magazyn wojskowy' and 'Zawod zolnierz' 0.1.2 - 26/11/2019 - workaround for certificate erros 0.2.0 - 01/12/2019 - refactoring due to complete youtube video hosting by TVR</news> 
-    </extension> 
-  </addon>
-  <addon id="plugin.video.youtube" name="YouTube" version="6.8.4" provider-name="anxdpanic, bromix"> 
-    <requires> 
-      <import addon="xbmc.python" version="2.20.0"/>  
-      <import addon="script.module.six" version="1.11.0"/>  
-      <import addon="script.module.requests" version="2.12.4"/>  
-      <import addon="script.module.inputstreamhelper" version="0.2.2" optional="true"/> 
-    </requires>  
-    <extension point="xbmc.python.pluginsource" library="resources/lib/default.py"> 
-      <provides>video</provides> 
-    </extension>  
-    <extension point="xbmc.service" library="resources/lib/startup.py" start="login"/>  
-    <extension point="xbmc.python.module" library="resources/lib/"/>  
-    <extension point="xbmc.addon.metadata"> 
-      <news>[fix] next page now ignores sorting, remains at the end of the directory [fix] searching, no longer require remote safe search [fix] notifications for some languages [chg] only log http server ping failures [lang] zh_cn strings |contrib: yureng, xiaojun|</news>  
-      <assets> 
-        <icon>icon.png</icon>  
-        <fanart>fanart.jpg</fanart> 
-      </assets>  
-      <summary lang="en_GB">Plugin for YouTube</summary>  
-      <description lang="en_GB">YouTube is one of the biggest video-sharing websites of the world.</description>  
-      <disclaimer lang="en_GB">This plugin is not endorsed by Google</disclaimer>  
-      <summary lang="he_IL">תוסף עבור YouTube</summary>  
-      <description lang="he_IL">YouTube הוא אחד מאתרי שיתוף הווידאו הגדולים בעולם.</description>  
-      <summary lang="de_DE">Plugin für YouTube</summary>  
-      <description lang="de_DE">YouTube ist eines der größten Video-Sharing-Websites der Welt.</description>  
-      <summary lang="pl_PL">Wtyczka YouTube</summary>  
-      <description lang="pl_PL">YouTube jest jednym z największych na świecie serwisów udostępniania wideo.</description>  
-      <summary lang="hu_HU">YouTube kiegészítő</summary>  
-      <description lang="hu_HU">A YouTube világ egyik legnagyobb videómegosztó weboldala.</description>  
-      <summary lang="es_ES">Plugin para YouTube</summary>  
-      <description lang="es_ES">YouTube es uno de los sitios web más grande del mundo para compartir vídeos.</description>  
-      <disclaimer lang="es_ES">Este add-on no está respaldado por Google</disclaimer>  
-      <summary lang="es_MX">Plugin para YouTube</summary>  
-      <description lang="es_MX">YouTube es uno de los más grandes sitios web de intercambio de videos del mundo.</description>  
-      <disclaimer lang="es_MX">Este add-on no está respaldado por Google</disclaimer>  
-      <summary lang="ru_RU">Видеодополнение YouTube</summary>  
-      <description lang="ru_RU">YouTube - популярнейший видеохостинговый сайт, предоставляющий пользователям услуги хранения, доставки и показа видео.</description>  
-      <summary lang="fr_FR">Plugin pour YouTube</summary>  
-      <description lang="fr_FR">YouTube est l'un des plus grands sites de partage vidéos du monde.</description>  
-      <summary lang="zh_CN">YouTube附加元件</summary>  
-      <description lang="zh_CN">「Youtube」是全世界最大的影片分享網站</description>  
-      <summary lang="zh_TW">YouTube附加元件</summary>  
-      <description lang="zh_TW">「Youtube」是全世界最大的影片分享網站</description>  
-      <disclaimer lang="zh_TW">此附加元件未由Google支持</disclaimer>  
-      <summary lang="bg_BG">Добавка за YouTube</summary>  
-      <description lang="bg_BG">YouTube е един от най-големите уеб сайтове за споделяне на видео в целия свят.</description>  
-      <summary lang="el_GR">Πρόσθετο YouTube</summary>  
-      <description lang="el_GR">Το YouTube είναι μία από τις μεγαλύτερες ιστοσελίδες διαμοιρασμού βίντεο στον κόσμο.</description>  
-      <disclaimer lang="el_GR">Η παρούσα μικροεφαρμογή δεν έχει υϊοθετηθεί από την Google</disclaimer>  
-      <summary lang="nb_NO">Tillegg for YouTube</summary>  
-      <description lang="nb_NO">YouTube er en av verdens største nettsider for videodeling.</description>  
-      <summary lang="ko_KR">유튜브 플러그인</summary>  
-      <description lang="ko_KR">유튜브는 세상에서 가장 큰 동영상 공유 사이트 중의 하나입니다.</description>  
-      <summary lang="cs_CZ">Plugin pro YouTube</summary>  
-      <description lang="cs_CZ">YouTube je jedna z největších webových stránek světa sdílející video.</description>  
-      <disclaimer lang="cs_CZ">Tento plugin není schválen společností Google</disclaimer>  
-      <summary lang="tr_TR">YouTube için eklenti</summary>  
-      <description lang="tr_TR">YouTube, dünya üzerindeki en büyük video paylaşma platformlarından birisidir</description>  
-      <disclaimer lang="tr_TR">Bu eklenti Google tarafından üretilmemiştir</disclaimer>  
-      <platform>all</platform>  
-      <license>GPL-2.0-only</license>  
-      <forum>https://ytaddon.page.link/forum</forum>  
-      <website>https://www.youtube.com</website>  
-      <source>https://github.com/anxdpanic/plugin.video.youtube</source>  
-      <reuselanguageinvoker>true</reuselanguageinvoker> 
-    </extension> 
-  </addon>
-  <addon id="repository.ostvanc" name="ostvanc addon repository" version="1.1.1" provider-name="ostvanc"> 
+  <addon id="repository.ostvanc" name="ostvanc addon repository" version="1.1.3" provider-name="ostvanc"> 
     <extension point="xbmc.addon.repository" name="ostvanc Repository"> 
       <info compressed="false">https://github.com/ostvanc/kodi/raw/master/addons.xml</info>  
       <checksum>https://github.com/ostvanc/kodi/raw/master/addons.xml.md5</checksum>  
@@ -490,263 +772,9 @@
     </extension>  
     <extension point="xbmc.addon.metadata"> 
       <summary lang="en">ostvanc addon repository</summary>  
-      <description lang="en">A Kodi addon repository including 4Anime.to, Bild.de, Focus Online and Telewizja Republika</description>  
+      <description lang="en">A Kodi addon repository including Bild.de, Focus Online and Telewizja Republika</description>  
       <platform>all</platform>  
-      <news>1.1.2 (13-09-2020) - Added Netflix addon</news> 
-    </extension> 
-  </addon>
-  <addon id="script.module.addon.signals" name="Addon Signals" version="0.0.6" provider-name="Rick Phillips (ruuk)"> 
-    <requires> 
-      <import addon="xbmc.python" version="2.14.0"/> 
-    </requires>  
-    <extension point="xbmc.python.module" library="lib"/>  
-    <extension point="xbmc.addon.metadata"> 
-      <summary lang="en_GB">Inter-addon signalling</summary>  
-      <description lang="en_GB">Provides signal/slot mechanism for inter-addon communication</description>  
-      <platform>all</platform>  
-      <license>LGPL-2.1-only</license>  
-      <source>https://github.com/ruuk/script.module.addon.signals</source>  
-      <assets> 
-        <icon>icon.png</icon> 
-      </assets> 
-    </extension> 
-  </addon>
-  <addon id="script.module.cloudscraper" name="cloudscraper" version="1.2.36" provider-name="VeNoMouS (venom@gen-x.co.nz)"> 
-    <requires> 
-      <import addon="xbmc.python" version="2.7.0"/>  
-      <import addon="script.module.requests" version="2.9.2"/> 
-    </requires>  
-    <extension point="xbmc.python.module" library="lib"/>  
-    <extension point="xbmc.addon.metadata"> 
-      <summary lang="en_GB">Screen-scraping library</summary>  
-      <description lang="en_GB">A simple Python module to bypass Cloudflare's anti-bot page (also known as "I'm Under Attack Mode", or IUAM), implemented with Requests.</description>  
-      <license>MIT</license>  
-      <platform>all</platform>  
-      <website>https://github.com/venomous/cloudscraper</website>  
-      <assets> 
-        <icon>icon.png</icon> 
-      </assets> 
-    </extension> 
-  </addon>
-  <addon id="script.module.defusedxml" name="defusedxml" version="0.6.0" provider-name="Christian Heimes"> 
-    <requires> 
-      <import addon="xbmc.python" version="2.25.0"/> 
-    </requires>  
-    <extension point="xbmc.python.module" library="lib"/>  
-    <extension point="xbmc.addon.metadata"> 
-      <summary lang="en_GB">defusedxml -- defusing XML bombs and other exploits</summary>  
-      <description lang="en_GB">Packed for KODI from https://github.com/tiran/defusedxml</description>  
-      <platform>all</platform>  
-      <license>PSF</license>  
-      <website>https://pypi.org/project/defusedxml/</website>  
-      <source>https://github.com/tiran/defusedxml</source>  
-      <assets> 
-        <icon>icon.png</icon> 
-      </assets> 
-    </extension> 
-  </addon>
-  <addon id="script.module.future" name="future" version="0.17.1" provider-name="Ed Schofield"> 
-    <requires> 
-      <import addon="xbmc.python" version="2.14.0"/> 
-    </requires>  
-    <extension point="xbmc.python.module" library="libs"/>  
-    <extension point="xbmc.addon.metadata"> 
-      <summary lang="en">Clean single-source support for Python 3 and 2</summary>  
-      <description lang="en">future is the missing compatibility layer between Python 2 and Python 3. It allows you to use a single, clean Python 3.x-compatible codebase to support both Python 2 and Python 3 with minimal overhead.</description>  
-      <platform>all</platform>  
-      <license>MIT</license>  
-      <source>https://github.com/PythonCharmers/python-future</source>  
-      <website>http://python-future.org</website> 
-    </extension> 
-  </addon>
-  <addon id="script.module.ijson" name="ijson" version="2.5" provider-name="Rodrigo Tobar, Ivan Sagalaev"> 
-    <requires> 
-      <import addon="xbmc.python" version="2.25.0"/> 
-    </requires>  
-    <extension point="xbmc.python.module" library="lib"/>  
-    <extension point="xbmc.addon.metadata"> 
-      <summary lang="en_GB">Iterative JSON parser with a standard Python iterator interface</summary>  
-      <description lang="en_GB">Packed for KODI from https://github.com/isagalaev/ijson</description>  
-      <license>BSD-3-Clause</license>  
-      <website>https://pypi.org/project/ijson/</website>  
-      <source>https://github.com/ICRAR/ijson</source>  
-      <assets> 
-        <icon>icon.png</icon> 
-      </assets> 
-    </extension> 
-  </addon>
-  <addon id="script.module.inputstreamhelper" name="InputStream Helper" version="0.4.4" provider-name="emilsvennesson, dagwieers, mediaminister"> 
-    <requires> 
-      <!--py3 compliant-->  
-      <!--<import addon="xbmc.python" version="2.25.0" target="3.0.0"/>-->  
-      <import addon="xbmc.python" version="2.25.0"/>  
-      <import addon="script.module.pysocks" version="1.6.8" optional="true"/> 
-    </requires>  
-    <!-- This is needed to get an add-on icon -->  
-    <extension point="xbmc.python.script" library="default.py"> 
-      <provides>executable</provides> 
-    </extension>  
-    <extension point="xbmc.python.module" library="lib"/>  
-    <extension point="xbmc.addon.metadata"> 
-      <summary lang="en_GB">Kodi InputStream and DRM playback made easy</summary>  
-      <summary lang="de_DE">Kodi InputStream und DRM Wiedergabe einfach gemacht</summary>  
-      <summary lang="el_GR">Βοηθός Inputstream για το Kodi και εύκολη αναπαραγωγή DRM</summary>  
-      <summary lang="fr_FR">La lecture Kodi InputStream et DRM en toute simplicité</summary>  
-      <description lang="en_GB">A simple Kodi module that makes life easier for add-on developers relying on InputStream based add-ons and DRM playback.</description>  
-      <description lang="de_DE">Dieses einfache Kodi-Modul macht das Leben für Addon Entwickler einfacher, die auf InputStream basierte Addons und DRM Wiedergabe angewiesen sind.</description>  
-      <description lang="el_GR">Μία απλή μονάδα για το Kodi η οποία διευκολύνει την ζωή των προγραμματιστών οι οποίοι εξαρτώνται από τα πρόσθετσ InputStream και αναπαραγωγή τύπου DRM.</description>  
-      <description lang="ru_RU">Простой модуль для Kodi, который облегчает жизнь разработчикам дополнений, с использованием InputStream дополнений и воспроизведения DRM контента.</description>  
-      <description lang="fr_FR">Un simple module Kodi qui simplifie la vie des développeurs de modules complémentaires en s’appuyant sur des modules complémentaires basés sur InputStream et sur la lecture de DRM.</description>  
-      <news>v0.4.4 (2020-03-01) - Added option to restore a previously installed Widevine version - Improve progress bar when extracting Widevine on ARM devices - Improve Widevine library version detection - Improve InputStream Helper information - Increase download reliability for Chrome OS on ARM devices - Added Japanese, Korean, Croatian and Hungarian translations - Updated existing translations - Various small bugfixes for Widevine installation on ARM devices</news>  
-      <platform>all</platform>  
-      <license>MIT</license>  
-      <website>https://github.com/emilsvennesson/script.module.inputstreamhelper/wiki</website>  
-      <source>https://github.com/emilsvennesson/script.module.inputstreamhelper</source>  
-      <assets> 
-        <icon>resources/icon.png</icon> 
-      </assets> 
-    </extension> 
-  </addon>
-  <addon id="script.module.js2py" name="js2py" provider-name="Piotr Dabkowski" version="7.0.0"> 
-    <requires> 
-      <import addon="xbmc.python" version="2.14.0"/>  
-      <import addon="script.module.six" version="1.11.0"/>  
-      <import addon="script.module.pyjsparser" version="2.7.1"/>  
-      <import addon="script.module.tzlocal" version="1.5.1"/> 
-    </requires>  
-    <extension library="lib" point="xbmc.python.module"/>  
-    <extension point="xbmc.addon.metadata"> 
-      <summary lang="en">js2py+pyjsparser module</summary>  
-      <description lan="en">Pure Python JavaScript Translator/Interpreter</description>  
-      <license>MIT</license>  
-      <platform>all</platform>  
-      <email/>  
-      <website>http://piter.io/projects/js2py</website>  
-      <forum/>  
-      <source>https://github.com/PiotrDabkowski/Js2Py</source>  
-      <language/>  
-      <news>09/03/2020 - Bugfix by ostvanc in version 6.03.0: removed local library "pyjsparser" due to parsing errors</news> 
-    </extension> 
-  </addon>
-  <addon id="script.module.kodi-six" name="Kodi Six" version="0.0.5" provider-name="Roman V.M."> 
-    <requires> 
-      <import addon="xbmc.python" version="2.14.0"/> 
-    </requires>  
-    <extension point="xbmc.python.module" library="libs"/>  
-    <extension point="xbmc.addon.metadata"> 
-      <summary lang="en">Wrappers around Kodi Python API for seamless Python 2/3 compatibility</summary>  
-      <description lang="en">Wrappers around Kodi Python API that normalize handling of textual and byte strings in Python 2 and 3.</description>  
-      <platform>all</platform>  
-      <license>GPL v.3</license>  
-      <forum>https://forum.kodi.tv/showthread.php?tid=327883</forum>  
-      <source>https://github.com/romanvm/kodi.six</source>  
-      <assets> 
-        <icon>icon.png</icon> 
-      </assets>  
-      <news>0.0.5: - Fixed Unicode decode errors when Kodi API returns non-UTF-8 byte strings. 0.0.4: - Implemented lazy patching of Kodi API functions and classes.</news> 
-    </extension> 
-  </addon>
-  <addon id="script.module.mechanicalsoup" name="MechanicalSoup" version="0.12.0" provider-name="Matthew Hickford, Dan Hemberger, Matthieu Moy"> 
-    <requires> 
-      <import addon="xbmc.python" version="2.25.0"/>  
-      <import addon="script.module.requests" version="2.0.0"/>  
-      <import addon="script.module.beautifulsoup4" version="4.4.0"/>  
-      <import addon="script.module.six" version="1.4.0"/> 
-    </requires>  
-    <extension point="xbmc.python.module" library="lib"/>  
-    <extension point="xbmc.addon.metadata"> 
-      <summary lang="en">A Python library for automating interaction with websites.</summary>  
-      <forum/>  
-      <website>https://mechanicalsoup.readthedocs.io/</website>  
-      <license>MIT</license>  
-      <platform>all</platform>  
-      <source>https://github.com/MechanicalSoup/MechanicalSoup</source> 
-    </extension> 
-  </addon>
-  <addon id="script.module.myconnpy" name="MySQL Connector/Python" version="1.1.7" provider-name="MySQL"> 
-    <requires> 
-      <import addon="xbmc.python" version="2.1.0"/> 
-    </requires>  
-    <extension point="xbmc.python.module" library="lib"/>  
-    <extension point="xbmc.addon.metadata"> 
-      <summary lang="en">MySQL Connector/Python</summary>  
-      <description lang="en">MySQL Connector/Python is implementing the MySQL Client/Server protocol completely in Python. This means you don't have to compile anything or MySQL (client library) doesn't even have to be installed on the machine.</description>  
-      <license>GPLv2</license>  
-      <platform>all</platform>  
-      <website>http://dev.mysql.com/doc/connector-python/en/index.html</website>  
-      <source>http://dev.mysql.com/downloads/connector/python/</source> 
-    </extension> 
-  </addon>
-  <addon id="script.module.pyautogui" name="PyAutoGUI" version="0.9.49" provider-name="Al Sweigart"> 
-    <requires> 
-      <import addon="xbmc.python" version="2.25.0"/> 
-    </requires>  
-    <extension point="xbmc.python.module" library="lib"/>  
-    <extension point="xbmc.addon.metadata"> 
-      <summary lang="en">PyAutoGUI is a cross-platform GUI automation Python module for human beings. Used to programmatically control the mouse and keyboard.</summary>  
-      <forum/>  
-      <website>https://pyautogui.readthedocs.io/</website>  
-      <license>see LICENSE.txt</license>  
-      <platform>all</platform>  
-      <source>https://github.com/asweigart/pyautogui</source> 
-    </extension> 
-  </addon>
-  <addon id="script.module.pycryptodome" name="PyCryptodome" version="3.9.8" provider-name="Legrandin"> 
-    <requires> 
-      <import addon="xbmc.python" version="2.14.0"/> 
-    </requires>  
-    <extension point="xbmc.python.module" library="lib"/>  
-    <extension point="xbmc.addon.metadata"> 
-      <summary>Cryptographic library for Python</summary>  
-      <source>http://www.pycryptodome.org</source>  
-      <platform>all</platform>  
-      <license>Public domain</license> 
-    </extension> 
-  </addon>
-  <addon id="script.module.pydes" name="pyDes" version="2.0.1" provider-name="Todd Whiteman"> 
-    <requires> 
-      <import addon="xbmc.python" version="2.1.0"/> 
-    </requires>  
-    <extension point="xbmc.python.module" library="lib"/>  
-    <extension point="xbmc.addon.metadata"> 
-      <summary lang="en">A pure python module which implements the DES and Triple-DES encryption algorithms.</summary>  
-      <website>http://twhiteman.netfirms.com/des.html</website>  
-      <license>MIT</license>  
-      <platform>all</platform>  
-      <source>http://sourceforge.net/projects/pydes/</source> 
-    </extension> 
-  </addon>
-  <addon id="script.module.pyjsparser" name="pyjsparser" version="2.7.2" provider-name="Addons4Kodi"> 
-    <requires> 
-      <import addon="xbmc.python" version="2.25.0"/> 
-    </requires>  
-    <extension point="xbmc.python.module" library="lib"/>  
-    <extension point="xbmc.addon.metadata"> 
-      <summary>Pure Python JavaScript Translator/Interpreter</summary>  
-      <description>Packed for Kodi from https://github.com/PiotrDabkowski/pyjsparser</description>  
-      <platform>all</platform>  
-      <language/>  
-      <license>MIT</license>  
-      <forum/>  
-      <website>https://github.com/PiotrDabkowski/pyjsparser</website>  
-      <source>https://github.com/PiotrDabkowski/pyjsparser</source>  
-      <email/> 
-    </extension> 
-  </addon>
-  <addon id="script.module.pyperclip" name="pyperclip" version="1.7.0" provider-name="asweigart"> 
-    <requires> 
-      <import addon="xbmc.python" version="2.7.0"/> 
-    </requires>  
-    <extension point="xbmc.python.module" library="src"/>  
-    <extension point="xbmc.addon.metadata"> 
-      <summary lang="en_GB">Python clipboard library</summary>  
-      <description lang="en_GB">The purpose of Pyperclip is to provide a cross-platform Python module for copying and pasting text to the clipboard.</description>  
-      <license>MIT</license>  
-      <platform>all</platform>  
-      <website>https://pyperclip.readthedocs.io/en/latest/index.html</website>  
-      <assets> 
-        <icon>icon.png</icon> 
-      </assets> 
+      <news>1.1.3 (19-11-2020) - Fixed RaiPlay and removed 4Anime.to</news> 
     </extension> 
   </addon>
   <addon id="script.module.pytz" name="pytz" version="2014.2" provider-name="Stuart Bishop, Paul Backhouse"> 
@@ -767,6 +795,19 @@
       <disclaimer lang="en">Use at your own risk. The authors accept no liability. May cause permanent and/or catastrophic damage. Side effects include, but are not limited to loss of memory, seizures, sudden fits of rage, sudden fits of melancholy, inability to recall prominent capital cities, lack of respect for authority, fear of cats, temporary and/or permanent black outs. Avoid inhalation. Use in a well ventilated space. Keep away from small children.</disclaimer> 
     </extension> 
   </addon>
+  <addon id="script.module.pydes" name="pyDes" version="2.0.1" provider-name="Todd Whiteman"> 
+    <requires> 
+      <import addon="xbmc.python" version="2.1.0"/> 
+    </requires>  
+    <extension point="xbmc.python.module" library="lib"/>  
+    <extension point="xbmc.addon.metadata"> 
+      <summary lang="en">A pure python module which implements the DES and Triple-DES encryption algorithms.</summary>  
+      <website>http://twhiteman.netfirms.com/des.html</website>  
+      <license>MIT</license>  
+      <platform>all</platform>  
+      <source>http://sourceforge.net/projects/pydes/</source> 
+    </extension> 
+  </addon>
   <addon id="script.module.pyxbmct" name="PyXBMCt" version="1.3.0" provider-name="Roman V.M."> 
     <requires> 
       <import addon="xbmc.python" version="2.25.0"/>  
@@ -784,72 +825,6 @@
       <email>roman1972@gmail.com</email>  
       <source>https://github.com/romanvm/script.module.pyxbmct</source>  
       <news>Added compatibility with Python 3</news> 
-    </extension> 
-  </addon>
-  <addon id="script.module.requests" name="requests" version="2.22.1" provider-name="kennethreitz, beenje"> 
-    <requires> 
-      <import addon="xbmc.python" version="2.1.0"/> 
-    </requires>  
-    <extension point="xbmc.python.module" library="lib"/>  
-    <extension point="xbmc.addon.metadata"> 
-      <summary>Python HTTP for Humans</summary>  
-      <description>Packed for KODI from https://github.com/kennethreitz/requests</description>  
-      <platform>all</platform>  
-      <language/>  
-      <license>Apache2</license>  
-      <forum/>  
-      <website>http://python-requests.org</website>  
-      <source>https://github.com/beenje/script.module.requests</source>  
-      <email>beenje AT gmail.com</email> 
-    </extension> 
-  </addon>
-  <addon id="script.module.requests-toolbelt" name="requests-toolbelt" version="0.9.1" provider-name="Ian Cordasco, Cory Benfield (graffatcolmingov@gmail.com)"> 
-    <requires> 
-      <import addon="xbmc.python" version="2.7.0"/>  
-      <import addon="script.module.requests" version="2.1.0"/> 
-    </requires>  
-    <extension point="xbmc.python.module" library="lib"/>  
-    <extension point="xbmc.addon.metadata"> 
-      <summary lang="en_GB">Requests toolbet</summary>  
-      <description lang="en_GB">A handy Python module with utilites for the Requests module.</description>  
-      <license>MIT</license>  
-      <platform>all</platform>  
-      <website>https://toolbelt.readthedocs.org/</website>  
-      <assets> 
-        <icon>icon.png</icon> 
-      </assets> 
-    </extension> 
-  </addon>
-  <addon id="script.module.six" name="six" version="1.9.0" provider-name="gutworth"> 
-    <requires> 
-      <import addon="xbmc.python" version="2.1.0"/> 
-    </requires>  
-    <extension point="xbmc.python.module" library="lib"/>  
-    <extension point="xbmc.addon.metadata"> 
-      <summary>Python 2 and 3 compatibility utilities.</summary>  
-      <description>Six is a Python 2 and 3 compatibility library. It provides utility functions for smoothing over the differences between the Python versions with the goal of writing Python code that is compatible on both Python versions. See the documentation for more information on what is provided.</description>  
-      <platform>all</platform>  
-      <license>MIT</license>  
-      <source>https://pypi.python.org/pypi/six</source>  
-      <website>https://pypi.python.org/pypi/six</website> 
-    </extension> 
-  </addon>
-  <addon id="script.module.tzlocal" name="tzlocal" version="1.5.2" provider-name="Addons4Kodi"> 
-    <requires> 
-      <import addon="xbmc.python" version="2.25.0"/>  
-      <import addon="script.module.pytz" version="2014.2"/> 
-    </requires>  
-    <extension point="xbmc.python.module" library="lib"/>  
-    <extension point="xbmc.addon.metadata"> 
-      <summary>Python Module to find out the current time zone</summary>  
-      <description>Packed for Kodi from https://github.com/regebro/tzlocal</description>  
-      <platform>all</platform>  
-      <language/>  
-      <license>MIT</license>  
-      <forum/>  
-      <website>https://github.com/regebro/tzlocal</website>  
-      <source>https://github.com/regebro/tzlocal</source>  
-      <email/> 
     </extension> 
   </addon>
 </addons>

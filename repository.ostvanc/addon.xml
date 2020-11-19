@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="repository.ostvanc" name="ostvanc addon repository" version="1.1.1" provider-name="ostvanc">
+<addon id="repository.ostvanc" name="ostvanc addon repository" version="1.1.3" provider-name="ostvanc">
 	<extension point="xbmc.addon.repository" name="ostvanc Repository">
 		<info compressed="false">https://github.com/ostvanc/kodi/raw/master/addons.xml</info>
 		<checksum>https://github.com/ostvanc/kodi/raw/master/addons.xml.md5</checksum>
@@ -7,10 +7,10 @@
 	</extension>
 	<extension point="xbmc.addon.metadata">
 		<summary lang="en">ostvanc addon repository</summary>
-		<description lang="en">A Kodi addon repository including 4Anime.to, Bild.de, Focus Online and Telewizja Republika</description>
+		<description lang="en">A Kodi addon repository including Bild.de, Focus Online and Telewizja Republika</description>
 		<platform>all</platform>
-		<news>1.1.2  (13-09-2020)
-			- Added Netflix addon
+		<news>1.1.3  (19-11-2020)
+			- Fixed RaiPlay and removed 4Anime.to
 		</news>
 	</extension>
 </addon>
