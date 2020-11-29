@@ -168,6 +168,9 @@ class Settings(Singleton):
         elif 'dispShowOnly' == name: return self._gs('disptvshow') == 'true'
         elif 'payCont' == name: return self._gs('paycont') == 'true'
         elif 'verbLog' == name: return self._gs('logging') == 'true'
+        elif 'dumpJSON' == name: return self._gs('json_dump') == 'true'
+        elif 'dumpJSONCollisions' == name: return self._gs('json_dump_collisions') == 'true'
+        elif 'refineJSON' == name: return self._gs('json_dump_raw') == 'false'
         elif 'useIntRC' == name: return self._gs('remotectrl') == 'true'
         elif 'RMC_vol' == name: return self._gs('remote_vol') == 'true'
         elif 'ms_mov' == name: ms_mov = self._gs('mediasource_movie'); return ms_mov if ms_mov else 'Amazon Movies'
@@ -201,6 +204,7 @@ class Settings(Singleton):
         }
         elif 'catalogCacheExpiry' == name:
             return [3600, 21600, 43200, 86400, 259200, 604800, 1296000, 2592000][int(self._gs('catalog_cache_expiry'))]
+        elif 'profiles' == name: return self._gs('profiles') == 'true'
 
 
 def jsonRPC(method, props='', param=None):
@@ -234,7 +238,7 @@ def sleep(sec):
     from .logging import Log
     if Globals().monitor.waitForAbort(sec):
         import sys
-        Log('Abort requested - exiting addon')
+        Log('Abort requested – exiting addon')
         sys.exit()
 
 

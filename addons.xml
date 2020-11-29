@@ -485,12 +485,11 @@
       </assets> 
     </extension> 
   </addon>
-  <addon id="plugin.video.amazon-test" name="Amazon VOD" version="0.8.9~beta" provider-name="Sandmann79, Varstahl"> 
+  <addon id="plugin.video.amazon-test" name="Amazon VOD" version="0.9.0~beta" provider-name="Sandmann79, Varstahl"> 
     <requires> 
       <import addon="xbmc.python" version="2.24.0"/>  
       <import addon="script.module.beautifulsoup4" version="4.6.2"/>  
       <import addon="script.module.mechanicalsoup" version="0.12.0"/>  
-      <import addon="script.module.pydes" version="2.0.1"/>  
       <import addon="script.module.pyxbmct" version="1.1.7"/>  
       <import addon="script.module.inputstreamhelper" version="0.4.4"/>  
       <import addon="script.module.requests" version="2.9.1"/>  
@@ -508,8 +507,8 @@
       <summary lang="de_DE">Amazon Prime Instant Video</summary>  
       <description lang="en_GB">Movies and Television Shows for Prime Members</description>  
       <description lang="de_DE">Filme und Serien für Amazon Prime Mitglieder</description>  
-      <disclaimer lang="en_GB">Some parts of this addon may not be legal in your country of residence - please check with your local laws before installing. This Addon uses pyDes by Todd Whiteman</disclaimer>  
-      <disclaimer lang="de_DE">Möglicherweise sind einge Teile dieses Addons in Ihrem Land illegal, Sie sollten dies unbedingt vor der Installation überprüfen. Diese Addon verwendet pyDes von Todd Whiteman</disclaimer>  
+      <disclaimer lang="en_GB">Some parts of this addon may not be legal in your country of residence - please check with your local laws before installing.</disclaimer>  
+      <disclaimer lang="de_DE">Möglicherweise sind einge Teile dieses Addons in Ihrem Land illegal, Sie sollten dies unbedingt vor der Installation überprüfen.</disclaimer>  
       <forum>http://www.kodinerds.net/index.php/Thread/44211-Release-Amazon-Prime-Instant-Video</forum>  
       <source>https://github.com/Sandmann79/xbmc</source>  
       <license>GPL-3.0-or-later</license>  
@@ -764,7 +763,7 @@
       </assets> 
     </extension> 
   </addon>
-  <addon id="repository.ostvanc" name="ostvanc addon repository" version="1.1.4" provider-name="ostvanc"> 
+  <addon id="repository.ostvanc" name="ostvanc addon repository" version="1.1.5" provider-name="ostvanc"> 
     <extension point="xbmc.addon.repository" name="ostvanc Repository"> 
       <info compressed="false">https://github.com/ostvanc/kodi/raw/master/addons.xml</info>  
       <checksum>https://github.com/ostvanc/kodi/raw/master/addons.xml.md5</checksum>  
@@ -774,7 +773,7 @@
       <summary lang="en">ostvanc addon repository</summary>  
       <description lang="en">A Kodi addon repository including Bild.de, Focus Online and Telewizja Republika</description>  
       <platform>all</platform>  
-      <news>1.1.4 (19-11-2020) - Fixed RaiPlay and Signals, and removed 4Anime.to</news> 
+      <news>1.1.5 (29-11-2020) - Fixed Amazon.VOD</news> 
     </extension> 
   </addon>
   <addon id="script.module.pytz" name="pytz" version="2014.2" provider-name="Stuart Bishop, Paul Backhouse"> 

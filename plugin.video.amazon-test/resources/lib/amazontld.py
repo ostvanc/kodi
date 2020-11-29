@@ -33,14 +33,17 @@ class AmazonTLD(Singleton):
 
         if self._s.multiuser:
             addDir(getString(30134).format(loadUser('name')), 'switchUser', '', cm=self._g.CONTEXTMENU_MULTIUSER)
+        if self._s.profiles:
+            act, profiles = self.getProfiles()
+            if act is not False:
+                addDir(profiles[act][0], 'switchProfile', '', thumb=profiles[act][2])
         addDir('Watchlist', 'getListMenu', self._g.watchlist, cm=cm_wl)
         self.listCategories(0)
         addDir('Channels', 'Channel', '/gp/video/storefront/ref=nav_shopall_nav_sa_aos?filterId=OFFER_FILTER%3DSUBSCRIPTIONS', opt='root')
         addDir(getString(30136), 'Recent', '')
         addDir(getString(30108), 'Search', '')
         addDir(getString(30100), 'getListMenu', self._g.library, cm=cm_lb)
-        # addDir('[B]{}[/B]'.format(getString(5)), 'openSettings', self._g.addon.getAddonInfo('id'))
-        xbmcplugin.endOfDirectory(self._g.pluginhandle, updateListing=False)
+        xbmcplugin.endOfDirectory(self._g.pluginhandle, updateListing=False, cacheToDisc=False)
 
     @staticmethod
     def _cleanName(name, isfile=True):
@@ -166,7 +169,7 @@ class AmazonTLD(Singleton):
                 source_added = True
             else:
                 for tag in video_tag.iter('source'):
-                    if tag.findtext('name') in src_name and tag.findtext('path') not in src_path:
+                    if tag.findtext('name') == src_name and tag.findtext('path') != src_path:
                         tag.find('path').text = src_path
                         Log(src_name + ' source path changed')
                         source_added = True
@@ -193,7 +196,7 @@ class AmazonTLD(Singleton):
             with open(self.recentsdb, 'rb') as fp:
                 all_rec = pickle.load(fp)
 
-        cur_user = loadUser('name')
+        cur_user = loadUser('name') + getConfig('profileID')
         user_rec = all_rec.get(cur_user, [])
         return all_rec, user_rec
 
@@ -219,7 +222,7 @@ class AmazonTLD(Singleton):
             rec = rec[0:200]
 
         with open(self.recentsdb, 'wb') as fp:
-            cur_user = loadUser('name')
+            cur_user = loadUser('name') + getConfig('profileID')
             if cur_user in all_rec.keys():
                 all_rec[cur_user] = rec
             else:
@@ -396,6 +399,7 @@ class AmazonTLD(Singleton):
         oldurl = url
         titlelist = []
         ResPage = self._s.MaxResults
+        contentType = ''
 
         if export:
             ResPage = 240
@@ -448,7 +452,6 @@ class AmazonTLD(Singleton):
             name = infoLabels['DisplayTitle']
             asin = item['titleId']
             wlmode = 1 if self._g.watchlist in parent else 0
-            simiUrl = quote_plus('ASIN=' + asin + self._s.OfferGroup)
             cm = [(getString(wlmode + 30180) % getString(self._g.langID[contentType]),
                    'RunPlugin(%s?mode=WatchList&url=%s&opt=%s)' % (self._g.pluginid, wl_asin, wlmode)),
                   (getString(30185) % getString(self._g.langID[contentType]),
@@ -797,6 +800,8 @@ class AmazonTLD(Singleton):
         asins = []
         url = self._g.BaseUrl + aurl
         json = getURL(url, useCookie=cj, binary=True)
+        if not json:
+            return False, False
         WriteLog(str(json), 'watchlist')
         cont = self.findKey('content', json)
         info = {'approximateSize': cont.get('totalItems', 0),
@@ -811,7 +816,7 @@ class AmazonTLD(Singleton):
         if listing in [self._g.watchlist, self._g.library]:
             cj = MechanizeLogin()
             if not cj:
-                return
+                return [], ''
             args = {listing: {'sort': self._s.wl_order,
                               'libraryType': 'Items',
                               'primeOnly': False,
@@ -821,6 +826,10 @@ class AmazonTLD(Singleton):
 
             url = '/gp/video/api/myStuff{}?viewType={}&args={}'.format(listing.capitalize(), listing, json.dumps(args, separators=(',', ':')))
             info, asins = self._scrapeAsins(url, cj)
+            if info is False:
+                Log('Cookie invalid', Log.ERROR)
+                g.dialog.notification(g.__plugin__, getString(30266), xbmcgui.NOTIFICATION_ERROR)
+                return [], ''
         else:
             asins = listing
 
@@ -976,7 +985,8 @@ class AmazonTLD(Singleton):
                 item['link'] = {'url': item['title'].get('url')}
                 for p in ['title', 'synopsis', 'year']:
                     item[p] = item.get(p, {}).get('text', '')
-            n = item.get('facetAlternateText', '')
+            facet = item.get('facet')
+            n = facet.get('alternateText', '') if facet else item.get('facetAlternateText', '')
             wl = item.get('watchlistAction', item.get('watchlistButton'))
             title = item.get('text', item.get('title', ''))
             num = item.get('episodeNumber')
@@ -1007,7 +1017,7 @@ class AmazonTLD(Singleton):
                 il['Thumb'] = self.cleanIMGurl(img.get('packshot', img.get('titleshot')))
                 il['Fanart'] = self.cleanIMGurl(img.get('heroshot'))
             else:
-                il['Thumb'] = self.cleanIMGurl(item.get('image', {}).get('url', item.get('facetImage')))
+                il['Thumb'] = self.cleanIMGurl(item.get('image', {}).get('url', facet.get('image', '') if facet else item.get('facetImage')))
             if rating and rating.get('value'):
                 il['Rating'] = float(rating['value']) * 2
                 il['Votes'] = str(rating['count'])
@@ -1064,7 +1074,6 @@ class AmazonTLD(Singleton):
         data = getcache(uid) if not url else GrabJSON(url)
         s = time.time()
         props = data.get('search', data.get('results', data))
-        # LogJSON(props)
         vw = ''
         urls = []
         num_items = 0
@@ -1089,7 +1098,6 @@ class AmazonTLD(Singleton):
             self._menuDb.commit()
         elif 'items' in props:
             items = props.get('items', [])
-            num_items = len(items)
             for item in items:
                 il, ct = getInfos(item)
                 chid = item.get('playbackAction', item).get('channelId')
@@ -1136,7 +1144,6 @@ class AmazonTLD(Singleton):
         elif 'sections' in props:
             from datetime import datetime
             channels = props['sections'][0].get('channels', [])
-            # [channels.extend(item.get('channels', [])) for item in props['sections']]
             for item in channels:
                 il = self.getAsins(item, True)
                 pa = item.get('playbackAction')
@@ -1177,3 +1184,26 @@ class AmazonTLD(Singleton):
         '''
         setContentAndView(vw)
         return
+
+    def getProfiles(self):
+        j = GrabJSON(self._g.BaseUrl + '/gp/video/profiles')
+        if not j:
+            return False, False
+        profiles = []
+        active = 0
+        for item in j['profiles']:
+            url = self._g.BaseUrl + item['switchLink']['partialURL']
+            q = urlencode(item['switchLink']['query'])
+            profiles.append((item['name'], '{}?{}'.format(url, q), item['avatarUrl']))
+            if item.get('isSelected', False):
+                active = len(profiles) - 1
+                writeConfig('profileID', '' if item.get('isDefault', False) else item['name'])
+        return active, profiles
+
+    def switchProfile(self):
+        active, profiles = self.getProfiles()
+        if active is not False:
+            ret = self._g.dialog.select('Amazon', [i[0] for i in profiles])
+            if ret >= 0 and ret != active:
+                getURL(profiles[ret][1], useCookie=True, rjson=False, silent=True, check=True)
+        exit()

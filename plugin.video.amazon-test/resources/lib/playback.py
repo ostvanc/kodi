@@ -412,7 +412,7 @@ def PlayVideo(name, asin, adultstr, streamtype, forcefb=0):
                 if skip and s.skip_scene > 0:
                     for elem in skip:
                         st_pos = elem.get('startTimecodeMs')
-                        et_pos = (elem.get('endTimecodeMs') - st_pos) * 0.9 + st_pos
+                        et_pos = (elem.get('endTimecodeMs') - 5000)  # * 0.9 + st_pos
                         btn_type = elem.get('elementType')
                         if st_pos <= (player.video_lastpos * 1000) <= et_pos:
                             skip_button.display(elem)
@@ -420,7 +420,7 @@ def PlayVideo(name, asin, adultstr, streamtype, forcefb=0):
                             skip_button.hide()
             g.monitor.waitForAbort(1)
         skip_button.hide()
-        player.finished()
+        player.finished(True)
         del player, skip_button
         return True
 
@@ -583,6 +583,7 @@ class _AmazonPlayer(xbmc.Player):
         self.resume = 0
         self.watched = 0
         self.content = 0
+        self.rec_added = False
         self.resumedb = OSPJoin(g.DATA_PATH, 'resume.db')
 
     def resolve(self, li):
@@ -656,19 +657,22 @@ class _AmazonPlayer(xbmc.Player):
         self.finished()
 
     def updateStream(self, event):
+        if not self.asin:
+            return
         suc, msg = getURLData('usage/UpdateStream', self.asin, useCookie=self.cookie, opt='&event=%s&timecode=%s' %
                               (event, self.video_lastpos))
         if suc and 'statusCallbackIntervalSeconds' in str(msg):
             self.interval = msg['message']['body']['statusCallbackIntervalSeconds']
+        if not self.rec_added and self.video_lastpos > 180 and not g.UsePrimeVideo:
+            self.rec_added = True
+            g.amz.updateRecents(self.asin)
 
-    def finished(self):
-        self.updateStream('STOP')
-        if self.running:
+    def finished(self, forced=False):
+        if self.running and (self.video_lastpos > 0 or forced):
             self.running = False
+            self.updateStream('STOP')
             if self.video_lastpos > 0 and self.video_totaltime > 0:
                 self.watched = 1 if (self.video_lastpos * 100) / self.video_totaltime >= 90 else 0
-                if self.video_lastpos > 180 and not g.UsePrimeVideo:
-                    g.amz.updateRecents(self.asin)
                 if self.dbid and g.KodiK:
                     dbtype = _getListItem('DBTYPE')
                     params = {'%sid' % dbtype: self.dbid,

@@ -26,12 +26,8 @@ msgid "Movies and Television Shows for Prime Members"
 msgstr "Filme und Serien für Prime-Mitglieder"
 
 msgctxt "Addon Disclaimer"
-msgid ""
-"Some parts of this addon may not be legal in your country of residence – please check with your local laws before installing.\n"
-"This Addon uses pyDes by Todd Whiteman"
-msgstr ""
-"Möglicherweise sind einge Teile dieses Addons in Ihrem Land illegal, Sie sollten dies unbedingt vor der Installation überprüfen.\n"
-"Diese Erweiterung verwendet pyDes von Todd Whiteman"
+msgid "Some parts of this addon may not be legal in your country of residence – please check with your local laws before installing."
+msgstr "Möglicherweise sind einge Teile dieses Addons in Ihrem Land illegal, Sie sollten dies unbedingt vor der Installation überprüfen."
 
 msgctxt "#30001"
 msgid "Amazon Account"
@@ -124,6 +120,14 @@ msgstr "Angemeldet bleiben"
 msgctxt "#30023"
 msgid "Use android app for 4K videos"
 msgstr "Android App für 4K Videos verwenden"
+
+msgctxt "#30024"
+msgid "Profiles"
+msgstr "Profile"
+
+msgctxt "#30025"
+msgid "Change text language"
+msgstr "Anzeigesprache ändern"
 
 msgctxt "#30027"
 msgid "Stretch factor"
@@ -337,6 +341,34 @@ msgctxt "#30086"
 msgid "Autoskip All"
 msgstr "Alles autom. überspringen"
 
+msgctxt "#30087"
+msgid "Clear cache"
+msgstr "Cache leeren"
+
+msgctxt "#30088"
+msgid ""
+"Clear cached catalog or video data?\n"
+"Video data includes series/season metadata."
+msgstr ""
+"Katalogcache oder Videoinfos leeren?\n"
+"Videoinfos enthalten Serien/Staffel Metadaten."
+
+msgctxt "#30089"
+msgid "No"
+msgstr "Nein"
+
+msgctxt "#30090"
+msgid "Catalog"
+msgstr "Katalog"
+
+msgctxt "#30091"
+msgid "Video data"
+msgstr "Videoinfos"
+
+msgctxt "#30092"
+msgid "Both"
+msgstr "Beides"
+
 msgctxt "#30100"
 msgid "Library"
 msgstr "Bibliothek"
@@ -525,9 +557,21 @@ msgctxt "#30195"
 msgid "Skipping Scene…"
 msgstr "Szene wird übersprungen…"
 
+msgctxt "#30196"
+msgid "Dump JSON replies"
+msgstr "JSON antworten speichern"
+
+msgctxt "#30197"
+msgid "Dump collisions"
+msgstr "Kollisionen speichern "
+
 msgctxt "#30198"
 msgid "Browser or Script not found. Please check settings."
 msgstr "Browser oder Skript nicht gefunden. Bitte Einstellungen überprüfen."
+
+msgctxt "#30199"
+msgid "Raw"
+msgstr "Rohdaten"
 
 msgctxt "#30200"
 msgid "Login Error"
@@ -613,7 +657,6 @@ msgctxt "#30219"
 msgid "Unable to retrieve Amazon's territorial configuration."
 msgstr "Die Regionskonfiguration konnte nicht von Amazon abgerufen werden."
 
-# empty strings from id 30221 to 30241
 msgctxt "#30242"
 msgid "Page {}"
 msgstr "Seite {}"
@@ -676,36 +719,40 @@ msgstr "Fehler: Keine Inhalte vom Server erhalten (für mehr Infos Logs überpr�
 
 msgctxt "#30257"
 msgid "Catalog cache expiration time"
-msgstr ""
+msgstr "Cache-Ablaufzeit"
 
 msgctxt "#30258"
 msgid "1 hour"
-msgstr ""
+msgstr "1 Stunde"
 
 msgctxt "#30259"
 msgid "6 hours"
-msgstr ""
+msgstr "6 Stunden"
 
 msgctxt "#30260"
 msgid "12 hours"
-msgstr ""
+msgstr "12 Stunden"
 
 msgctxt "#30261"
 msgid "1 day"
-msgstr ""
+msgstr "1 Tag"
 
 msgctxt "#30262"
 msgid "3 days"
-msgstr ""
+msgstr "3 Tage"
 
 msgctxt "#30263"
 msgid "7 days"
-msgstr ""
+msgstr "7 Tage"
 
 msgctxt "#30264"
 msgid "15 days"
-msgstr ""
+msgstr "15 Tage"
 
 msgctxt "#30265"
 msgid "30 days"
-msgstr ""
+msgstr "30 Tage"
+
+msgctxt "#30266"
+msgid "Login credentials invalid, please login again."
+msgstr "Zugangsdaten ungültig, bitte erneut anmelden."

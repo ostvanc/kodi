@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 import os.path
+import sys
 
 from .network import *
 from .users import *
@@ -59,9 +60,7 @@ def EntryPoint():
     if path.startswith('/pv/'):
         path = py2_decode(path[4:])
         verb, path = path.split('/', 1)
-        if 'search' == verb: g.pv.Search()
-        elif 'browse' == verb: g.pv.Browse(path)
-        elif 'refresh' == verb: g.pv.Refresh(path)
+        g.pv.Route(verb, path)
     elif None is mode:
         Log('Version: %s' % g.__version__)
         Log('Unicode filename support: %s' % os.path.supports_unicode_filenames)
@@ -101,7 +100,7 @@ def EntryPoint():
             g.amz.Search(searchString)
     elif mode in ['LogIn', 'remLoginData', 'removeUser', 'renameUser', 'switchUser']:
         exec('{}()'.format(mode))
-    elif mode in ['checkMissing', 'Recent']:
+    elif mode in ['checkMissing', 'Recent', 'switchProfile']:
         exec('g.amz.{}()'.format(mode))
     elif mode == 'Channel':
         g.amz.Channel(url=args.get('url'), uid=args.get('opt'))

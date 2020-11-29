@@ -10,10 +10,10 @@ import re
 import sys
 import time
 
-from .common import key_exists, return_item
+from .common import key_exists, return_item, sleep
 from .singleton import Singleton
 from .network import getURL, getURLData, MechanizeLogin, FQify, GrabJSON
-from .logging import Log, LogJSON
+from .logging import Log
 from .itemlisting import setContentAndView
 from .l10n import *
 from .users import *
@@ -32,15 +32,17 @@ class PrimeVideo(Singleton):
     def __init__(self, globalsInstance, settingsInstance):
         self._g = globalsInstance
         self._s = settingsInstance
+        """ Data for date string deconstruction and reassembly
+
+            Date references:
+            https://www.primevideo.com/detail/0LCQSTWDMN9V770DG2DKXY3GVF/  09 10 11 12 01 02 03 04 05
+            https://www.primevideo.com/detail/0ND5POOAYD6A4THTH7C1TD3TYE/  06 07 08 09
+
+            Languages: https://www.primevideo.com/settings/language/
+        """
         self._dateParserData = {
-            """ Data for date string deconstruction and reassembly
-
-                Date references:
-                https://www.primevideo.com/detail/0LCQSTWDMN9V770DG2DKXY3GVF/  09 10 11 12 01 02 03 04 05
-                https://www.primevideo.com/detail/0ND5POOAYD6A4THTH7C1TD3TYE/  06 07 08 09
-
-                Languages: https://www.primevideo.com/settings/language/
-            """
+            'generic': r'^(?P<m>[^W]+)[.,:;\s-]+(?P<d>[0-9]+),\s+(?P<y>[0-9]+)(?:\s+[0-9]+|$)',
+            'asianMonthExtractor': r'^([0-9]+)[월月]',
             'da_DK': {'deconstruct': r'^(?P<d>[0-9]+)\.?\s+(?P<m>[^\s]+)\s+(?P<y>[0-9]+)',
                       'months': {'januar': 1, 'februar': 2, 'marts': 3, 'april': 4, 'maj': 5, 'juni': 6, 'juli': 7, 'august': 8, 'september': 9, 'oktober': 10,
                                  'november': 11, 'december': 12}},
@@ -81,6 +83,9 @@ class PrimeVideo(Singleton):
             'pt_BR': {'deconstruct': r'^(?P<d>[0-9]+)\s+de\s+(?P<m>[^\s]+),?\s+de\s+(?P<y>[0-9]+)',
                       'months': {'janeiro': 1, 'fevereiro': 2, 'março': 3, 'abril': 4, 'maio': 5, 'junho': 6, 'julho': 7, 'agosto': 8, 'setembro': 9, 'outubro': 10,
                                  'novembro': 11, 'dezembro': 12}},
+            'pt_PT': {'deconstruct': r'^(?P<d>[0-9]+)\s+de\s+(?P<m>[^\s]+),?\s+de\s+(?P<y>[0-9]+)',
+                      'months': {'janeiro': 1, 'fevereiro': 2, 'março': 3, 'abril': 4, 'maio': 5, 'junho': 6, 'julho': 7, 'agosto': 8, 'setembro': 9, 'outubro': 10,
+                                 'novembro': 11, 'dezembro': 12}},
             'ru_RU': {'deconstruct': r'^(?P<d>[0-9]+)\s+(?P<m>[^\s]+)\s+(?P<y>[0-9]+)',
                       'months': {'января': 1, 'февраля': 2, 'марта': 3, 'апреля': 4, 'мая': 5, 'июня': 6, 'июля': 7, 'августа': 8, 'сентября': 9,
                                  'октября': 10, 'ноября': 11, 'декабря': 12}},
@@ -104,6 +109,49 @@ class PrimeVideo(Singleton):
             'zh_TW': {'deconstruct': r'^(?P<y>[0-9]+)年(?P<m>[0-9]+)月(?P<d>[0-9]+)日',
                       'months': {'一月': 1, '二月': 2, '三月': 3, '四月': 4, '五月': 5, '六月': 6, '七月': 7, '八月': 8, '九月': 9, '十月': 10, '十一月': 11, '十二月': 12}},
         }
+        self._languages = [
+            ('id_ID', 'Bahasa Indonesia'),
+            ('da_DK', 'Dansk'),
+            ('de_DE', 'Deutsch'),
+            ('en_US', 'English'),
+            ('es_ES', 'Español'),
+            ('fr_FR', 'Français'),
+            ('it_IT', 'Italiano'),
+            ('nl_NL', 'Nederlands'),
+            ('nb_NO', 'Norsk'),
+            ('pl_PL', 'Polski'),
+            ('pt_BR', 'Português (Brasil)'),
+            ('pt_PT', 'Português (Portugal)'),
+            ('fi_FI', 'Suomi'),
+            ('sv_SE', 'Svenska'),
+            ('tr_TR', 'Türkçe'),
+            ('ru_RU', 'Русский'),
+            ('hi_IN', 'हिन्दी'),
+            ('ta_IN', 'தமிழ்'),
+            ('te_IN', 'తెలుగు'),
+            ('th_TH', 'ไทย'),
+            ('zh_CN', '简体中文'),
+            ('zh_TW', '繁體中文'),
+            ('ko_KR', '한국어'),
+        ]
+        self._TextCleanPatterns = [[r'\s+-\s*([^&])', r' – \1'],  # Convert dash from small to medium where needed
+                                   [r'\s*-\s+([^&])', r' – \1'],  # Convert dash from small to medium where needed
+                                   [r'^\s+', ''],  # Remove leading spaces
+                                   [r'\s+$', ''],  # Remove trailing spaces
+                                   [r' {2,}', ' '],  # Remove double spacing
+                                   [r'\.\.\.', '…']]  # Replace triple dots with ellipsis
+        # rex compilation
+        self._imageRefiner = re.compile(r'\._.*_\.')
+        self._reURN = re.compile(r'(?:/gp/video)?/d(?:p|etail)/([^/]+)/')
+        self._dateParserData['generic'] = re.compile(self._dateParserData['generic'], re.UNICODE)
+        self._dateParserData['asianMonthExtractor'] = re.compile(self._dateParserData['asianMonthExtractor'])
+        for k in self._dateParserData:
+            try:
+                self._dateParserData[k]['deconstruct'] = re.compile(self._dateParserData[k]['deconstruct'])
+            except: pass
+        for i, s in enumerate(self._TextCleanPatterns):
+            self._TextCleanPatterns[i][0] = re.compile(s[0])
+
         self._LoadCache()
 
     def _Flush(self, bFlushCacheData=True, bFlushVideoData=False):
@@ -152,13 +200,8 @@ class PrimeVideo(Singleton):
     def _BeautifyText(self, title):
         """ Correct stylistic errors in Amazon's titles """
 
-        for t in [(r'\s+-\s*([^&])', r' – \1'),  # Convert dash from small to medium where needed
-                  (r'\s*-\s+([^&])', r' – \1'),  # Convert dash from small to medium where needed
-                  (r'^\s+', ''),  # Remove leading spaces
-                  (r'\s+$', ''),  # Remove trailing spaces
-                  (r' {2,}', ' '),  # Remove double spacing
-                  (r'\.\.\.', '…')]:  # Replace triple dots with ellipsis
-            title = re.sub(t[0], t[1], title)
+        for r in self._TextCleanPatterns:
+            title = r[0].sub(r[1], title)
         return title
 
     def _TraverseCatalog(self, path, bRefresh=False):
@@ -208,6 +251,113 @@ class PrimeVideo(Singleton):
 
         return (node, pathList)
 
+    def _AddDirectoryItem(self, title, artmetadata, verb):
+        item = xbmcgui.ListItem(title)
+        item.setArt(artmetadata)
+        xbmcplugin.addDirectoryItem(self._g.pluginhandle, self._g.pluginid + verb, item, isFolder=True)
+        del item
+
+    def _UpdateProfiles(self, data):
+        if 'cerberus' in data:
+            p = data['cerberus']['activeProfile']
+            self._catalog['profiles'] = {'active': p['id']}
+            self._catalog['profiles'][p['id']] = {
+                'title': p['name'],
+                'metadata': {'artmeta': {'icon': p['avatarUrl']}},
+                'verb': 'pv/profiles/switch/{}'.format(p['id']),
+                'endpoint': p['switchLink'],
+            }
+            if 'otherProfiles' in data['cerberus']:
+                for p in data['cerberus']['otherProfiles']:
+                    self._catalog['profiles'][p['id']] = {
+                        'title': p['name'],
+                        'metadata': {'artmeta': {'icon': p['avatarUrl']}},
+                        'verb': 'pv/profiles/switch/{}'.format(p['id']),
+                        'endpoint': p['switchLink'],
+                    }
+
+    def Route(self, verb, path):
+        if 'search' == verb: g.pv.Search()
+        elif 'browse' == verb: g.pv.Browse(path)
+        elif 'refresh' == verb: g.pv.Refresh(path)
+        elif 'profiles' == verb: g.pv.Profile(path)
+        elif 'languageselect' == verb: g.pv.LanguageSelect()
+        elif 'clearcache' == verb: g.pv.DeleteCache()
+
+    def Profile(self, path):
+        """ Profile actions """
+        path = path.split('/')
+
+        def List():
+            """ List all inactive profiles """
+            # Hit a fast endpoint to grab and update CSRF tokens
+            home = GrabJSON(self._g.BaseUrl + '/gp/video/profiles')
+            self._UpdateProfiles(home)
+            for k, p in self._catalog['profiles'].items():
+                if 'active' == k or k == self._catalog['profiles']['active']:
+                    continue
+                self._AddDirectoryItem(p['title'], p['metadata']['artmeta'], p['verb'])
+            xbmcplugin.endOfDirectory(self._g.pluginhandle, succeeded=True, cacheToDisc=False, updateListing=False)
+
+        def Switch():
+            """ Switch to an inactive profile """
+            # Sometimes the switch just fails due to CSRF, possibly due to problems on Amazon's servers,
+            # so we patiently try a few times
+            for _ in range(0, 5):
+                endpoint = self._catalog['profiles'][path[1]]['endpoint']
+                Log('{} {}'.format(self._g.BaseUrl + endpoint['partialURL'], endpoint['query']))
+                home = GrabJSON(self._g.BaseUrl + endpoint['partialURL'], endpoint['query'])
+                self._UpdateProfiles(home)
+                if path[1] == self._catalog['profiles']['active']:
+                    break
+                sleep(3)
+            if path[1] == self._catalog['profiles']['active']:
+                self.BuildRoot(home if home else {})
+            else:
+                self._g.dialog.notification(self._g.addon.getAddonInfo('name'), 'Profile switching unavailable at the moment, please try again', time=1000, sound=False)
+            xbmcplugin.endOfDirectory(self._g.pluginhandle, succeeded=False, cacheToDisc=False, updateListing=True)
+
+        if 'list' == path[0]: List()
+        elif 'switch' == path[0]: Switch()
+
+    def DeleteCache(self):
+        """ Pops up a dialog asking cache purge confirmation """
+        from .dialogs import PV_ClearCache
+        from xbmcvfs import delete
+
+        # ClearCache.value returns a boolean bitmask
+        clear = PV_ClearCache()
+        if 0 > clear.value:
+            return
+
+        # Clear catalog (PVCP)
+        if 1 & clear.value:
+            self._catalog = {}
+            delete(self._catalogCache)
+            Log('Deleting catalog', Log.DEBUG)
+
+        # Clear video data (PVDP)
+        if 2 & clear.value:
+            self._videodata = {'urn2gti': {}}
+            delete(self._videodataCache)
+            Log('Deleting video data', Log.DEBUG)
+
+        del clear
+
+    def LanguageSelect(self):
+        cj = MechanizeLogin()
+        if cj:
+            l = cj.get('lc-main-av', path='/')
+        presel = [i for i, x in enumerate(self._languages) if x[0] == l]
+        sel = self._g.dialog.select(getString(30133), [x[1] for x in self._languages], preselect=presel[0] if presel else -1)
+        if sel < 0:
+            self._g.addon.openSettings()
+        else:
+            Log('Changing text language to [{}] {}'.format(self._languages[sel][0], self._languages[sel][1]), Log.DEBUG)
+            cj.set('lc-main-av', self._languages[sel][0], path='/')
+            saveUserCookies(cj)
+            self.DeleteCache()
+
     def BrowseRoot(self):
         """ Build and load the root PrimeVideo menu """
 
@@ -217,12 +367,15 @@ class PrimeVideo(Singleton):
                 return
         self.Browse('root')
 
-    def BuildRoot(self):
+    def BuildRoot(self, home=None):
         """ Parse the top menu on primevideo.com and build the root catalog """
 
-        home = GrabJSON(self._g.BaseUrl)
-        if not home:
-            return False
+        # Specify `None` instead of just not empty to avoid multiple queries to the same endpoint
+        if (home is None):
+            home = GrabJSON(self._g.BaseUrl)
+            if not home:
+                return False
+            self._UpdateProfiles(home)
         self._catalog['root'] = OrderedDict()
 
         # Insert the watchlist
@@ -301,6 +454,11 @@ class PrimeVideo(Singleton):
             if switchUser():
                 self.BuildRoot()
             return
+
+        # Add Profiles
+        if self._s.profiles and ('root' == path) and ('profiles' in self._catalog):
+            activeProfile = self._catalog['profiles'][self._catalog['profiles']['active']]
+            self._AddDirectoryItem(activeProfile['title'], activeProfile['metadata']['artmeta'], 'pv/profiles/list')
 
         try:
             from urllib.parse import quote_plus
@@ -432,6 +590,7 @@ class PrimeVideo(Singleton):
             folderType = 0 if 2 > folderType else 2
 
         setContentAndView([None, 'videos', 'series', 'season', 'episode', 'movie'][folderType])
+        xbmcplugin.endOfDirectory(self._g.pluginhandle, succeeded=True, cacheToDisc=False)
 
     def Search(self, searchString=None):
         """ Provide search functionality for PrimeVideo """
@@ -507,12 +666,12 @@ class PrimeVideo(Singleton):
         def MaxSize(imgUrl):
             """ Strip the dynamic resize triggers from the URL (and other effects, such as blur) """
 
-            return re.sub(r'\._.*_\.', '.', imgUrl)
+            return self._imageRefiner.sub(r'\._.*_\.', '.', imgUrl)
 
         def ExtractURN(url):
             """ Extract the unique resource name identifier """
 
-            ret = re.search(r'(?:/gp/video)?/d(?:p|etail)/([^/]+)/', url)
+            ret = self._reURN.search(url)
             return None if not ret else ret.group(1)
 
         def DelocalizeDate(lang, datestr):
@@ -524,13 +683,12 @@ class PrimeVideo(Singleton):
 
             # Try to decode the date as localized format
             try:
-                p = re.search(self._dateParserData[lang]['deconstruct'], datestr.lower())
+                p = self._dateParserData[lang]['deconstruct'].search(datestr.lower())
             except: pass
-
             # Sometimes the date is returned with an american format and/or not localized
             if None is p:
                 try:
-                    p = re.search(r'^(?P<m>[^W]+)[.,:;\s-]+(?P<d>[0-9]+),\s+(?P<y>[0-9]+)(?:\s+[0-9]+|$)', datestr.lower(), re.UNICODE)
+                    p = self._dateParserData['generic'].search(datestr.lower())
                 except: pass
                 if (None is p) or ('en_US' == lang):
                     Log('Unable to parse date "{}" with language "{}": format changed?'.format(datestr, lang), Log.DEBUG)
@@ -545,7 +703,7 @@ class PrimeVideo(Singleton):
             else:
                 # Since they're inept, try with asiatic numeric months first
                 try:
-                    p['m'] = int(re.match(r'^([0-9]+)[월月]', p['m'])[1])
+                    p['m'] = int(self._dateParserData['asianMonthExtractor'].match(p['m'])[1])
                 except: pass
 
                 def MonthToInt(langCode):
@@ -687,7 +845,6 @@ class PrimeVideo(Singleton):
                     NotifyUser(getString(30256), True)
                     Log('Unable to fetch the url: {}'.format(url), Log.ERROR)
                     return False
-                # LogJSON(data, url)
 
             # Video/season/movie data are in the `state` field of the response
             if 'state' not in data:
@@ -986,7 +1143,6 @@ class PrimeVideo(Singleton):
                         continue
                     else:
                         cnt = GrabJSON(requestURL)
-                        # LogJSON(cnt, requestURL)
 
                 # Don't switch direct action for reference until we have content to show for it
                 if cnt and ('lazyLoadURL' in o):
@@ -1012,10 +1168,12 @@ class PrimeVideo(Singleton):
             # Watchlist
             if ['root', 'Watchlist'] == breadcrumb:
                 wl = return_item(cnt, 'viewOutput', 'features', 'legacy-watchlist')
-                for f in wl['filters']:
-                    o[f['id']] = {'title': f['text'], 'lazyLoadURL': f['apiUrl' if 'apiUrl' in f else 'href']}
-                    if 'applied' in f and f['applied']:
-                        o[f['id']]['lazyLoadData'] = cnt
+                try:
+                    for f in wl['filters']:
+                        o[f['id']] = {'title': f['text'], 'lazyLoadURL': f['apiUrl' if 'apiUrl' in f else 'href']}
+                        if 'applied' in f and f['applied']:
+                            o[f['id']]['lazyLoadData'] = cnt
+                except KeyError: pass  # Empty watchlist
             else:
                 # Watchlist / Widow list / API Search
                 vo = return_item(cnt, 'viewOutput', 'features', 'legacy-watchlist', 'content')

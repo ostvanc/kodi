@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: XBMC-Addons\n"
 "Report-Msgid-Bugs-To: alanwww1@xbmc.org\n"
 "POT-Creation-Date: 2016-07-07 19:46+0000\n"
-"PO-Revision-Date: 2020-05-15 11:24+0200\n"
+"PO-Revision-Date: 2020-09-22 08:30+0200\n"
 "Last-Translator: \n"
 "Language-Team: LANGUAGE\n"
 "Language: it_IT\n"
@@ -16,7 +16,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Poedit 2.3.1\n"
+"X-Generator: Poedit 2.4.1\n"
 
 msgctxt "Addon Summary"
 msgid "Amazon Prime Video Streaming"
@@ -27,12 +27,8 @@ msgid "Movies and Television Shows for Prime Members"
 msgstr "Film e Serie TV per i clienti Prime"
 
 msgctxt "Addon Disclaimer"
-msgid ""
-"Some parts of this addon may not be legal in your country of residence – please check with your local laws before installing.\n"
-"This Addon uses pyDes by Todd Whiteman"
-msgstr ""
-"Alcune parti di questo addon potrebbero non essere legali nel tuo paese di residenza – si prega di verificare con le leggi locali prima di installare.\n"
-"Questo Addon utilizza pyDes di Todd Whiteman"
+msgid "Some parts of this addon may not be legal in your country of residence – please check with your local laws before installing."
+msgstr "Alcune parti di questo addon potrebbero non essere legali nel tuo paese di residenza – si prega di verificare con le leggi locali prima di installare."
 
 msgctxt "#30001"
 msgid "Amazon Account"
@@ -126,7 +122,14 @@ msgctxt "#30023"
 msgid "Use android app for 4K videos"
 msgstr "Usa app Android per i video in 4K"
 
-# empty strings from id 30024 to id 30026
+msgctxt "#30024"
+msgid "Profiles"
+msgstr "Profili"
+
+msgctxt "#30025"
+msgid "Change text language"
+msgstr "Cambia lingua del testo"
+
 msgctxt "#30027"
 msgid "Stretch factor"
 msgstr "Fattore di regolazione"
@@ -163,7 +166,6 @@ msgctxt "#30035"
 msgid "Enable Views"
 msgstr "Abilita Viste"
 
-# empty string with id 30036
 msgctxt "#30037"
 msgid "Disable SSL Certificate Verification"
 msgstr "Disabilita verifica certificati SSL"
@@ -176,7 +178,6 @@ msgctxt "#30039"
 msgid "Items Per Page"
 msgstr "Elementi per Pagina"
 
-# empty string with id 30040
 msgctxt "#30041"
 msgid "Enable Fullscreen Video"
 msgstr "Abilita video a schermo intero"
@@ -245,7 +246,6 @@ msgctxt "#30057"
 msgid "Wait till PIN Input"
 msgstr "Attendere fino all'inserimento del PIN"
 
-# empty string with id 30058
 msgctxt "#30059"
 msgid "Use own user profile"
 msgstr "Usa il proprio profilo utente"
@@ -274,7 +274,6 @@ msgctxt "#30065"
 msgid "Mediasource TV Title"
 msgstr "Titolo della sorgente multimediale TV"
 
-# empty strings from id 30066 to 30069
 msgctxt "#30070"
 msgid "Miscellaneous"
 msgstr "Miscellanee"
@@ -343,7 +342,34 @@ msgctxt "#30086"
 msgid "Autoskip All"
 msgstr "Salta entrambi in automatico"
 
-# empty strings from id 30087 to 30099
+msgctxt "#30087"
+msgid "Clear cache"
+msgstr "Pulizia della cache"
+
+msgctxt "#30088"
+msgid ""
+"Clear cached catalog or video data?\n"
+"Video data includes series/season metadata."
+msgstr ""
+"Pulire la cache del catalogo e dei dati video?\n"
+"I dati video includono metadati di serie/stagioni."
+
+msgctxt "#30089"
+msgid "No"
+msgstr "No"
+
+msgctxt "#30090"
+msgid "Catalog"
+msgstr "Catalogo"
+
+msgctxt "#30091"
+msgid "Video data"
+msgstr "Dati video"
+
+msgctxt "#30092"
+msgid "Both"
+msgstr "Entrambe"
+
 msgctxt "#30100"
 msgid "Library"
 msgstr "Libreria"
@@ -356,12 +382,10 @@ msgctxt "#30102"
 msgid "Force Fallback"
 msgstr "Obbliga Fallback"
 
-# empty string id 301033
 msgctxt "#30104"
 msgid "Movies"
 msgstr "Film"
 
-# empty strings from id 30105 to 30106
 msgctxt "#30107"
 msgid "Television"
 msgstr "Televisione"
@@ -374,7 +398,6 @@ msgctxt "#30109"
 msgid "Choose Bitrate for Playback"
 msgstr "Scegli Bitrate per la riproduzione"
 
-# empty string with id 30110
 msgctxt "#30111"
 msgid "Continue to Page %s"
 msgstr "Continua a pagina %s"
@@ -395,7 +418,6 @@ msgctxt "#30115"
 msgid "Available Languages:"
 msgstr "Lingue disponibili:"
 
-# empty strings from id 30116 to 30119
 msgctxt "#30120"
 msgid "PIN (empty for no restriction)"
 msgstr "PIN (vuoto per nessuna restrizione)"
@@ -412,12 +434,10 @@ msgctxt "#30123"
 msgid "Cancel"
 msgstr "Annulla"
 
-# empty strings from id 30124 to 30126
 msgctxt "#30127"
 msgid "No content found"
 msgstr "Nessun contenuto trovato"
 
-# empty strings from id 30128 to 30129
 msgctxt "#30130"
 msgid "Add User…"
 msgstr "Aggiungi utente…"
@@ -446,17 +466,14 @@ msgctxt "#30136"
 msgid "Recently watched"
 msgstr "Visti di recente"
 
-# empty strings from id 30137 to 30142
 msgctxt "#30143"
 msgid "All Movies"
 msgstr "Tutti i Film"
 
-# empty strings from id 30144 to 30159
 msgctxt "#30160"
 msgid "All Shows"
 msgstr "Tutte le Serie"
 
-# empty strings from id 30161 to 30164
 msgctxt "#30165"
 msgid "Movie"
 msgstr "Film"
@@ -477,17 +494,14 @@ msgctxt "#30169"
 msgid "Specials"
 msgstr "Speciali"
 
-# empty string with id 30170
 msgctxt "#30171"
 msgid "Unrated"
 msgstr "Non classificato"
 
-# empty string with id 30172
 msgctxt "#30173"
 msgid "Episode"
 msgstr "Episodio"
 
-# empty strings from id 30174 to 30179
 msgctxt "#30180"
 msgid "Add %s to Watchlist"
 msgstr "Aggiungi %s alla Lista Video"
@@ -544,12 +558,22 @@ msgctxt "#30195"
 msgid "Skipping Scene…"
 msgstr "Salto in corso…"
 
-# empty strings from id 30195 to 30197
+msgctxt "#30196"
+msgid "Dump JSON replies"
+msgstr "Salva le risposte JSON"
+
+msgctxt "#30197"
+msgid "Dump collisions"
+msgstr "Salva le collisioni"
+
 msgctxt "#30198"
 msgid "Browser or Script not found. Please check settings."
 msgstr "Browser o script non trovato. Per favore controlla le impostazioni."
 
-# empty string with id 30199
+msgctxt "#30199"
+msgid "Raw"
+msgstr "Grezzi"
+
 msgctxt "#30200"
 msgid "Login Error"
 msgstr "Errore di login"
@@ -634,7 +658,6 @@ msgctxt "#30219"
 msgid "Unable to retrieve Amazon's territorial configuration."
 msgstr "Impossibile recuperare la configurazione territoriale di Amazon."
 
-# empty strings from id 30221 to 30241
 msgctxt "#30242"
 msgid "Page {}"
 msgstr "Pagina {}"
@@ -647,7 +670,6 @@ msgctxt "#30244"
 msgid "Everything"
 msgstr "Tutto"
 
-# empty strings from id 30174 to 30179
 msgctxt "#30245"
 msgid "Watchlist"
 msgstr "Lista Video"
@@ -660,7 +682,6 @@ msgctxt "#30247"
 msgid "Search"
 msgstr "Ricerca"
 
-# empty strings from id 30220 to 30247
 msgctxt "#30248"
 msgid "Proxy MPD alteration"
 msgstr "Proxy di modifica MPD"
@@ -699,36 +720,40 @@ msgstr "Errore: nessun contenuto fornito dai server (controllare i log per maggi
 
 msgctxt "#30257"
 msgid "Catalog cache expiration time"
-msgstr ""
+msgstr "Permanenza del catalogo nella cache"
 
 msgctxt "#30258"
 msgid "1 hour"
-msgstr ""
+msgstr "1 ora"
 
 msgctxt "#30259"
 msgid "6 hours"
-msgstr ""
+msgstr "6 ore"
 
 msgctxt "#30260"
 msgid "12 hours"
-msgstr ""
+msgstr "12 ore"
 
 msgctxt "#30261"
 msgid "1 day"
-msgstr ""
+msgstr "1 giorno"
 
 msgctxt "#30262"
 msgid "3 days"
-msgstr ""
+msgstr "3 giorni"
 
 msgctxt "#30263"
 msgid "7 days"
-msgstr ""
+msgstr "7 giorni"
 
 msgctxt "#30264"
 msgid "15 days"
-msgstr ""
+msgstr "15 giorni"
 
 msgctxt "#30265"
 msgid "30 days"
+msgstr "30 giorni"
+
+msgctxt "#30266"
+msgid "Login credentials invalid, please login again."
 msgstr ""

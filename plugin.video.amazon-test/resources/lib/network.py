@@ -7,21 +7,20 @@ from kodi_six import xbmcgui
 import pickle
 import json
 import mechanicalsoup
-from platform import node
 import pyxbmct
 import re
 import requests
-import uuid
 import ssl
+from timeit import default_timer as timer
 from urllib3.poolmanager import PoolManager
 from requests.adapters import HTTPAdapter
-from pyDes import *
 from random import randint
 from bs4 import BeautifulSoup
 from .l10n import *
 from .logging import *
 from .configs import *
 from .common import Globals, Settings, sleep
+from .metrics import addNetTime
 
 
 def _parseHTML(br):
@@ -113,13 +112,14 @@ def getTerritory(user):
 def getURL(url, useCookie=False, silent=False, headers=None, rjson=True, attempt=1, check=False, postdata=None, binary=False, allow_redirects=True):
     if not hasattr(getURL, 'sessions'):
         getURL.sessions = {}  # Keep-Alive sessions
+        getURL.hostParser = re.compile(r'://([^/]+)(?:/|$)')
 
     # Static variable to store last response code. 0 means generic error (like SSL/connection errors),
     # while every other response code is a specific HTTP status code
     getURL.lastResponseCode = 0
 
     # Create sessions for keep-alives and connection pooling
-    host = re.search('://([^/]+)(?:/|$)', url)  # Try to extract the host from the URL
+    host = getURL.hostParser.search(url)  # Try to extract the host from the URL
     if None is not host:
         host = host.group(1)
         if host not in getURL.sessions:
@@ -128,12 +128,12 @@ def getURL(url, useCookie=False, silent=False, headers=None, rjson=True, attempt
     else:
         session = requests.Session()
 
-    cj = requests.cookies.RequestsCookieJar()
-    retval = [] if rjson else ''
+    retval = {} if rjson else ''
     if useCookie:
         cj = MechanizeLogin() if isinstance(useCookie, bool) else useCookie
         if isinstance(cj, bool):
             return retval
+        session.cookies.update(cj)
 
     from .common import Globals, Settings
     g = Globals()
@@ -161,21 +161,28 @@ def getURL(url, useCookie=False, silent=False, headers=None, rjson=True, attempt
         pass  # Fail on permanent errors
 
     try:
-        starttime = time.time()
+        starttime = timer()
         method = 'POST' if postdata is not None else 'GET'
-        r = session.request(method, url, data=postdata, headers=headers, cookies=cj, verify=s.verifySsl, stream=True, allow_redirects=allow_redirects)
+        r = session.request(method, url, data=postdata, headers=headers, verify=s.verifySsl, stream=True, allow_redirects=allow_redirects)
         getURL.lastResponseCode = r.status_code  # Set last response code
         response = 'OK'
         if not check:
             response = r.content.decode('utf-8') if binary else r.text
         else:
             rjson = False
+        if useCookie and 'auth-cookie-warning-message' in response:
+            Log('Cookie invalid', Log.ERROR)
+            g.dialog.notification(g.__plugin__, getString(30266), xbmcgui.NOTIFICATION_ERROR)
+            return retval
         # 408 Timeout, 429 Too many requests and 5xx errors are temporary
         # Consider everything else definitive fail (like 404s and 403s)
         if (408 == r.status_code) or (429 == r.status_code) or (500 <= r.status_code):
             raise TryAgain('{0} error'.format(r.status_code))
         if 400 <= r.status_code:
             raise NoRetries('{0} error'.format(r.status_code))
+        if useCookie:
+            from .users import saveUserCookies
+            saveUserCookies(session.cookies)
     except (TryAgain,
             NoRetries,
             requests.exceptions.Timeout,
@@ -207,7 +214,10 @@ def getURL(url, useCookie=False, silent=False, headers=None, rjson=True, attempt
             return getURL(url, useCookie, silent, headers, rjson, attempt, check, postdata, binary)
         return retval
     res = json.loads(response) if rjson else response
-    Log('Download Time: %s' % (time.time() - starttime), Log.DEBUG)
+    duration = timer()
+    duration -= starttime
+    addNetTime(duration)
+    Log('Download Time: %s' % duration, Log.DEBUG)
     return res
 
 
@@ -342,10 +352,10 @@ def MechanizeLogin():
         except:
             pass
 
-    return LogIn(False)
+    return LogIn()
 
 
-def LogIn(ask=True):
+def LogIn():
     def _insertLF(string, begin=70):
         spc = string.find(' ', begin)
         return string[:spc] + '\n' + string[spc + 1:] if spc > 0 else string
@@ -503,24 +513,6 @@ def LogIn(ask=True):
             return password
         return False
 
-    def _getmac():
-        mac = uuid.getnode()
-        if (mac >> 40) % 2:
-            mac = node()
-        return uuid.uuid5(uuid.NAMESPACE_DNS, str(mac)).bytes
-
-    def _encode(data):
-        k = triple_des(_getmac(), CBC, b"\0\0\0\0\0\0\0\0", padmode=PAD_PKCS5)
-        d = k.encrypt(data)
-        return b64encode(d).decode('utf-8')
-
-    def _decode(data):
-        if not data:
-            return ''
-        k = triple_des(_getmac(), CBC, b"\0\0\0\0\0\0\0\0", padmode=PAD_PKCS5)
-        d = k.decrypt(b64decode(data))
-        return d
-
     class LoginLocked(Exception):
         pass
 
@@ -548,29 +540,16 @@ def LogIn(ask=True):
         s = Settings()
         Log('Login')
         from .users import loadUser, addUser
-        user = loadUser(empty=ask)
-        email = user['email']
-        password = _decode(user['password'])
-        savelogin = False  # g.addon.getSetting('save_login') == 'true'
-        useMFA = False
-
-        if not user['baseurl']:
-            user = getTerritory(user)
-            if False is user[1]:
-                return False
-            user = user[0]
-
-        if ask:
-            keyboard = xbmc.Keyboard(email, getString(30002))
-            keyboard.doModal()
-            if keyboard.isConfirmed() and keyboard.getText():
-                email = keyboard.getText()
-                password = _setLoginPW()
-        else:
-            if not email or not password:
-                g.dialog.notification(getString(30200), getString(30216))
-                xbmc.executebuiltin('Addon.OpenSettings(%s)' % g.addon.getAddonInfo('id'))
-                return False
+        user = getTerritory(loadUser(empty=True))
+        if False is user[1]:
+            return False
+        user = user[0]
+        password = ''
+        keyboard = xbmc.Keyboard('', getString(30002))
+        keyboard.doModal()
+        if keyboard.isConfirmed() and keyboard.getText():
+            email = keyboard.getText()
+            password = _setLoginPW()
 
         if password:
             cj = requests.cookies.RequestsCookieJar()
@@ -637,28 +616,18 @@ def LogIn(ask=True):
                 except AttributeError:
                     usr = getString(30209)
 
-                if s.multiuser and ask:
+                if s.multiuser:
                     usr = g.dialog.input(getString(30135), usr)
                     if not usr:
                         return False
-                if useMFA:
-                    g.addon.setSetting('save_login', 'false')
-                    savelogin = False
 
                 user['name'] = usr
-                user['email'] = user['password'] = user['cookie'] = ''
+                user['cookie'] = requests.utils.dict_from_cookiejar(cj)
 
-                if savelogin:
-                    user['email'] = email
-                    user['password'] = _encode(password)
-                else:
-                    user['cookie'] = requests.utils.dict_from_cookiejar(cj)
-
-                if ask:
-                    remLoginData(False)
-                    g.addon.setSetting('login_acc', usr)
-                    if not s.multiuser:
-                        g.dialog.ok(getString(30215), '{0} {1}'.format(getString(30014), usr))
+                remLoginData(False)
+                g.addon.setSetting('login_acc', usr)
+                if not s.multiuser:
+                    g.dialog.ok(getString(30215), '{0} {1}'.format(getString(30014), usr))
 
                 addUser(user)
                 g.genID()
@@ -714,8 +683,10 @@ def FQify(URL):
         return base + '/' + URL
 
 
-def GrabJSON(url, bRaw=False):
+def GrabJSON(url, postData=None):
     """ Extract JSON objects from HTMLs while keeping the API ones intact """
+
+    s = Settings()
 
     def Unescape(text):
         """ Unescape various html/xml entities in dictionary values, courtesy of Fredrik Lundh """
@@ -760,7 +731,7 @@ def GrabJSON(url, bRaw=False):
 
         return text
 
-    def Merge(o, n):
+    def Merge(o, n, keys=[]):
         """ Merge JSON objects with multiple multi-level collisions """
         if (not n) or (o == n):  # Nothing to do
             return
@@ -776,11 +747,22 @@ def GrabJSON(url, bRaw=False):
                 if k not in o:
                     o[k] = n[k]  # Insert into dictionary
                 else:
-                    Merge(o[k], n[k])  # Recurse
+                    Merge(o[k], n[k], keys + [k])  # Recurse
         else:
-            # LogJSON(n, optionalName='CollisionNew')
-            # LogJSON(o, optionalName='CollisionOld')
-            Log('Collision detected during JSON objects merging, overwriting and praying (type: {})'.format(type(n)), Log.WARNING)
+            # Ignore reporting collisions on metadata we don't care about
+            if keys not in [
+                ['csrfToken'],
+                ['metadata', 'availability', 'description'],
+                ['metadata', 'availability', 'severity'],
+            ]:
+                k = ' > '.join(keys)
+                if s.dumpJSONCollisions:
+                    LogJSON(n, k, optionalName='CollisionNew')
+                    LogJSON(o, k, optionalName='CollisionOld')
+                Log('Collision detected during JSON objects merging{}, overwriting and praying (type: {})'.format(
+                    ' on key “{}”'.format(k) if keys else '',
+                    type(n)
+                ), Log.WARNING)
             o = n
 
     def Prune(d):
@@ -793,74 +775,80 @@ def GrabJSON(url, bRaw=False):
             for k in list(l):  # list() instead of .keys() to avoid py3 iteration errors
                 if k == 'strings':
                     l[k] = {s: l[k][s] for s in ['AVOD_DP_season_selector'] if s in l[k]}
-                if (not l[k]) or (k in ['csrfToken', 'context', 'params', 'playerConfig', 'refine']):
+                if (not l[k]) or (k in ['context', 'params', 'playerConfig', 'refine']):
                     del l[k]
             l = d.values()
         for v in l:
             if isinstance(v, dict) or isinstance(v, list):
                 Prune(v)
 
-    try:
-        from htmlentitydefs import name2codepoint
-        from urlparse import urlparse, parse_qs
-        from urllib import urlencode
-    except:
-        from urllib.parse import urlparse, parse_qs, urlencode
-        from html.entities import name2codepoint
+    def do(url, postData):
+        """ Wrapper to facilitate logging """
+        try:
+            from htmlentitydefs import name2codepoint
+            from urlparse import urlparse, parse_qs
+            from urllib import urlencode
+        except:
+            from urllib.parse import urlparse, parse_qs, urlencode
+            from html.entities import name2codepoint
 
-    if url.startswith('/search/'):
-        np = urlparse(url)
-        qs = parse_qs(np.query)
-        if 'from' in list(qs):  # list() instead of .keys() to avoid py3 iteration errors
-            qs['startIndex'] = qs['from']
-            del qs['from']
-        np = np._replace(path='/gp/video/api' + np.path, query=urlencode([(k, v) for k, l in qs.items() for v in l]))
-        url = np.geturl()
+        if url.startswith('/search/'):
+            np = urlparse(url)
+            qs = parse_qs(np.query)
+            if 'from' in list(qs):  # list() instead of .keys() to avoid py3 iteration errors
+                qs['startIndex'] = qs['from']
+                del qs['from']
+            np = np._replace(path='/gp/video/api' + np.path, query=urlencode([(k, v) for k, l in qs.items() for v in l]))
+            url = np.geturl()
 
-    r = getURL(FQify(url), silent=True, useCookie=True, rjson=False)
-    if not r:
-        return None
-    try:
-        r = r.strip()
-        if '{' == r[0:1]:
-            o = json.loads(Unescape(r))
-            if not bRaw:
-                Prune(o)
-            return o
-    except:
-        pass
-    matches = re.findall(r'\s*(?:<script[^>]+type="(?:text/template|application/json)"[^>]*>|state:)\s*({[^\n]+})\s*(?:,|</script>)\s*', r)
-    if not matches:
-        Log('No JSON objects found in the page', Log.ERROR)
-        return None
+        r = getURL(FQify(url), silent=True, useCookie=True, rjson=False, postdata=postData)
+        if not r:
+            return None
+        try:
+            r = r.strip()
+            if '{' == r[0:1]:
+                o = json.loads(Unescape(r))
+                if s.refineJSON:
+                    Prune(o)
+                return o
+        except:
+            pass
+        matches = re.findall(r'\s*(?:<script[^>]+type="(?:text/template|application/json)"[^>]*>|state:)\s*({[^\n]+})\s*(?:,|</script>)\s*', r)
+        if not matches:
+            Log('No JSON objects found in the page', Log.ERROR)
+            return None
 
-    # Create a single object containing all the data from the multiple JSON objects in the page
-    o = {}
-    for m in matches:
-        m = json.loads(Unescape(m))
+        # Create a single object containing all the data from the multiple JSON objects in the page
+        o = {}
+        for m in matches:
+            m = json.loads(Unescape(m))
 
-        if ('widgets' in m) and ('Storefront' in m['widgets']):
-            m = m['widgets']['Storefront']
-        elif 'props' in m:
-            m = m['props']
+            if ('widgets' in m) and ('Storefront' in m['widgets']):
+                m = m['widgets']['Storefront']
+            elif 'props' in m:
+                m = m['props']
 
-            if not bRaw:
-                # Prune useless/sensitive info
-                for k in list(m):  # list() instead of .keys() to avoid py3 iteration errors
-                    if (not m[k]) or (k in ['copyright', 'links', 'logo', 'params', 'playerConfig', 'refine']):
-                        del m[k]
-                if 'state' in m:
-                    st = m['state']
-                    for k in list(st):  # list() instead of .keys() to avoid py3 iteration errors
-                        if not st[k]:
-                            del st[k]
-                        elif k in ['features', 'customerPreferences']:
-                            del st[k]
-        # Prune sensitive context info and merge into o
-        if not bRaw:
-            Prune(m)
-        Merge(o, m)
-    return o if o else None
+                if s.refineJSON:
+                    # Prune useless/sensitive info
+                    for k in list(m):  # list() instead of .keys() to avoid py3 iteration errors
+                        if (not m[k]) or (k in ['copyright', 'links', 'logo', 'params', 'playerConfig', 'refine']):
+                            del m[k]
+                    if 'state' in m:
+                        st = m['state']
+                        for k in list(st):  # list() instead of .keys() to avoid py3 iteration errors
+                            if not st[k]:
+                                del st[k]
+                            elif k in ['features', 'customerPreferences']:
+                                del st[k]
+            # Prune sensitive context info and merge into o
+            if s.refineJSON:
+                Prune(m)
+            Merge(o, m)
+        return o if o else None
+
+    j = do(url, postData)
+    LogJSON(j, url)
+    return j
 
 
 class _Captcha(pyxbmct.AddonDialogWindow):
