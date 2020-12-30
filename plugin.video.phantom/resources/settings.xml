@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<settings>
+    <category label="Ogólne">
+        <setting id="auto_select" type="enum" label="Wybieraj jakość filmu" entries="0|1" values="ręcznie|automatycznie" default="0"/>
+        <setting id="resolution" type="labelenum" label="ograniczaj jakość filmu do:" subsetting="true" visible="eq(-1,1)" values="bez ograniczeń|360p|480p|720p|1080p" default="bez ograniczeń" />
+        <setting type="sep"/>
+        <setting id="show_adult" type="bool" label="Pokazuj filmy dla dorosłych" default="false"/>
+        <setting id="show_premium" type="bool" label="Pokazuj filmy PREMIUM" default="true"/>
+        <setting id="up_info" type="bool" label="Pobieraj dodatkowe informacje o filmie" default="true"/>
+        <setting id="set_list_colours" type="bool" label="Koloruj listy" default="true"/>
+        <setting id="save_viewed" type="number" label="Zapisuj historię oglądania (dla X ostatnich filmów)" default="20"/>
+    </category>
+
+    <category label="CDA.pl">
+        <setting id="cda_login" type="bool" label="Zaloguj się do serwisu" default="false" />
+        <setting type="sep"/>
+        <setting id="cda_user" type="text" label="login" default="" />
+        <setting id="cda_pass" type="text" label="hasło" option="hidden"  default="" />
+    </category>
+
+    <category label="Menu główne">
+        <setting id="M1" type="bool" label="[COLOR=blue]Phantom[/COLOR] [COLOR=red]Extra[/COLOR]" default="true"/>
+        <setting id="M2" type="bool" label="[COLOR=red]Filmy - HD[/COLOR]" default="true"/>
+        <setting id="M3" type="bool" label="[COLOR=green]Filmy - najnowsze[/COLOR]" default="true"/>
+        <setting id="M4" type="bool" label="Filmy - PREMIUM" default="true"/>
+        <setting id="M5" type="bool" label="Filmy - najpopularniejsze" default="true"/>
+        <setting id="M6" type="bool" label="Filmy - najlepiej oceniane" default="true"/>
+        <setting id="M7" type="bool" label="Filmy - najtrafniejsze" default="true"/>
+        <setting id="M8" type="bool" label="Filmy - alfabetycznie" default="true"/>
+        <setting id="M9" type="bool" label="[COLOR=green]Video - najnowsze[/COLOR]" default="true"/>
+        <setting id="M10" type="bool" label="Video - najlepiej oceniane" default="true"/>
+        <setting id="M11" type="bool" label="Video - ekstremalne" default="true"/>
+        <setting id="M12" type="bool" label="Video - krótkie filmy i animacje" default="true"/>
+        <setting id="M13" type="bool" label="Video - motoryzacja, wypadki" default="true"/>
+        <setting id="M14" type="bool" label="Video - muzyka" default="true"/>
+        <setting id="M15" type="bool" label="Video - prosto z Polski" default="true"/>
+        <setting id="M16" type="bool" label="Video - rozrywka" default="true"/>
+        <setting id="M17" type="bool" label="Video - sport" default="true"/>
+        <setting id="M18" type="bool" label="Video - śmieszne filmy" default="true"/>
+        <setting id="M19" type="bool" label="Video - różności" default="true"/>
+        <setting id="M20" type="bool" label="Video - życie studenckie" default="true"/>
+        <setting id="M21" type="bool" label="[COLOR=yellow]Poczekalnia[/COLOR]" default="true"/>
+        <setting id="M22" type="bool" label="Narzędzia" default="true"/>
+    </category>
+
+    <category label="Moje foldery">
+        <setting id="F1" type="bool" label="[COLOR blue]Folder 1[/COLOR]" entries="0|1" default="0"/>
+        <setting id="F1_nazwa"  type="text" label="    Nazwa folderu" default="Mój folder 1" visible="eq(-1,true)"/>
+        <setting id="F1_fraza"  type="text" label="    Szukana fraza  (* wyszukuje wszystko)" default="*" visible="eq(-2,true)"/>
+        <setting id="F1_dlugosc" type="enum" label="    Długość"     values="każda długość|krótkie (poniżej 5 minut)|średnie (powyżej 20 minut)|długie (powyżej 60 minut)" default="3" visible="eq(-3,true)"/>
+        <setting id="F1_jakosc" type="enum" label="    Jakość"      values="każda jakość|średnia jakość 480p|wysoka jakość 720p|bardzo wysoka jakość 1080p" default="2" visible="eq(-4,true)"/>
+        <setting id="F1_sort" type="enum" label="    Sortuj po"   values="Najtrafniejsze|Najnowsze|Najpopularniejsze|Najlepiej oceniane|Alfabetycznie" default="1" visible="eq(-5,true)"/>
+        <setting type="sep" />
+
+        <setting id="F2" type="bool" label="[COLOR blue]Folder 2[/COLOR]" entries="0|1" default="0"/>
+        <setting id="F2_nazwa"  type="text" label="    Nazwa folderu" default="Mój folder 2" visible="eq(-1,true)"/>
+        <setting id="F2_fraza"  type="text" label="    Szukana fraza  (* wyszukuje wszystko)" default="*" visible="eq(-2,true)"/>
+        <setting id="F2_dlugosc" type="enum" label="    Długość"     values="każda długość|krótkie (poniżej 5 minut)|średnie (powyżej 20 minut)|długie (powyżej 60 minut)" default="3" visible="eq(-3,true)"/>
+        <setting id="F2_jakosc" type="enum" label="    Jakość"      values="każda jakość|średnia jakość 480p|wysoka jakość 720p|bardzo wysoka jakość 1080p" default="2" visible="eq(-4,true)"/>
+        <setting id="F2_sort" type="enum" label="    Sortuj po"   values="Najtrafniejsze|Najnowsze|Najpopularniejsze|Najlepiej oceniane|Alfabetycznie" default="1" visible="eq(-5,true)"/>
+        <setting type="sep" />
+
+        <setting id="F3" type="bool" label="[COLOR blue]Folder 3[/COLOR]" entries="0|1" default="0"/>
+        <setting id="F3_nazwa"  type="text" label="    Nazwa folderu" default="Mój folder 3" visible="eq(-1,true)"/>
+        <setting id="F3_fraza"  type="text" label="    Szukana fraza  (* wyszukuje wszystko)" default="*" visible="eq(-2,true)"/>
+        <setting id="F3_dlugosc" type="enum" label="    Długość"     values="każda długość|krótkie (poniżej 5 minut)|średnie (powyżej 20 minut)|długie (powyżej 60 minut)" default="3" visible="eq(-3,true)"/>
+        <setting id="F3_jakosc" type="enum" label="    Jakość"      values="każda jakość|średnia jakość 480p|wysoka jakość 720p|bardzo wysoka jakość 1080p" default="2" visible="eq(-4,true)"/>
+        <setting id="F3_sort" type="enum" label="    Sortuj po"   values="Najtrafniejsze|Najnowsze|Najpopularniejsze|Najlepiej oceniane|Alfabetycznie" default="1" visible="eq(-5,true)"/>
+        <setting type="sep" />
+
+        <setting id="F4" type="bool" label="[COLOR blue]Folder 4[/COLOR]" entries="0|1" default="0"/>
+        <setting id="F4_nazwa"  type="text" label="    Nazwa folderu" default="Mój folder 4" visible="eq(-1,true)"/>
+        <setting id="F4_fraza"  type="text" label="    Szukana fraza  (* wyszukuje wszystko)" default="*" visible="eq(-2,true)"/>
+        <setting id="F4_dlugosc" type="enum" label="    Długość"     values="każda długość|krótkie (poniżej 5 minut)|średnie (powyżej 20 minut)|długie (powyżej 60 minut)" default="3" visible="eq(-3,true)"/>
+        <setting id="F4_jakosc" type="enum" label="    Jakość"      values="każda jakość|średnia jakość 480p|wysoka jakość 720p|bardzo wysoka jakość 1080p" default="2" visible="eq(-4,true)"/>
+        <setting id="F4_sort" type="enum" label="    Sortuj po"   values="Najtrafniejsze|Najnowsze|Najpopularniejsze|Najlepiej oceniane|Alfabetycznie" default="1" visible="eq(-5,true)"/>
+        <setting type="sep" />
+
+        <setting id="F5" type="bool" label="[COLOR blue]Folder 5[/COLOR]" entries="0|1" default="0"/>
+        <setting id="F5_nazwa"  type="text" label="    Nazwa folderu" default="Mój folder 5" visible="eq(-1,true)"/>
+        <setting id="F5_fraza"  type="text" label="    Szukana fraza  (* wyszukuje wszystko)" default="*" visible="eq(-2,true)"/>
+        <setting id="F5_dlugosc" type="enum" label="    Długość"     values="każda długość|krótkie (poniżej 5 minut)|średnie (powyżej 20 minut)|długie (powyżej 60 minut)" default="3" visible="eq(-3,true)"/>
+        <setting id="F5_jakosc" type="enum" label="    Jakość"      values="każda jakość|średnia jakość 480p|wysoka jakość 720p|bardzo wysoka jakość 1080p" default="2" visible="eq(-4,true)"/>
+        <setting id="F5_sort" type="enum" label="    Sortuj po"   values="Najtrafniejsze|Najnowsze|Najpopularniejsze|Najlepiej oceniane|Alfabetycznie" default="1" visible="eq(-5,true)"/>
+        <setting type="sep" />
+    </category>
+
+    <category label="Phantom Extra">
+        <setting id="phantom_user" type="text" label="login" default="free" />
+        <setting id="phantom_pass" type="text" label="hasło" option="hidden"  default="free" />
+    </category>
+</settings>
