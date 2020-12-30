@@ -48,7 +48,7 @@ MEDIA_TYPE_MAPPINGS = {
 }
 
 
-def get_info(videoid, item, raw_data, profile_language_code=''):
+def get_info(videoid, item, raw_data, profile_language_code='', delayed_db_op=False):
     """Get the infolabels data"""
     cache_identifier = videoid.value + '_' + profile_language_code
     try:
@@ -57,13 +57,15 @@ def get_info(videoid, item, raw_data, profile_language_code=''):
         quality_infos = cache_entry['quality_infos']
     except CacheMiss:
         infos, quality_infos = parse_info(videoid, item, raw_data)
-        G.CACHE.add(CACHE_INFOLABELS, cache_identifier, {'infos': infos, 'quality_infos': quality_infos})
+        G.CACHE.add(CACHE_INFOLABELS, cache_identifier, {'infos': infos, 'quality_infos': quality_infos},
+                    delayed_db_op=delayed_db_op)
     return infos, quality_infos
 
 
-def add_info_dict_item(dict_item, videoid, item, raw_data, is_in_mylist, common_data):
-    """Add infolabels to a dict_item"""
-    infos, quality_infos = get_info(videoid, item, raw_data)
+def add_info_dict_item(dict_item, videoid, item, raw_data, is_in_mylist, common_data, art_item=None):
+    """Add infolabels and art to a dict_item"""
+    infos, quality_infos = get_info(videoid, item, raw_data,
+                                    delayed_db_op=True)
     dict_item['quality_info'] = quality_infos
     # Use a deepcopy of dict to not reflect future changes to the dictionary also to the cache
     infos_copy = copy.deepcopy(infos)
@@ -76,11 +78,15 @@ def add_info_dict_item(dict_item, videoid, item, raw_data, is_in_mylist, common_
         dict_item['label'] = _colorize_text(common_data['mylist_titles_color'], dict_item['label'])
     infos_copy['title'] = dict_item['label']
     dict_item['info'] = infos_copy
+    dict_item['art'] = get_art(videoid, art_item or item, common_data['profile_language_code'],
+                               delayed_db_op=True)
 
 
 def _add_supplemental_plot_info(infos_copy, item, common_data):
     """Add supplemental info to plot description"""
     suppl_info = []
+    if item.get('summary', {}).get('availabilityDateMessaging'):
+        suppl_info.append(item['summary']['availabilityDateMessaging'])
     if item.get('dpSupplementalMessage'):
         # Short information about future release of tv show season or other
         suppl_info.append(item['dpSupplementalMessage'])
@@ -103,19 +109,21 @@ def _add_supplemental_plot_info(infos_copy, item, common_data):
         infos_copy.update({'PlotOutline': plotoutline + suppl_text})
 
 
-def get_art(videoid, item, profile_language_code=''):
+def get_art(videoid, item, profile_language_code='', delayed_db_op=False):
     """Get art infolabels"""
-    return _get_art(videoid, item or {}, profile_language_code)
+    return _get_art(videoid, item or {}, profile_language_code,
+                    delayed_db_op=delayed_db_op)
 
 
-def _get_art(videoid, item, profile_language_code):
+def _get_art(videoid, item, profile_language_code, delayed_db_op=False):
     # If item is None this method raise TypeError
     cache_identifier = videoid.value + '_' + profile_language_code
     try:
         art = G.CACHE.get(CACHE_ARTINFO, cache_identifier)
     except CacheMiss:
         art = parse_art(videoid, item)
-        G.CACHE.add(CACHE_ARTINFO, cache_identifier, art)
+        G.CACHE.add(CACHE_ARTINFO, cache_identifier, art,
+                    delayed_db_op=delayed_db_op)
     return art
 
 
@@ -302,24 +310,26 @@ def set_watched_status(dict_item, video_data, common_data):
     """Check and set progress status (watched and resume)"""
     if not common_data['set_watched_status'] or dict_item['is_folder']:
         return
-
     video_id = str(video_data['summary']['id'])
     # Check from db if user has manually changed the watched status
-    profile_guid = G.LOCAL_DB.get_active_profile_guid()
-    override_is_watched = G.SHARED_DB.get_watched_status(profile_guid, video_id, None, bool)
+    is_watched_user_overrided = G.SHARED_DB.get_watched_status(common_data['active_profile_guid'], video_id, None, bool)
     resume_time = 0
-
-    if override_is_watched is None:
-        # NOTE shakti 'watched' tag value:
-        # in my tests playing a video (via web browser) until to the end this value is not changed to True
-        # seem not respect really if a video is watched to the end or this tag have other purposes
-        # to now, the only way to know if a video is watched is compare the bookmarkPosition with creditsOffset value
-
-        # NOTE shakti 'creditsOffset' tag not exists on video type 'movie',
-        # then simulate the default Kodi playcount behaviour (playcountminimumpercent)
-        watched_threshold = min(video_data['runtime'] / 100 * 90,
-                                video_data.get('creditsOffset', video_data['runtime']))
-
+    if is_watched_user_overrided is None:
+        # Note to shakti properties:
+        # 'watched':  unlike the name this value is used to other purposes, so not to set a video as watched
+        # 'watchedToEndOffset':  this value is used to determine if a video is watched but
+        #                        is available only with the metadata api and only for "episode" video type
+        # 'creditsOffset' :  this value is used as position where to show the (play) "Next" (episode) button
+        #                    on the website, but it may not be always available with the "movie" video type
+        if 'creditsOffset' in video_data:
+            # To better ensure that a video is marked as watched also when a user do not reach the ending credits
+            # we generally lower the watched threshold by 50 seconds for 50 minutes of video (3000 secs)
+            lower_value = video_data['runtime'] / 3000 * 50
+            watched_threshold = video_data['creditsOffset'] - lower_value
+        else:
+            # When missing the value should be only a video of movie type,
+            # then we simulate the default Kodi playcount behaviour (playcountminimumpercent)
+            watched_threshold = video_data['runtime'] / 100 * 90
         # To avoid asking to the server again the entire list of titles (after watched a video)
         # to get the updated value, we override the value with the value saved in memory (see am_video_events.py)
         try:
@@ -327,12 +337,11 @@ def set_watched_status(dict_item, video_data, common_data):
         except CacheMiss:
             # NOTE shakti 'bookmarkPosition' tag when it is not set have -1 value
             bookmark_position = video_data['bookmarkPosition']
-
         playcount = '1' if bookmark_position >= watched_threshold else '0'
         if playcount == '0' and bookmark_position > 0:
             resume_time = bookmark_position
     else:
-        playcount = '1' if override_is_watched else '0'
+        playcount = '1' if is_watched_user_overrided else '0'
     # We have to set playcount with setInfo(), because the setProperty('PlayCount', ) have a bug
     # when a item is already watched and you force to set again watched, the override do not work
     dict_item['info']['PlayCount'] = playcount

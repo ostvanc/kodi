@@ -9,6 +9,8 @@
 """
 from __future__ import absolute_import, division, unicode_literals
 
+import json
+
 from future.utils import raise_from
 
 import xbmcgui
@@ -76,7 +78,7 @@ def _play(videoid, is_played_from_strm=False):
     # Get metadata of videoid
     try:
         metadata = api.get_metadata(videoid)
-        LOG.debug('Metadata is {}', metadata)
+        LOG.debug('Metadata is {}', json.dumps(metadata))
     except MetadataNotAvailable:
         LOG.warn('Metadata not available for {}', videoid)
         metadata = [{}, {}]
@@ -135,8 +137,6 @@ def _play(videoid, is_played_from_strm=False):
         'is_played_from_strm': is_played_from_strm,
         'resume_position': resume_position,
         'event_data': event_data}, non_blocking=True)
-    # Send callback after send the initialization signal
-    # to give a bit of more time to the action controller (see note in initialize_playback of action_controller.py)
     xbmcplugin.setResolvedUrl(handle=G.PLUGIN_HANDLE, succeeded=True, listitem=list_item)
 
 

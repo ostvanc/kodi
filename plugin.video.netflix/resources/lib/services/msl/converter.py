@@ -8,12 +8,14 @@
     See LICENSES/MIT.md for more information.
 """
 from __future__ import absolute_import, division, unicode_literals
+
 import uuid
 import xml.etree.ElementTree as ET
 
+import resources.lib.common as common
 from resources.lib.database.db_utils import TABLE_SESSION
 from resources.lib.globals import G
-import resources.lib.common as common
+from resources.lib.utils.esn import ForceWidevine
 from resources.lib.utils.logging import LOG
 
 
@@ -45,16 +47,16 @@ def convert_to_dash(manifest):
 
     has_audio_drm_streams = manifest['audio_tracks'][0].get('hasDrmStreams', False)
 
-    default_audio_language_index = _get_default_audio_language(manifest)
-    for index, audio_track in enumerate(manifest['audio_tracks']):
-        _convert_audio_track(audio_track, period, init_length, (index == default_audio_language_index),
-                             has_audio_drm_streams, cdn_index)
+    id_default_audio_tracks = _get_id_default_audio_tracks(manifest)
+    for audio_track in manifest['audio_tracks']:
+        is_default = audio_track['id'] in id_default_audio_tracks
+        _convert_audio_track(audio_track, period, init_length, is_default, has_audio_drm_streams, cdn_index)
 
-    default_subtitle_language_index = _get_default_subtitle_language(manifest)
-    for index, text_track in enumerate(manifest['timedtexttracks']):
+    for text_track in manifest['timedtexttracks']:
         if text_track['isNoneTrack']:
             continue
-        _convert_text_track(text_track, period, (index == default_subtitle_language_index), cdn_index, isa_version)
+        is_default = _is_default_subtitle(manifest, text_track)
+        _convert_text_track(text_track, period, is_default, cdn_index, isa_version)
 
     xml = ET.tostring(root, encoding='utf-8', method='xml')
     if LOG.level == LOG.LEVEL_VERBOSE:
@@ -110,7 +112,7 @@ def _add_protection_info(adaptation_set, pssh, keyid):
         })
     # Add child tags to the DRM system configuration ('widevine:license' is an ISA custom tag)
     if (G.LOCAL_DB.get_value('drm_security_level', '', table=TABLE_SESSION) == 'L1'
-            and not G.ADDON.getSettingBool('force_widevine_l3')):
+            and G.ADDON.getSettingString('force_widevine') == ForceWidevine.DISABLED):
         # The flag HW_SECURE_CODECS_REQUIRED is mandatory for L1 devices,
         # if it is set on L3 devices ISA already remove it automatically.
         # But some L1 devices with non regular Widevine library cause issues then need to be handled
@@ -260,7 +262,7 @@ def _convert_text_track(text_track, period, default, cdn_index, isa_version):
     adaptation_set = ET.SubElement(
         period,  # Parent
         'AdaptationSet',  # Tag
-        lang=text_track.get('language'),
+        lang=text_track['language'],
         codecs=('stpp', 'wvtt')[is_ios8],
         contentType='text',
         mimeType=('application/ttml+xml', 'text/vtt')[is_ios8])
@@ -290,51 +292,64 @@ def _convert_text_track(text_track, period, default, cdn_index, isa_version):
     _add_base_url(representation, list(downloadable[content_profile]['downloadUrls'].values())[cdn_index])
 
 
-def _get_default_audio_language(manifest):
-    channel_list = {'1.0': '1', '2.0': '2'}
-    channel_list_dolby = {'5.1': '6', '7.1': '8'}
-
+def _get_id_default_audio_tracks(manifest):
+    """Get the track id of the audio track to be set as default"""
+    channels_stereo = ['1.0', '2.0']
+    channels_multi = ['5.1', '7.1']
+    is_prefer_stereo = G.ADDON.getSettingBool('prefer_audio_stereo')
     audio_language = common.get_kodi_audio_language()
-    index = 0
-    # Try to find the preferred language with the right channels
-    if G.ADDON.getSettingBool('enable_dolby_sound'):
-        index = _find_audio_track_index(manifest, 'language', audio_language, channel_list_dolby)
+    audio_stream = {}
+    if audio_language == 'mediadefault':
+        # Netflix do not have a "Media default" track then we rely on the language of current nf profile,
+        # due to current Kodi locale problems this could not be accurate.
+        profile_language_code = G.LOCAL_DB.get_profile_config('language')
+        audio_language = profile_language_code[0:2]
+    if not audio_language == 'original':
+        # If set give priority to the same audio language with different country
+        if not G.KODI_VERSION.is_major_ver('18') and G.ADDON.getSettingBool('prefer_alternative_lang'):
+            # Here we have only the language code without country code, we do not know the country code to be used,
+            # usually there are only two tracks with the same language and different countries,
+            # then we try to find the language with the country code
+            stream = next((audio_track for audio_track in manifest['audio_tracks']
+                           if audio_track['language'].startswith(audio_language + '-')), None)
+            if stream:
+                audio_language = stream['language']
+        # Try find the default track based on the Netflix profile language
+        if not is_prefer_stereo:
+            audio_stream = _find_audio_stream(manifest, 'language', audio_language, channels_multi)
+        if not audio_stream:
+            audio_stream = _find_audio_stream(manifest, 'language', audio_language, channels_stereo)
+    # Try find the default track based on the original audio language
+    if not audio_stream and not is_prefer_stereo:
+        audio_stream = _find_audio_stream(manifest, 'isNative', True, channels_multi)
+    if not audio_stream:
+        audio_stream = _find_audio_stream(manifest, 'isNative', True, channels_stereo)
+    # Try find the default track for impaired
+    imp_audio_stream = {}
+    if not is_prefer_stereo:
+        imp_audio_stream = _find_audio_stream(manifest, 'language', audio_language, channels_multi, True)
+    if not imp_audio_stream:
+        imp_audio_stream = _find_audio_stream(manifest, 'language', audio_language, channels_stereo, True)
+    return audio_stream.get('id'), imp_audio_stream.get('id')
 
-    # If dolby audio track not exists check other channels list
-    if index is None:
-        index = _find_audio_track_index(manifest, 'language', audio_language, channel_list)
 
-    # If there is no matches to preferred language,
-    # try to sets the original language track as default
-    # Check if the dolby audio track in selected language exists
-    if index is None and G.ADDON.getSettingBool('enable_dolby_sound'):
-        index = _find_audio_track_index(manifest, 'isNative', True, channel_list_dolby)
-
-    # If dolby audio track not exists check other channels list
-    if index is None:
-        index = _find_audio_track_index(manifest, 'isNative', True, channel_list)
-    return index
+def _find_audio_stream(manifest, property_name, property_value, channels_list, is_impaired=False):
+    return next((audio_track for audio_track in manifest['audio_tracks']
+                 if audio_track[property_name] == property_value
+                 and audio_track['channels'] in channels_list
+                 and (audio_track['trackType'] == 'ASSISTIVE') == is_impaired), {})
 
 
-def _find_audio_track_index(manifest, property_name, property_value, channel_list):
-    for index, audio_track in enumerate(manifest['audio_tracks']):
-        if audio_track[property_name] == property_value and audio_track['channels'] in channel_list:
-            return index
-    return None
-
-
-def _get_default_subtitle_language(manifest):
-    subtitle_language = common.get_kodi_subtitle_language()
-    is_forced = subtitle_language == 'forced_only'
-    if is_forced:
-        subtitle_language = common.get_kodi_audio_language()
-    for index, text_track in enumerate(manifest['timedtexttracks']):
-        if text_track['isNoneTrack']:
-            continue
-        if text_track.get('isForcedNarrative', False) != is_forced:
-            continue
-        if text_track['language'] != subtitle_language:
-            continue
-        return index
-    # Leave the selection of forced subtitles to Kodi
-    return -1
+def _is_default_subtitle(manifest, current_text_track):
+    """Check if the subtitle is to be set as default"""
+    # Kodi subtitle default flag:
+    #  The subtitle default flag is meant for is for where there are multiple subtitle tracks for the
+    #  same language so the default flag is used to tell which track should be picked as default
+    if current_text_track['isForcedNarrative'] or current_text_track['trackType'] == 'ASSISTIVE':
+        return False
+    # Check only regular subtitles that have other tracks in same language
+    if any(text_track['language'] == current_text_track['language'] and
+           (text_track['isForcedNarrative'] or text_track['trackType'] == 'ASSISTIVE')
+           for text_track in manifest['timedtexttracks']):
+        return True
+    return False

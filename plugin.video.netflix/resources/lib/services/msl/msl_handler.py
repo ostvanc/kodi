@@ -12,19 +12,21 @@ from __future__ import absolute_import, division, unicode_literals
 import json
 import time
 
+from future.utils import raise_from
+
 import xbmcaddon
 
 import resources.lib.common as common
 from resources.lib.common.cache_utils import CACHE_MANIFESTS
+from resources.lib.common.exceptions import CacheMiss, MSLError
 from resources.lib.database.db_utils import TABLE_SESSION
 from resources.lib.globals import G
 from resources.lib.utils.esn import get_esn
-from resources.lib.common.exceptions import CacheMiss, MSLError
 from resources.lib.utils.logging import LOG, measure_exec_time_decorator
 from .converter import convert_to_dash
 from .events_handler import EventsHandler
 from .msl_requests import MSLRequests
-from .msl_utils import ENDPOINTS, display_error_info, MSL_DATA_FILENAME
+from .msl_utils import ENDPOINTS, display_error_info, MSL_DATA_FILENAME, create_req_params
 from .profiles import enabled_profiles
 
 try:  # Python 2
@@ -223,7 +225,7 @@ class MSLHandler(object):
             #   then when ISA perform the license callback we replace it with the fresh license challenge data.
             params['challenge'] = self.manifest_challenge
 
-        endpoint_url = ENDPOINTS['manifest'] + '?reqAttempt=1&reqPriority=0&reqName=prefetch/manifest'
+        endpoint_url = ENDPOINTS['manifest'] + create_req_params(0, 'prefetch/manifest')
         manifest = self.msl_requests.chunked_request(endpoint_url,
                                                      self.msl_requests.build_request_data('/manifest', params),
                                                      esn,
@@ -257,12 +259,20 @@ class MSLHandler(object):
             'xid': xid
         }]
         self.manifest_challenge = challenge
-        endpoint_url = ENDPOINTS['license'] + '?reqAttempt=1&reqPriority=0&reqName=prefetch/license'
-        response = self.msl_requests.chunked_request(endpoint_url,
-                                                     self.msl_requests.build_request_data(self.last_license_url,
-                                                                                          params,
-                                                                                          'drmSessionId'),
-                                                     get_esn())
+        endpoint_url = ENDPOINTS['license'] + create_req_params(0, 'prefetch/license')
+        try:
+            response = self.msl_requests.chunked_request(endpoint_url,
+                                                         self.msl_requests.build_request_data(self.last_license_url,
+                                                                                              params,
+                                                                                              'drmSessionId'),
+                                                         get_esn())
+        except MSLError as exc:
+            if exc.err_number == '1044' and common.get_system_platform() == 'android':
+                msg = ('This title is not available to watch instantly. Please try another title.\r\n'
+                       'To try to solve this problem you can force "Widevine L3" from the add-on Expert settings.\r\n'
+                       'More info in the Wiki FAQ on add-on GitHub.')
+                raise_from(MSLError(msg), exc)
+            raise
         # This xid must be used also for each future Event request, until playback stops
         G.LOCAL_DB.set_value('xid', xid, TABLE_SESSION)
 
@@ -281,7 +291,8 @@ class MSLHandler(object):
         # playback, and only the first time after a switch,
         # in the response you can also understand if the msl switch has worked
         LOG.debug('Requesting bind events')
-        response = self.msl_requests.chunked_request(ENDPOINTS['events'],
+        endpoint_url = ENDPOINTS['manifest'] + create_req_params(20, 'bind')
+        response = self.msl_requests.chunked_request(endpoint_url,
                                                      self.msl_requests.build_request_data('/bind', {}),
                                                      get_esn(),
                                                      disable_msl_switch=False)
@@ -308,7 +319,8 @@ class MSLHandler(object):
                 'echo': 'drmSessionId'
             }]
 
-            response = self.msl_requests.chunked_request(ENDPOINTS['license'],
+            endpoint_url = ENDPOINTS['license'] + create_req_params(10, 'release/license')
+            response = self.msl_requests.chunked_request(endpoint_url,
                                                          self.msl_requests.build_request_data('/bundle', params),
                                                          get_esn())
             LOG.debug('License release response: {}', response)

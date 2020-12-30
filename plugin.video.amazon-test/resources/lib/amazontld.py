@@ -194,7 +194,10 @@ class AmazonTLD(Singleton):
         all_rec = {}
         if xbmcvfs.exists(self.recentsdb):
             with open(self.recentsdb, 'rb') as fp:
-                all_rec = pickle.load(fp)
+                try:
+                    all_rec = pickle.load(fp)
+                except:
+                    pass
 
         cur_user = loadUser('name') + getConfig('profileID')
         user_rec = all_rec.get(cur_user, [])
@@ -1173,8 +1176,10 @@ class AmazonTLD(Singleton):
                     addDir(il['DisplayTitle'], 'text', infoLabels=il)
 
         more = props.get('pagination', props.get('seeMoreLink'))
-        if more and remref(more['url']) not in urls:
-            addDir('-= %s =-' % more['label'], 'Channel', more['url'], thumb=self._s.NextIcon)
+        if more:
+            nextpage = more.get('apiUrl', more['url'])
+            if remref(nextpage) not in urls:
+                addDir('-= %s =-' % more['label'], 'Channel', nextpage, thumb=self._s.NextIcon)
 
         Log('Parsing Channels Page: %ss' % (time.time()-s), Log.DEBUG)
         '''

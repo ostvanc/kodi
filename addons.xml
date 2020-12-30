@@ -235,7 +235,7 @@
       <news>1.2.1 - 02/01/2019 - Fix riproduzione video su Android con versioni di Kodi superiori alla 17 (ora utilizza InputStreamAdactive sempre su Android) 1.2.2 - 11/06/2019 - Aggiunta compatibilita' Python 3 e retrocompatibilita' Python 2 (thanks to cttynul) 1.2.3 - 26/11/2019 - Fixato problema con mancanza di thumbnail in canali "Informazione" - Richiesta nuova versione di Python 2.25.0 per migliore compatibilità</news> 
     </extension> 
   </addon>
-  <addon id="plugin.video.mediathekview" name="MediathekView" version="0.6.4" provider-name="MediathekView.de, Leo Moll"> 
+  <addon id="plugin.video.mediathekview" name="MediathekView" version="0.6.5" provider-name="MediathekView.de, Leo Moll"> 
     <requires> 
       <import addon="xbmc.python" version="2.25.0"/>  
       <import addon="script.module.myconnpy" version="1.1.7"/> 
@@ -251,10 +251,10 @@
       <description lang="de_DE">Ermöglicht den Zugriff auf fast alle deutschen Mediatheken der öffentlich Rechtlichen basierend auf der Datenbank von MediathekView.de</description>  
       <description lang="en_GB">Gives access to most video-platforms from German public service broadcasters using the database of MediathekView.de</description>  
       <description lang="it_IT">Fornisce l'accesso a gran parte delle piattaforme video operate dalle emittenti pubbliche tedesche usando la banca dati di MediathekView.de</description>  
-      <news>v.0.6.4 (2020-05-26): [fix] - #143 ijson issue on FireTvStick - #136 MySql caching_sha2_password issue - #135 HTTPMessage Header issue - #134 ijson issue - #124 Corrupt database - #166 Sorttitle missing in shows and channel list - #168 Added urlopen timeout - Fixed heading on DB-Status-Dialog [new] - #140 / #131 Datenbank check interval - #71 Default Sort - #95 Sort by time, date - #147 Show error message for 8 sec [others] - Update 3rd party code for Py3 (subtitles SRT-Files) - Update cache for sqlListe for invalidate after DB update - RBTV logo add - Python 3 compat - Kodi loglevel change (notice to info) - Add User Agent String for all request to fix issue with ORF v.0.6.2 (2019-03-10): - [fix] Implemented Workaround for broken gzip module support in Kodi 18 running on Android - [fix] Fixed crash in mvupdate tool when invoked with MySQL support - [new] Improved compatibility with future Kodi versions with Python 3 support</news>  
+      <news>v.0.6.6 (2020-09-xx): - [fix] #175 fix for airdate 1969 (update mySql DB structure) - [other] #173 delay service startup by 10 sec to avoid error message - [other] #171 / #170 improved memory usage - [new] #169 new sort order (airdate desc) - [new] define content type in settings to enable more skins - [new] Bulk insert for mySQL / update to latest mySql driver v.0.6.4 (2020-05-26): [fix] - #143 ijson issue on FireTvStick - #136 MySql caching_sha2_password issue - #135 HTTPMessage Header issue - #134 ijson issue - #124 Corrupt database - #166 Sorttitle missing in shows and channel list - #168 Added urlopen timeout - Fixed heading on DB-Status-Dialog [new] - #140 / #131 Datenbank check interval - #71 Default Sort - #95 Sort by time, date - #147 Show error message for 8 sec [others] - Update 3rd party code for Py3 (subtitles SRT-Files) - Update cache for sqlListe for invalidate after DB update - RBTV logo add - Python 3 compat - Kodi loglevel change (notice to info) - Add User Agent String for all request to fix issue with ORF</news>  
       <platform>all</platform>  
       <language>de fr</language>  
-      <license>MIT License</license>  
+      <license>MIT</license>  
       <forum>https://forum.kodi.tv/showthread.php?tid=326799</forum>  
       <source>https://github.com/mediathekview/plugin.video.mediathekview</source>  
       <website>https://mediathekview.de/</website>  
@@ -485,7 +485,7 @@
       </assets> 
     </extension> 
   </addon>
-  <addon id="plugin.video.amazon-test" name="Amazon VOD" version="0.9.0~beta" provider-name="Sandmann79, Varstahl"> 
+  <addon id="plugin.video.amazon-test" name="Amazon VOD" version="0.9.0" provider-name="Sandmann79, Varstahl"> 
     <requires> 
       <import addon="xbmc.python" version="2.24.0"/>  
       <import addon="script.module.beautifulsoup4" version="4.6.2"/>  
@@ -632,7 +632,7 @@
       <news>4.4.1 (2020-09-12) - fix for Kodi repo</news> 
     </extension> 
   </addon>
-  <addon id="plugin.video.netflix" name="Netflix" version="1.9.0" provider-name="libdev + jojo + asciidisco + caphm + castagnait"> 
+  <addon id="plugin.video.netflix" name="Netflix" version="1.12.0" provider-name="libdev + jojo + asciidisco + caphm + castagnait"> 
     <requires> 
       <import addon="xbmc.python" version="2.26.0"/>  
       <import addon="script.module.addon.signals" version="0.0.3"/>  
@@ -717,7 +717,7 @@
       <email/>  
       <forum>https://forum.kodi.tv/showthread.php?tid=329767</forum>  
       <source>https://github.com/CastagnaIT/plugin.video.netflix</source>  
-      <news>v1.9.0 (2020-09-06) -New login method "Authentication key" details on GitHub readme -Add possibility to import library from a different folder -Add flatted tvshow for single season (depends from kodi setting) -Big speedup improvement for Kodi 18 in service loading and opening profiles page -Fixed a problem that could cause the addon to not start after login unexpected errors -Fixed a wrong behaviour that caused timeout error after credentials login fails -Fixed context menus issues after add a new search -Updated translations de, it, fr, pl, zh_ch, pt_br, hu, jp, kr, el_gr, es</news> 
+      <news>v1.12.0 (2020-12-13) - &gt;&gt; END OF THE ADD-ON DEVELOPMENT ON KODI 18.x - &gt;&gt; ON KODI 18.x THE ADD-ON WILL RECEIVE ONLY BUG FIX OR MINOR CHANGES - Add more options to force Widevine L3 (android) - Improved errors messages to resolve: - This title is not available to watch instantly - Request failed validation during key exchange - Reverted "reworked Audio/Subtitles language features" on Kodi 18 - Fix missing default audio track for impaired (Kodi 19) - Fixed "Prefer audio/subtitles language with country code" (Kodi 19) - Parental control moved to profiles list context menu - Fixed ESN generation with modelgroup - Fixed build_media_tag exception due to video pause - Blocked profile switching while playing, can cause issues - Managed wrong password case on login that caused http error 500 - Updated translations it, de, gr, pt-br, hu, ro, es, jp, kr, fr</news> 
     </extension> 
   </addon>
   <addon id="script.module.kodi-six" name="Kodi Six" version="0.0.5" provider-name="Roman V.M."> 
@@ -738,7 +738,7 @@
       <news>0.0.5: - Fixed Unicode decode errors when Kodi API returns non-UTF-8 byte strings. 0.0.4: - Implemented lazy patching of Kodi API functions and classes.</news> 
     </extension> 
   </addon>
-  <addon id="plugin.video.TVP.pl" name="TVP.pl" version="2.2.3" provider-name="mbebe"> 
+  <addon id="plugin.video.TVP.pl" name="TVP.pl" version="2.2.43" provider-name="mbebe"> 
     <requires> 
       <import addon="xbmc.python" version="2.1.0"/>  
       <import addon="script.module.inputstreamhelper" version="0.3.3"/>  
@@ -763,7 +763,7 @@
       </assets> 
     </extension> 
   </addon>
-  <addon id="repository.ostvanc" name="ostvanc addon repository" version="1.1.5" provider-name="ostvanc"> 
+  <addon id="repository.ostvanc" name="ostvanc addon repository" version="1.1.6" provider-name="ostvanc"> 
     <extension point="xbmc.addon.repository" name="ostvanc Repository"> 
       <info compressed="false">https://github.com/ostvanc/kodi/raw/master/addons.xml</info>  
       <checksum>https://github.com/ostvanc/kodi/raw/master/addons.xml.md5</checksum>  
@@ -773,7 +773,7 @@
       <summary lang="en">ostvanc addon repository</summary>  
       <description lang="en">A Kodi addon repository including Bild.de, Focus Online and Telewizja Republika</description>  
       <platform>all</platform>  
-      <news>1.1.5 (29-11-2020) - Fixed Amazon.VOD</news> 
+      <news>1.1.6 (30-12-2020) - Updated some addons to a newer version</news> 
     </extension> 
   </addon>
   <addon id="script.module.pytz" name="pytz" version="2014.2" provider-name="Stuart Bishop, Paul Backhouse"> 

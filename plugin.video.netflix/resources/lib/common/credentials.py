@@ -23,15 +23,6 @@ from .fileops import load_file
 from .kodi_ops import get_local_string
 from .uuid_device import get_crypt_key
 
-try:  # The crypto package depends on the library installed (see Wiki)
-    from Crypto import Random
-    from Crypto.Cipher import AES
-    from Crypto.Util import Padding
-except ImportError:
-    from Cryptodome import Random
-    from Cryptodome.Cipher import AES
-    from Cryptodome.Util import Padding
-
 __BLOCK_SIZE__ = 32
 
 
@@ -42,6 +33,16 @@ def encrypt_credential(raw):
     :type raw: str
     :returns:  string -- Encoded data
     """
+    # Keep these imports within the method otherwise if the packages are not installed,
+    # the addon crashes and the user does not read the warning message
+    try:  # The crypto package depends on the library installed (see Wiki)
+        from Cryptodome import Random
+        from Cryptodome.Cipher import AES
+        from Cryptodome.Util import Padding
+    except ImportError:
+        from Crypto import Random
+        from Crypto.Cipher import AES
+        from Crypto.Util import Padding
     raw = bytes(Padding.pad(data_to_pad=raw.encode('utf-8'), block_size=__BLOCK_SIZE__))
     iv = Random.new().read(AES.block_size)
     cipher = AES.new(get_crypt_key(), AES.MODE_CBC, iv)
@@ -55,6 +56,14 @@ def decrypt_credential(enc):
     :type enc: str
     :returns:  string -- Decoded data
     """
+    # Keep these imports within the method otherwise if the packages are not installed,
+    # the addon crashes and the user does not read the warning message
+    try:  # The crypto package depends on the library installed (see Wiki)
+        from Cryptodome.Cipher import AES
+        from Cryptodome.Util import Padding
+    except ImportError:
+        from Crypto.Cipher import AES
+        from Crypto.Util import Padding
     enc = base64.b64decode(enc)
     iv = enc[:AES.block_size]
     cipher = AES.new(get_crypt_key(), AES.MODE_CBC, iv)
@@ -139,6 +148,14 @@ def run_nf_authentication_key():
 def _get_authentication_key_data(file_path, pin):
     """Open the auth key file"""
     from resources.lib.kodi import ui
+    # Keep these imports within the method otherwise if the packages are not installed,
+    # the addon crashes and the user does not read the warning message
+    try:  # The crypto package depends on the library installed (see Wiki)
+        from Cryptodome.Cipher import AES
+        from Cryptodome.Util import Padding
+    except ImportError:
+        from Crypto.Cipher import AES
+        from Crypto.Util import Padding
     try:
         file_content = load_file(file_path)
         iv = '\x00' * 16
@@ -179,6 +196,26 @@ def _prepare_authentication_key_data(data):
     if (data['app_name'] == 'NFAuthenticationKey' and
             data['app_system'] == 'Windows' and
             # data['app_version'] == '1.0.0.0' and
+            data['app_author'] == 'CastagnaIT'):
+        result_data = {'cookies': []}
+        for cookie in data['data']['cookies']:
+            if 'netflix' not in cookie['domain']:
+                continue
+            result_data['cookies'].append(convert_chrome_cookie(cookie))
+        return result_data
+    if (data['app_name'] == 'NFAuthenticationKey' and
+            data['app_system'] == 'Linux' and
+            # data['app_version'] == '1.0.0' and
+            data['app_author'] == 'CastagnaIT'):
+        result_data = {'cookies': []}
+        for cookie in data['data']['cookies']:
+            if 'netflix' not in cookie['domain']:
+                continue
+            result_data['cookies'].append(convert_chrome_cookie(cookie))
+        return result_data
+    if (data['app_name'] == 'NFAuthenticationKey' and
+            data['app_system'] == 'MacOS' and
+            # data['app_version'] == '1.0.0' and
             data['app_author'] == 'CastagnaIT'):
         result_data = {'cookies': []}
         for cookie in data['data']['cookies']:

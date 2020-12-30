@@ -10,10 +10,10 @@ msgstr ""
 "PO-Revision-Date: 2020-07-24 21:39+0000\n"
 "Last-Translator: Tobias Weimer\n"
 "Language-Team: German\n"
+"Language: de\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: de\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 msgctxt "Addon Summary"
@@ -37,7 +37,6 @@ msgid "Enter PIN to watch restricted content"
 msgstr "Geben Sie Ihre PIN ein um beschränkten Inhalt anzusehen"
 
 # Unused 30003
-
 msgctxt "#30004"
 msgid "Password"
 msgstr "Passwort"
@@ -66,7 +65,14 @@ msgctxt "#30010"
 msgid "Lists of all kinds"
 msgstr "Alle Kategorien"
 
-# Unused 30011, 30012, 30013
+# Unused 30011
+msgctxt "#30012"
+msgid "Profiles options and parental control"
+msgstr "Profileinstellungen und Kindersicherung"
+
+msgctxt "#30013"
+msgid "In the profile list, open the context menu in the chosen profile"
+msgstr "Öffnen Sie in der Profilliste das Kontextmenü zum ausgewählten Profil"
 
 msgctxt "#30014"
 msgid "Account"
@@ -94,15 +100,15 @@ msgstr "Auf Netflix bewerten"
 
 msgctxt "#30020"
 msgid "Remove from 'My list'"
-msgstr "Von 'Meiner Liste' entfernen"
+msgstr "Von 'Meine Liste' entfernen"
 
 msgctxt "#30021"
 msgid "Add to 'My list'"
-msgstr "Zu 'Meiner Liste' hinzufügen"
+msgstr "Zu 'Meine Liste' hinzufügen"
 
 msgctxt "#30022"
-msgid "(between 0 & 10)"
-msgstr "(zwischen 0 & 10)"
+msgid "(between 0 and 10)"
+msgstr "(zwischen 0 und 10)"
 
 msgctxt "#30023"
 msgid "Expert"
@@ -129,7 +135,6 @@ msgid "Playback error"
 msgstr "Fehler beim Abspielen"
 
 # Unused 30029
-
 msgctxt "#30030"
 msgid "Remove from library"
 msgstr "Aus Bibliothek entfernen"
@@ -139,7 +144,6 @@ msgid "General"
 msgstr "Allgemein"
 
 # Unused 30032
-
 msgctxt "#30033"
 msgid "Enable Dolby Digital Plus (DDPlus HQ and Atmos on Premium)"
 msgstr "Aktiviere Dolby Digital Plus (DDPlus HQ und Atmos mit Premium)"
@@ -153,7 +157,6 @@ msgid "InputStream Adaptive settings..."
 msgstr "InputStream Adaptive Einstellungen..."
 
 # Unused 30036
-
 msgctxt "#30037"
 msgid "Views"
 msgstr "Ansichten"
@@ -207,7 +210,6 @@ msgid "Library"
 msgstr "Bibliothek"
 
 # Unused 30050
-
 msgctxt "#30051"
 msgid "Profile set for playback from the library"
 msgstr "Profil hat Wiedergabe aus Bibliothek gesetzt"
@@ -233,7 +235,6 @@ msgid "Remove auto-selection"
 msgstr "Automatische Auswahl entfernen"
 
 # Unused 30057, 30058
-
 msgctxt "#30059"
 msgid "Be careful, you are about to update many titles {}.[CR]This may cause service problems or temporary ban of the account.[CR]Do you want to continue?"
 msgstr "Seien Sie vorsichtig, sie aktualisieren viele Titel {}.[CR]Dies kann ernste Probleme oder eine temporäre Sperre Ihres Kontos verursachen.[CR]Möchten Sie fortfahren?"
@@ -259,7 +260,7 @@ msgid "Perform auto-update"
 msgstr "Automatische Aktualisierung durchführen"
 
 msgctxt "#30065"
-msgid "Auto-update for tv shows seasons and episodes"
+msgid "Auto-update for TV shows seasons and episodes"
 msgstr "Automatische Aktualisierung für Serien-Staffeln und -Episoden"
 
 msgctxt "#30066"
@@ -300,7 +301,7 @@ msgstr "Ansicht für Exportiert"
 
 msgctxt "#30075"
 msgid "Ask to skip intro and recap"
-msgstr "Aktiviere Intro und Recap überspringen Funktion"
+msgstr "Fragen, ob Intro und Recap übersprungen werden sollen"
 
 msgctxt "#30076"
 msgid "Skip intro"
@@ -331,8 +332,8 @@ msgid "Remember audio / subtitle preferences"
 msgstr "Audio- und Untertitel-Einstellungen beibehalten"
 
 msgctxt "#30083"
-msgid "Save bookmarks for library items / mark as watched"
-msgstr "Fortschritt für Bibliothekseinträge speichern und als gesehen markieren"
+msgid "Force the display of forced subtitles only with the audio language set"
+msgstr "Anzeige erzwungener Untertitel nur erzwingen, wenn Audiosprache gesetzt ist"
 
 msgctxt "#30084"
 msgid "Cache objects TTL (minutes)"
@@ -344,7 +345,7 @@ msgstr "Time-to-live für Metadaten Cache-Einträge (Tage)"
 
 msgctxt "#30086"
 msgid "Cache objects 'My list' TTL (minutes)"
-msgstr "Time-to-live der Cache-Einträge für meine Liste (Minuten)"
+msgstr "Time-to-live der Cache-Einträge für 'Meine Liste' (Minuten)"
 
 msgctxt "#30087"
 msgid "Contains {} and more..."
@@ -379,7 +380,7 @@ msgid "Browse recommendations and pick up on something new you might like."
 msgstr "Sieh dir Empfehlungen an und entdecke neue Inhalte die dir gefallen könnten."
 
 msgctxt "#30095"
-msgid "All TV Shows"
+msgid "All TV shows"
 msgstr "Alle Serien"
 
 msgctxt "#30096"
@@ -455,8 +456,8 @@ msgid "Logout successful"
 msgstr "Erfolgreich abgemeldet"
 
 msgctxt "#30114"
-msgid "Keep My List and Kodi Library in sync"
-msgstr "Meine Liste und Kodi-Bibliothek synchronisieren"
+msgid "Keep 'My list' and Kodi Library in sync"
+msgstr "'Meine Liste' und Kodi-Bibliothek synchronisieren"
 
 msgctxt "#30115"
 msgid "Content Profiles"
@@ -475,8 +476,8 @@ msgid "API operation failed: {}"
 msgstr "API-Aktion fehlgeschlagen: {}"
 
 msgctxt "#30119"
-msgid "My List operation successful"
-msgstr "Meine Liste erfolgreich aktualisiert"
+msgid "'My list' operation successful"
+msgstr "'Meine Liste' erfolgreich aktualisiert"
 
 msgctxt "#30120"
 msgid "Cannot automatically remove a season from Kodi library, please do it manually"
@@ -487,12 +488,12 @@ msgid "Perform full sync now"
 msgstr "Vollständige Synchronisation jetzt durchführen"
 
 msgctxt "#30122"
-msgid "Sync My List to Kodi library"
-msgstr "Meine Liste in Kodi Bilbiothek synchronisieren"
+msgid "Sync 'My list' to Kodi library"
+msgstr "'Meine Liste' mit Kodi Bibliothek synchronisieren"
 
 msgctxt "#30123"
 msgid "Do you want to continue?[CR]The full synchronization will delete all previously exported titles.[CR]If there are many titles this operation may take some time."
-msgstr "Möchten Sie fortfahren?[CR]Die vollständige Synchronisation wird alle vormals exportierten Titel löschen.[CR]Wenn es da viele Titel gibt, lann diese Operation etwas dauern."
+msgstr "Möchten Sie fortfahren?[CR]Die vollständige Synchronisation wird alle vormals exportierten Titel löschen.[CR]Wenn es da viele Titel gibt, kann diese Operation etwas dauern."
 
 msgctxt "#30124"
 msgid "Do you want to remove this item from the library?"
@@ -503,8 +504,8 @@ msgid "Delete library contents"
 msgstr "Bibliotheksinhalte löschen"
 
 msgctxt "#30126"
-msgid "Do you really want to purge your library?\nAll exported items will be deleted."
-msgstr "Möchten Sie wirklich Ihre Bibliothek-Exporte zurücksetzen?\nAlle vormals exportierten Einträge werden hierdurch gelöscht."
+msgid "Do you really want to purge your library?[CR]All exported items will be deleted."
+msgstr "Möchten Sie wirklich Ihre Bibliothek-Exporte zurücksetzen?[CR]Alle vormals exportierten Einträge werden hierdurch gelöscht."
 
 msgctxt "#30127"
 msgid "Awarded rating of {}"
@@ -519,7 +520,6 @@ msgid "Enable Up Next integration"
 msgstr "Up Next Integration aktivieren"
 
 # Unused 30130
-
 msgctxt "#30131"
 msgid "Check the logfile for detailed information"
 msgstr "Prüfe die Logdatei für detaillierte Informationen"
@@ -541,7 +541,6 @@ msgid "Cache cleared"
 msgstr "Cache geleert"
 
 # Unused 30136
-
 msgctxt "#30137"
 msgid "Enable VP9 profiles (disable if it causes artifacts)"
 msgstr "Aktiviere VP9-Profile (deaktivieren wenn es Artefakte verursacht)"
@@ -583,12 +582,12 @@ msgid "Discover the latest content added."
 msgstr "Zeige zuletzt hinzugefügte Inhalte"
 
 msgctxt "#30147"
-msgid "Next page >>"
-msgstr "Nächste Seite >>"
+msgid "Next page »"
+msgstr "Nächste Seite »"
 
 msgctxt "#30148"
-msgid "<< Previous page"
-msgstr "<< Vorherige Seite"
+msgid "« Previous page"
+msgstr "« Vorherige Seite"
 
 msgctxt "#30149"
 msgid "Sort results by"
@@ -619,7 +618,6 @@ msgid "Do you have a Netflix Premium account?"
 msgstr "Haben Sie ein Netflix-Premiumkonto?"
 
 # Unused 30156
-
 msgctxt "#30157"
 msgid "The configuration has been completed"
 msgstr "Die Einrichtung wurde abgeschlossen"
@@ -653,8 +651,8 @@ msgid "Browse contents with audio description."
 msgstr "Durchsuche Inhalte mit Audiobeschreibung"
 
 msgctxt "#30165"
-msgid "View for my list"
-msgstr "Ansicht für Meine Liste"
+msgid "View for 'My list'"
+msgstr "Ansicht für 'Meine Liste'"
 
 msgctxt "#30166"
 msgid "Main menu items"
@@ -689,7 +687,7 @@ msgid "Netflix Originals"
 msgstr "Netflix-Originale"
 
 msgctxt "#30174"
-msgid "Tv Show genres"
+msgid "TV show genres"
 msgstr "Serien-Kategorien"
 
 msgctxt "#30175"
@@ -702,23 +700,23 @@ msgstr "Aktiviere Workaround für STRM-Wiedergabe-Fortsetzung"
 
 msgctxt "#30177"
 msgid "Ask to resume the video"
-msgstr "Frage zum Fortsetzen des Videos"
+msgstr "Fragen, ob Video fortgesetzt werden soll"
 
 msgctxt "#30178"
 msgid "Open Up Next add-on settings"
 msgstr "Up Next Addon-Einstellungen öffnen"
 
 msgctxt "#30179"
-msgid "Show trailers & more"
-msgstr "Zeige Trailer & Mehr"
+msgid "Show trailers and more"
+msgstr "Zeige Trailer und mehr"
 
 msgctxt "#30180"
 msgid "There has been a problem with login, it is possible that your account has not been confirmed or reactivated."
 msgstr "Es gab ein Problem bei der Anmeldung, möglicherweise ist Ihr Account nicht bestätigt oder reaktiviert."
 
 msgctxt "#30181"
-msgid "Disable subtitles if there are no forced subtitles streams (Works only if Kodi Player is set to 'Only forced' subtitles)"
-msgstr "Deaktiviere Untertitel wenn keine erzwungenen Untertitel vorhanden sind (funktioniert nur wenn der Kodi-Player auf 'Nur erzwungen' eingesellt ist"
+msgid "Always show the subtitles when the preferred audio language is not available"
+msgstr "Untertitel immer anzeigen, wenn bevorzugte Audiosprache nicht verfügbar ist"
 
 msgctxt "#30182"
 msgid "Export NFO files"
@@ -741,7 +739,7 @@ msgid "For Movies"
 msgstr "Für Filme"
 
 msgctxt "#30187"
-msgid "For TV Show"
+msgid "For TV show"
 msgstr "Für Serien"
 
 msgctxt "#30188"
@@ -757,10 +755,9 @@ msgid "TV show"
 msgstr "Serie"
 
 # Unused 30191
-
 msgctxt "#30192"
-msgid "\r\nThese files are used by the provider information scrapers to integrate movies and tv shows info, useful with bonus episodes or director's cut"
-msgstr "\r\nDiese Dateien werden benutzt um Informationen über Filme und Serien an den Scraper zu übergeben - Hilfreich für Bonus-Episoden oder Director's Cut"
+msgid "[CR]These files are used by the provider information scrapers to integrate movies and TV shows info, useful with bonus episodes or director's cut"
+msgstr "[CR]Diese Dateien werden benutzt um Informationen über Filme und Serien an den Scraper zu übergeben - Hilfreich für Bonus-Episoden oder Director's Cut"
 
 msgctxt "#30193"
 msgid "Include all information in NFO files (use only with 'Local Information' scraper)"
@@ -788,18 +785,18 @@ msgstr "Exportiere neue Episoden"
 
 msgctxt "#30199"
 msgid "Shared library (Kodi MySQL server is required)"
-msgstr "Datenbank (Kodi MySQL-Server wird benötigt)"
+msgstr "Geteilte Bibliothek (Kodi MySQL-Server wird benötigt)"
 
 msgctxt "#30200"
-msgid "Use MySQL shared library database"
-msgstr "Benutze MySQL-Datenbank"
+msgid "Use shared library MySQL-database"
+msgstr "Benutze MySQL-Datenbank für geteilte Bibliothek"
 
 msgctxt "#30201"
 msgid "Username"
 msgstr "Benutzername"
 
 msgctxt "#30202"
-msgid "Connection to the MySQL database was successful"
+msgid "Connection to the MySQL-database was successful"
 msgstr "Verbindung zu MySQL-Datenbank war erfolgreich"
 
 msgctxt "#30203"
@@ -815,7 +812,7 @@ msgid "Test database connection"
 msgstr "Teste Datenbankverbindung"
 
 msgctxt "#30206"
-msgid "ERROR: The MySQL database is not reachable - the local database will be used"
+msgid "ERROR: The MySQL-database is not reachable - the local database will be used"
 msgstr "FEHLER: Die MySQL-Datenbank ist nicht erreichbar - die lokale Datenbank wird benutzt"
 
 msgctxt "#30207"
@@ -827,20 +824,20 @@ msgid "Check if this device is the main auto-update manager"
 msgstr "Prüfe ob dieses Gerät der Haupt-Autoupdate-Manager ist"
 
 msgctxt "#30209"
-msgid "This device now handles the auto-updates of shared-library"
-msgstr "Dieses Gerät verwaltet jetzt das Autoupdate der Datenbank"
+msgid "This device now handles the auto-updates of the shared library"
+msgstr "Dieses Gerät verwaltet jetzt das Autoupdate der geteilten Bibliothek"
 
 msgctxt "#30210"
-msgid "This device handles the auto-updates of shared-library"
-msgstr "Dieses Gerät verwaltet das Autoupdate der Datenbank"
+msgid "This device handles the auto-updates of the shared library"
+msgstr "Dieses Gerät verwaltet das Autoupdate der geteilten Bibliothek"
 
 msgctxt "#30211"
-msgid "Another device handles the auto-updates of shared-library"
-msgstr "Ein anderes Gerät verwaltet das Autoupdate der Datenbank"
+msgid "Another device handles the auto-updates of the shared library"
+msgstr "Ein anderes Gerät verwaltet das Autoupdate der geteilten Bibliothek"
 
 msgctxt "#30212"
-msgid "There is no device that handles the auto-updates of shared-library"
-msgstr "Es ist kein Gerät definiert für die Verwaltung des Autoupdates der Datenbank"
+msgid "There is no device that handles the auto-updates of the shared library"
+msgstr "Kein Gerät verwaltet das Autoupdate der geteilten Bibliothek"
 
 msgctxt "#30213"
 msgid "InputStream Helper settings..."
@@ -851,8 +848,8 @@ msgid "Force refresh"
 msgstr "Aktualisierung erzwingen"
 
 msgctxt "#30215"
-msgid "Color of the titles included in My list"
-msgstr "Farbe der Titel aus meiner Liste"
+msgid "Color of the titles included in 'My list'"
+msgstr "Farbe der Titel aus 'Meine Liste'"
 
 msgctxt "#30216"
 msgid "Show ESN in use"
@@ -863,8 +860,8 @@ msgid "Reset ESN"
 msgstr "ESN zurücksetzen"
 
 msgctxt "#30218"
-msgid "Are you sure you want to reset the ESN?\r\nIf you confirm, wait until you receive the login message."
-msgstr "Wollen Sie die ESN wirklich zurücksetzen?\r\nFalls Sie bestätigen, warten Sie, bis Sie die Anmelde-Nachricht erhalten."
+msgid "Are you sure you want to reset the ESN?[CR]If you confirm, wait until you receive the login message."
+msgstr "Wollen Sie die ESN wirklich zurücksetzen?[CR]Falls Sie bestätigen, warten Sie, bis Sie die Anmelde-Nachricht erhalten."
 
 msgctxt "#30219"
 msgid "Disable notification for synchronization completed"
@@ -883,7 +880,6 @@ msgid "Kid account"
 msgstr "Kinder-Account"
 
 # Unused 30223
-
 msgctxt "#30224"
 msgid "Auto update mode"
 msgstr "Auto-Aktualisierungs-Modus"
@@ -897,15 +893,14 @@ msgid "Scheduled"
 msgstr "Geplant"
 
 msgctxt "#30227"
-msgid "Synchronize Kodi library with My List"
-msgstr "Synchronisiere Kodi-Bibliothek mit Meiner Liste"
+msgid "Synchronize Kodi library with 'My list'"
+msgstr "Synchronisiere Kodi-Bibliothek mit 'Meine Liste'"
 
 msgctxt "#30228"
 msgid "Set a profile for synchronization"
 msgstr "Profil zur Synchronisierung auswählen"
 
 # Unused 30229
-
 msgctxt "#30230"
 msgid "Check for updates now"
 msgstr "Jetzt auf Aktualisierungen prüfen"
@@ -928,15 +923,15 @@ msgstr "Up Next Addon installieren"
 
 msgctxt "#30235"
 msgid "Synchronize the watched status of the videos with Netflix"
-msgstr "'Gesehen'-Status der Videos mit Netflix synchronisieren"
+msgstr "Gesehen-Status der Videos mit Netflix synchronisieren"
 
 msgctxt "#30236"
 msgid "Change watched status (locally)"
-msgstr "'Gesehen'-Status ändern (lokal)"
+msgstr "Gesehen-Status ändern (lokal)"
 
 msgctxt "#30237"
 msgid "Marked as watched|Marked as unwatched|Restored Netflix watched status"
-msgstr "Als gesehen markiert|Als nicht gesehen markiert|'Gesehen'-Status von Netflix wiederherstellen"
+msgstr "Als gesehen markiert|Als nicht gesehen markiert|Gesehen-Status von Netflix wiederherstellen"
 
 msgctxt "#30238"
 msgid "Up Next notifications (watch next video)"
@@ -947,8 +942,8 @@ msgid "Color of supplemental plot info"
 msgstr "Farbe der zusätzlichen Handlungsinformation"
 
 msgctxt "#30240"
-msgid "The background services cannot be started due to this problem:\r\n{}"
-msgstr "Die Hintergrunddienste konnten wegen folgendem Problem nicht gestartet werden:\r\n{}"
+msgid "The background services cannot be started due to this problem:[CR]{}"
+msgstr "Die Hintergrunddienste konnten wegen folgendem Problem nicht gestartet werden:[CR]{}"
 
 msgctxt "#30241"
 msgid "Open Connect CDN (the lower index is better)"
@@ -968,7 +963,7 @@ msgstr "Widevine-Sicherheitslevel L3 erzwingen"
 
 msgctxt "#30245"
 msgid "Deleting files exported to the library"
-msgstr "Dateien löschen, die in die Bibliothek importiert wurden"
+msgstr "Dateien löschen, die in die Bibliothek exportiert wurden"
 
 msgctxt "#30246"
 msgid "There are {} titles that cannot be imported.[CR]Do you want to delete these files?"
@@ -979,7 +974,6 @@ msgid "Results per page (in case of timeout error decrease it)"
 msgstr "Ergebnisse pro Seite (bei Zeitüberschreitungen reduzieren)"
 
 # Unused 30248 to 30299
-
 msgctxt "#30300"
 msgid "Do you want to remove watched status of '{}'?[CR][CR]The operation could take up to 24h, therefore the title may still appear in the list."
 msgstr "Möchten Sie den Gesehen-Status von '{}' entfernen?[CR][CR]Dieser Vorgang kann bis zu 24 Stunden dauern, bis dahin kann dieser Titel noch in der Liste auftauchen."
@@ -989,7 +983,6 @@ msgid "Include Kodi library (only sending data)"
 msgstr "Inklusive Kodi-Bibliothek (nur ausgehend)"
 
 # Unused 30302 to 30339
-
 msgctxt "#30340"
 msgid "Choose the login method[CR](if the login with E-Mail/Password always returns \"incorrect password\", then use Authentication key, instructions in the GitHub ReadMe)"
 msgstr "Wählen Sie Ihre Anmeldemethode aus[CR](falls die Anmeldung mit E-Mail/Passwort immer \"falsches Passwort\" zurückgibt, verwenden Sie einen Authentifizierungsschlüssel gemäß der Anweisungen im GitHub-ReadMe)"
@@ -1015,7 +1008,6 @@ msgid "Enter PIN"
 msgstr "PIN eingeben"
 
 # Unused 30346 to 30398
-
 msgctxt "#30399"
 msgid "Sort history by"
 msgstr "Verlauf sortieren nach"
@@ -1053,7 +1045,6 @@ msgid "No matches found"
 msgstr "Keine Titel gefunden"
 
 # Unused 30408, 30409
-
 msgctxt "#30410"
 msgid "By term"
 msgstr "Nach Suchbegriff"
@@ -1069,3 +1060,12 @@ msgstr "Nach Untertitelsprache"
 msgctxt "#30413"
 msgid "By genre/subgenre ID"
 msgstr "Nach Genre/Subgenre ID"
+
+# Unused 30414 to 30499
+msgctxt "#30500"
+msgid "Prefer the audio/subtitle language with country code (if available)"
+msgstr "Audio-/Untertitelsprache mit Landescode bevorzugen (falls verfügbar)"
+
+msgctxt "#30501"
+msgid "Prefer stereo audio tracks by default"
+msgstr "Standardmäßig Stereo-Audiospur bevorzugen"

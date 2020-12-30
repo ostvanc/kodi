@@ -8,12 +8,12 @@ msgstr ""
 "Report-Msgid-Bugs-To: https://github.com/CastagnaIT/plugin.video.netflix\n"
 "POT-Creation-Date: 2017-07-24 16:15+0000\n"
 "PO-Revision-Date: 2020-07-09 16:40+0000\n"
-"Last-Translator: shaolin-kongfu <>\n"
+"Last-Translator: Liqianyu <>\n"
 "Language-Team: Chinese\n"
+"Language: zh_CN\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: zh_CN\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 msgctxt "Addon Summary"
@@ -22,29 +22,28 @@ msgstr "Netflix"
 
 msgctxt "Addon Description"
 msgid "Netflix VOD Services Add-on"
-msgstr "Netflix VOD服务附加组件"
+msgstr "Netflix VOD服务插件"
 
 msgctxt "Addon Disclaimer"
 msgid "The use of this add-on may not be legal in your country of residence - please check with your local laws before installing."
-msgstr "此附加组件在您的居住国可能不合法-请在安装前与您当地的法律核对。"
+msgstr "在您居住的国家使用此插件可能不合法-请在安装前与您当地的法律核对。"
 
 msgctxt "#30001"
 msgid "Recommendations"
-msgstr "建议"
+msgstr "推荐"
 
 msgctxt "#30002"
 msgid "Enter PIN to watch restricted content"
 msgstr "输入PIN来观看受限内容"
 
 # Unused 30003
-
 msgctxt "#30004"
 msgid "Password"
 msgstr "密码"
 
 msgctxt "#30005"
 msgid "E-mail"
-msgstr "邮箱"
+msgstr "电子邮箱"
 
 msgctxt "#30006"
 msgid "Enter PIN to access this profile"
@@ -60,13 +59,20 @@ msgstr "登录失败"
 
 msgctxt "#30009"
 msgid "Please check your e-mail and password"
-msgstr "请检查您的邮箱和密码"
+msgstr "请检查您的电子邮箱和密码"
 
 msgctxt "#30010"
 msgid "Lists of all kinds"
 msgstr "所有种类的列表"
 
-# Unused 30011, 30012, 30013
+# Unused 30011
+msgctxt "#30012"
+msgid "Profiles options and parental control"
+msgstr ""
+
+msgctxt "#30013"
+msgid "In the profile list, open the context menu in the chosen profile"
+msgstr ""
 
 msgctxt "#30014"
 msgid "Account"
@@ -101,7 +107,7 @@ msgid "Add to 'My list'"
 msgstr "添加到'我的列表'"
 
 msgctxt "#30022"
-msgid "(between 0 & 10)"
+msgid "(between 0 and 10)"
 msgstr "（介于0和10之间）"
 
 msgctxt "#30023"
@@ -129,7 +135,6 @@ msgid "Playback error"
 msgstr "播放错误"
 
 # Unused 30029
-
 msgctxt "#30030"
 msgid "Remove from library"
 msgstr "从库中删除"
@@ -139,10 +144,9 @@ msgid "General"
 msgstr "常规"
 
 # Unused 30032
-
 msgctxt "#30033"
 msgid "Enable Dolby Digital Plus (DDPlus HQ and Atmos on Premium)"
-msgstr "启用杜比 Plus（对于netflix高级账户启用DDPlus HQ和Atmos）"
+msgstr "启用杜比数字+（对于Netflix高级方案启用高品质音频和杜比全景声）"
 
 msgctxt "#30034"
 msgid "Manual ESN"
@@ -153,7 +157,6 @@ msgid "InputStream Adaptive settings..."
 msgstr "InputStream自适应设置..."
 
 # Unused 30036
-
 msgctxt "#30037"
 msgid "Views"
 msgstr "视图"
@@ -188,11 +191,11 @@ msgstr "查看文件"
 
 msgctxt "#30045"
 msgid "Thumb rating removed|You rated a thumb down|You rated a thumb up"
-msgstr "移除了拇指评级|踩|赞"
+msgstr "移除评分|踩|赞"
 
 msgctxt "#30046"
 msgid "There is a problem with InputStream Adaptive add-on or the Widevine library. May be missing or not enabled, the operation will be cancelled."
-msgstr "InputStream Adaptive附加组件或Widevine库存在问题。可能丢失或未启用，操作将被取消"
+msgstr "InputStream Adaptive插件或Widevine库存在问题。可能丢失或未启用，操作将被取消"
 
 msgctxt "#30047"
 msgid "Library update in progress"
@@ -204,10 +207,9 @@ msgstr "已导出"
 
 msgctxt "#30049"
 msgid "Library"
-msgstr "图书馆"
+msgstr "库"
 
 # Unused 30050
-
 msgctxt "#30051"
 msgid "Profile set for playback from the library"
 msgstr "从库中播放的配置文件集"
@@ -233,14 +235,13 @@ msgid "Remove auto-selection"
 msgstr "删除文件的自动选择"
 
 # Unused 30057, 30058
-
 msgctxt "#30059"
 msgid "Be careful, you are about to update many titles {}.[CR]This may cause service problems or temporary ban of the account.[CR]Do you want to continue?"
-msgstr "注意，您将更新许多标题{}。[CR]这可能会导致服务问题或暂时禁止帐户。你想继续吗?"
+msgstr "注意，您将更新许多标题{}。[CR]这可能会导致服务问题或帐户暂时封禁。您想继续吗?"
 
 msgctxt "#30060"
 msgid "Enable HEVC profiles (4k for Android/HDR/DolbyVision)"
-msgstr "启用HEVC配置文件（对于Android / HDR / DolbyVision为4k）"
+msgstr "启用HEVC（对于Android启用4K/高动态范围/杜比视界）"
 
 msgctxt "#30061"
 msgid "Update inside library"
@@ -259,8 +260,8 @@ msgid "Perform auto-update"
 msgstr "执行自动更新"
 
 msgctxt "#30065"
-msgid "Auto-update for tv shows seasons and episodes"
-msgstr "电视的自动更新显示了每一季和情节"
+msgid "Auto-update for TV shows seasons and episodes"
+msgstr "自动更新电视节目的季与集"
 
 msgctxt "#30066"
 msgid "Debug logging level"
@@ -268,7 +269,7 @@ msgstr "调试日志记录级别"
 
 msgctxt "#30067"
 msgid "daily"
-msgstr "日常"
+msgstr "每日"
 
 msgctxt "#30068"
 msgid "every other day"
@@ -276,7 +277,7 @@ msgstr "每隔一天"
 
 msgctxt "#30069"
 msgid "every 5 days"
-msgstr "每隔5天"
+msgstr "每隔五天"
 
 msgctxt "#30070"
 msgid "weekly"
@@ -284,11 +285,11 @@ msgstr "每周"
 
 msgctxt "#30071"
 msgid "Time of Day"
-msgstr "一天中的某个时间"
+msgstr "指定时间"
 
 msgctxt "#30072"
 msgid "Only start after 5 minutes of idle"
-msgstr "只有在闲置5分钟后才能启动"
+msgstr "仅闲置5分钟后启动"
 
 msgctxt "#30073"
 msgid "Always show codec information during video playback"
@@ -300,11 +301,11 @@ msgstr "查看导出"
 
 msgctxt "#30075"
 msgid "Ask to skip intro and recap"
-msgstr "请求跳过介绍和概述"
+msgstr "询问跳过片头和前期回顾"
 
 msgctxt "#30076"
 msgid "Skip intro"
-msgstr "跳过简介"
+msgstr "跳过片头"
 
 msgctxt "#30077"
 msgid "Skip recap"
@@ -331,8 +332,8 @@ msgid "Remember audio / subtitle preferences"
 msgstr "记住音频/字幕首选项"
 
 msgctxt "#30083"
-msgid "Save bookmarks for library items / mark as watched"
-msgstr "保存图书馆项目的书签/标记为已观看"
+msgid "Force the display of forced subtitles only with the audio language set"
+msgstr "仅在设置音频语言后强制显示字幕"
 
 msgctxt "#30084"
 msgid "Cache objects TTL (minutes)"
@@ -376,10 +377,10 @@ msgstr "按类型浏览内容并轻松发现相关内容。"
 
 msgctxt "#30094"
 msgid "Browse recommendations and pick up on something new you might like."
-msgstr "浏览建议并获取您可能喜欢的新内容。"
+msgstr "浏览推荐并挑选您可能喜欢的新内容。"
 
 msgctxt "#30095"
-msgid "All TV Shows"
+msgid "All TV shows"
 msgstr "所有电视节目"
 
 msgctxt "#30096"
@@ -392,11 +393,11 @@ msgstr "主菜单"
 
 msgctxt "#30098"
 msgid "Enable HDR profiles"
-msgstr "启用HDR配置文件"
+msgstr "启用HDR"
 
 msgctxt "#30099"
 msgid "Enable DolbyVision profiles"
-msgstr "启用DolbyVision配置文件"
+msgstr "启用杜比视界"
 
 msgctxt "#30100"
 msgid "Results for '{}'"
@@ -416,7 +417,7 @@ msgstr "错误详细信息已写入Kodi日志文件。如果错误消息未提�
 
 msgctxt "#30104"
 msgid "The add-on encountered the following error:"
-msgstr "加载项遇到以下错误："
+msgstr "插件遇到以下错误："
 
 msgctxt "#30105"
 msgid "Netflix Add-on Error"
@@ -455,7 +456,7 @@ msgid "Logout successful"
 msgstr "注销成功"
 
 msgctxt "#30114"
-msgid "Keep My List and Kodi Library in sync"
+msgid "Keep 'My list' and Kodi Library in sync"
 msgstr "同步保存我的列表和Kodi库"
 
 msgctxt "#30115"
@@ -464,7 +465,7 @@ msgstr "内容配置文件"
 
 msgctxt "#30116"
 msgid "Advanced Add-on Configuration"
-msgstr "高级加载项配置"
+msgstr "高级插件配置"
 
 msgctxt "#30117"
 msgid "Cache"
@@ -475,7 +476,7 @@ msgid "API operation failed: {}"
 msgstr "API操作失败：{}"
 
 msgctxt "#30119"
-msgid "My List operation successful"
+msgid "'My list' operation successful"
 msgstr "我的列表操作成功"
 
 msgctxt "#30120"
@@ -487,12 +488,12 @@ msgid "Perform full sync now"
 msgstr "立即执行完全同步"
 
 msgctxt "#30122"
-msgid "Sync My List to Kodi library"
+msgid "Sync 'My list' to Kodi library"
 msgstr "将我的列表同步到Kodi库"
 
 msgctxt "#30123"
 msgid "Do you want to continue?[CR]The full synchronization will delete all previously exported titles.[CR]If there are many titles this operation may take some time."
-msgstr "你想继续吗?完全同步将删除所有以前导出的标题。如果有很多标题，这个操作可能需要一些时间。"
+msgstr "您想继续吗?完全同步将删除所有以前导出的标题。如果有很多标题，这个操作可能需要一些时间。"
 
 msgctxt "#30124"
 msgid "Do you want to remove this item from the library?"
@@ -503,8 +504,8 @@ msgid "Delete library contents"
 msgstr "删除库内容"
 
 msgctxt "#30126"
-msgid "Do you really want to purge your library?\nAll exported items will be deleted."
-msgstr "您是否真的要清除库？\n所有导出的项目将被删除"
+msgid "Do you really want to purge your library?[CR]All exported items will be deleted."
+msgstr "您是否真的要清除库？[CR]所有导出的项目将被删除"
 
 msgctxt "#30127"
 msgid "Awarded rating of {}"
@@ -516,10 +517,9 @@ msgstr "选择个人资料"
 
 msgctxt "#30129"
 msgid "Enable Up Next integration"
-msgstr "启用下一步集成"
+msgstr "启用Up Next集成"
 
 # Unused 30130
-
 msgctxt "#30131"
 msgid "Check the logfile for detailed information"
 msgstr "检查日志文件以获取详细信息”"
@@ -541,18 +541,17 @@ msgid "Cache cleared"
 msgstr "缓存已清除"
 
 # Unused 30136
-
 msgctxt "#30137"
 msgid "Enable VP9 profiles (disable if it causes artifacts)"
-msgstr "启用VP9配置文件（如果导致伪像则禁用）"
+msgstr "启用VP9（如果导致伪像则禁用）"
 
 msgctxt "#30138"
 msgid "The background services may not yet be available if you just started Kodi/the add-on. In this case, try again in a moment."
-msgstr "如果您刚启动Kodi/附加组件，则可能无法使用后台服务。在这种情况下，请稍后重试。"
+msgstr "如果您刚启动Kodi/插件，则可能无法使用后台服务。在这种情况下，请稍后重试。"
 
 msgctxt "#30139"
 msgid "Enable IPC over HTTP (use when Addon Signals timeout messages appear)"
-msgstr "通过HTTP启用IPC（在出现附加信号超时消息时使用）"
+msgstr "启用基于HTTP的IPC（在插件提示信号超时信息时使用）"
 
 msgctxt "#30140"
 msgid "Import existing library"
@@ -583,12 +582,12 @@ msgid "Discover the latest content added."
 msgstr "发现最新添加的内容"
 
 msgctxt "#30147"
-msgid "Next page >>"
-msgstr "下一页>>"
+msgid "Next page »"
+msgstr "下一页»"
 
 msgctxt "#30148"
-msgid "<< Previous page"
-msgstr "<<上一页"
+msgid "« Previous page"
+msgstr "«上一页"
 
 msgctxt "#30149"
 msgid "Sort results by"
@@ -608,7 +607,7 @@ msgstr "对您的建议"
 
 msgctxt "#30153"
 msgid "Year released"
-msgstr "发布年"
+msgstr "发布年份"
 
 msgctxt "#30154"
 msgid "Netflix configuration wizard"
@@ -616,17 +615,16 @@ msgstr "Netflix配置向导"
 
 msgctxt "#30155"
 msgid "Do you have a Netflix Premium account?"
-msgstr "您有Netflix Premium帐户吗？"
+msgstr "您有Netflix高级方案账户吗？"
 
 # Unused 30156
-
 msgctxt "#30157"
 msgid "The configuration has been completed"
 msgstr "配置已完成"
 
 msgctxt "#30158"
 msgid "Run add-on configuration wizard"
-msgstr "运行附加组件配置向导"
+msgstr "运行插件配置向导"
 
 msgctxt "#30159"
 msgid "View for main menu"
@@ -646,14 +644,14 @@ msgstr "最后使用"
 
 msgctxt "#30163"
 msgid "Audio description"
-msgstr "音频说明"
+msgstr "音频描述"
 
 msgctxt "#30164"
 msgid "Browse contents with audio description."
 msgstr "浏览带有音频描述的内容"
 
 msgctxt "#30165"
-msgid "View for my list"
+msgid "View for 'My list'"
 msgstr "查看我的列表"
 
 msgctxt "#30166"
@@ -689,7 +687,7 @@ msgid "Netflix Originals"
 msgstr "Netflix 自制"
 
 msgctxt "#30174"
-msgid "Tv Show genres"
+msgid "TV show genres"
 msgstr "电视节目类型"
 
 msgctxt "#30175"
@@ -698,18 +696,18 @@ msgstr "电影类型"
 
 msgctxt "#30176"
 msgid "Enable STRM resume workaround"
-msgstr "启用STRM恢复解决方法"
+msgstr "启用STRM继续播放"
 
 msgctxt "#30177"
 msgid "Ask to resume the video"
-msgstr "询问恢复视频"
+msgstr "播放时询问"
 
 msgctxt "#30178"
 msgid "Open Up Next add-on settings"
-msgstr "打开下一个加载项设置"
+msgstr "打开Up Next插件设置"
 
 msgctxt "#30179"
-msgid "Show trailers & more"
+msgid "Show trailers and more"
 msgstr "显示预告片及更多内容"
 
 msgctxt "#30180"
@@ -717,8 +715,8 @@ msgid "There has been a problem with login, it is possible that your account has
 msgstr "有一个登录的问题，可能是您的帐户没有被确认或重新激活。"
 
 msgctxt "#30181"
-msgid "Disable subtitles if there are no forced subtitles streams (Works only if Kodi Player is set to 'Only forced' subtitles)"
-msgstr "如果没有强制字幕流，则禁用字幕（仅当Kodi Player设置为“仅强制”字幕时才有效）"
+msgid "Always show the subtitles when the preferred audio language is not available"
+msgstr "当首选的音频语言不可用时，总是显示字幕"
 
 msgctxt "#30182"
 msgid "Export NFO files"
@@ -741,7 +739,7 @@ msgid "For Movies"
 msgstr "应用于电影"
 
 msgctxt "#30187"
-msgid "For TV Show"
+msgid "For TV show"
 msgstr "应用于电视节目"
 
 msgctxt "#30188"
@@ -757,10 +755,9 @@ msgid "TV show"
 msgstr "电视节目"
 
 # Unused 30191
-
 msgctxt "#30192"
-msgid "\r\nThese files are used by the provider information scrapers to integrate movies and tv shows info, useful with bonus episodes or director's cut"
-msgstr "\r\n这些文件由提供商信息收集器用来集成电影和电视节目信息，可用于奖励剧集或导演剪辑。"
+msgid "[CR]These files are used by the provider information scrapers to integrate movies and TV shows info, useful with bonus episodes or director's cut"
+msgstr "[CR]这些文件由提供商信息收集器用来集成电影和电视节目信息，可用于额外章节或导演剪辑。"
 
 msgctxt "#30193"
 msgid "Include all information in NFO files (use only with 'Local Information' scraper)"
@@ -791,7 +788,7 @@ msgid "Shared library (Kodi MySQL server is required)"
 msgstr "共享库（需要Kodi MySQL服务器）"
 
 msgctxt "#30200"
-msgid "Use MySQL shared library database"
+msgid "Use shared library MySQL-database"
 msgstr "使用MySQL共享库数据库"
 
 msgctxt "#30201"
@@ -799,7 +796,7 @@ msgid "Username"
 msgstr "用户名"
 
 msgctxt "#30202"
-msgid "Connection to the MySQL database was successful"
+msgid "Connection to the MySQL-database was successful"
 msgstr "到MySQL数据库的连接成功"
 
 msgctxt "#30203"
@@ -815,7 +812,7 @@ msgid "Test database connection"
 msgstr "测试数据库连接"
 
 msgctxt "#30206"
-msgid "ERROR: The MySQL database is not reachable - the local database will be used"
+msgid "ERROR: The MySQL-database is not reachable - the local database will be used"
 msgstr "错误：无法访问MySQL数据库-将使用本地数据库"
 
 msgctxt "#30207"
@@ -827,19 +824,19 @@ msgid "Check if this device is the main auto-update manager"
 msgstr "检查此设备是否是主要的自动更新管理器"
 
 msgctxt "#30209"
-msgid "This device now handles the auto-updates of shared-library"
+msgid "This device now handles the auto-updates of the shared library"
 msgstr "此设备现在可以处理共享库的自动更新"
 
 msgctxt "#30210"
-msgid "This device handles the auto-updates of shared-library"
+msgid "This device handles the auto-updates of the shared library"
 msgstr "此设备处理共享库的自动更新"
 
 msgctxt "#30211"
-msgid "Another device handles the auto-updates of shared-library"
+msgid "Another device handles the auto-updates of the shared library"
 msgstr "另一台设备处理共享库的自动更新"
 
 msgctxt "#30212"
-msgid "There is no device that handles the auto-updates of shared-library"
+msgid "There is no device that handles the auto-updates of the shared library"
 msgstr "没有设备可以处理共享库的自动更新"
 
 msgctxt "#30213"
@@ -851,8 +848,8 @@ msgid "Force refresh"
 msgstr "强制刷新"
 
 msgctxt "#30215"
-msgid "Color of the titles included in My list"
-msgstr "我的列表中包含的标题的颜色"
+msgid "Color of the titles included in 'My list'"
+msgstr "我的列表中标题颜色"
 
 msgctxt "#30216"
 msgid "Show ESN in use"
@@ -863,12 +860,12 @@ msgid "Reset ESN"
 msgstr "重置ESN"
 
 msgctxt "#30218"
-msgid "Are you sure you want to reset the ESN?\r\nIf you confirm, wait until you receive the login message."
-msgstr "确定要重置ESN吗？\r\n如果确认，请等待直到收到登录消息。"
+msgid "Are you sure you want to reset the ESN?[CR]If you confirm, wait until you receive the login message."
+msgstr "确定要重置ESN吗？[CR]如果确认，请等待直到收到登录消息。"
 
 msgctxt "#30219"
 msgid "Disable notification for synchronization completed"
-msgstr "禁用同步通知已完成"
+msgstr "禁用同步完成通知"
 
 msgctxt "#30220"
 msgid "The Kodi library has been updated"
@@ -883,7 +880,6 @@ msgid "Kid account"
 msgstr "儿童帐户"
 
 # Unused 30223
-
 msgctxt "#30224"
 msgid "Auto update mode"
 msgstr "自动更新模式"
@@ -894,10 +890,10 @@ msgstr "手动"
 
 msgctxt "#30226"
 msgid "Scheduled"
-msgstr "预定的"
+msgstr "计划"
 
 msgctxt "#30227"
-msgid "Synchronize Kodi library with My List"
+msgid "Synchronize Kodi library with 'My list'"
 msgstr "将Kodi库与我的列表同步"
 
 msgctxt "#30228"
@@ -905,7 +901,6 @@ msgid "Set a profile for synchronization"
 msgstr "为同步设置一个配置文件"
 
 # Unused 30229
-
 msgctxt "#30230"
 msgid "Check for updates now"
 msgstr "立即检查更新"
@@ -916,7 +911,7 @@ msgstr "您要立即检查更新吗？"
 
 msgctxt "#30232"
 msgid "Profile maturity rating for {}"
-msgstr "{}的个人资料成熟度等级"
+msgstr "{}的个人资料年龄分级"
 
 msgctxt "#30233"
 msgid "Only show titles rated [B]{}[/B]."
@@ -924,7 +919,7 @@ msgstr "仅显示评分为[B]{}[/B]的标题。"
 
 msgctxt "#30234"
 msgid "Install Up Next add-on"
-msgstr "安装下一个附加组件"
+msgstr "安装Up Next插件"
 
 msgctxt "#30235"
 msgid "Synchronize the watched status of the videos with Netflix"
@@ -936,19 +931,19 @@ msgstr "更改监视状态（本地）"
 
 msgctxt "#30237"
 msgid "Marked as watched|Marked as unwatched|Restored Netflix watched status"
-msgstr "标记为已监视|标记为未监视|已恢复Netflix监视状态"
+msgstr "标记为已观看|标记为未观看|已恢复Netflix观看状态"
 
 msgctxt "#30238"
 msgid "Up Next notifications (watch next video)"
-msgstr "上一个下一个通知（观看下一个视频）"
+msgstr "Up Next通知（观看下一个视频）"
 
 msgctxt "#30239"
 msgid "Color of supplemental plot info"
-msgstr "补充地块信息的颜色"
+msgstr "补充信息文字颜色"
 
 msgctxt "#30240"
-msgid "The background services cannot be started due to this problem:\r\n{}"
-msgstr "由于以下问题而无法启动后台服务:\r\n{}"
+msgid "The background services cannot be started due to this problem:[CR]{}"
+msgstr "由于以下问题而无法启动后台服务:[CR]{}"
 
 msgctxt "#30241"
 msgid "Open Connect CDN (the lower index is better)"
@@ -956,11 +951,11 @@ msgstr "Open Connect CDN（索引越低越好）"
 
 msgctxt "#30242"
 msgid "Top 10"
-msgstr "前10名"
+msgstr "十大排行"
 
 msgctxt "#30243"
 msgid "Select first unwatched TV show episode"
-msgstr "选择第一个未收看的电视节目剧集"
+msgstr "选择第一个未观看的电视节目剧集"
 
 msgctxt "#30244"
 msgid "Force Widevine security level L3"
@@ -979,7 +974,6 @@ msgid "Results per page (in case of timeout error decrease it)"
 msgstr "每页结果（如果超时错误，请减少）"
 
 # Unused 30248 to 30299
-
 msgctxt "#30300"
 msgid "Do you want to remove watched status of '{}'?[CR][CR]The operation could take up to 24h, therefore the title may still appear in the list."
 msgstr "您是否要删除已监视的'{}'状态？[CR][CR]此操作最多可能需要24小时，因此标题可能仍显示在列表中。"
@@ -989,14 +983,13 @@ msgid "Include Kodi library (only sending data)"
 msgstr "包括Kodi库（仅发送数据）"
 
 # Unused 30302 to 30339
-
 msgctxt "#30340"
 msgid "Choose the login method[CR](if the login with E-Mail/Password always returns \"incorrect password\", then use Authentication key, instructions in the GitHub ReadMe)"
 msgstr "选择登录方式[CR]（如果使用电子邮件/密码登录总是返回“不正确的密码”，请使用身份验证密钥，查看GitHub自述文件中的说明）"
 
 msgctxt "#30341"
 msgid "E-Mail/Password"
-msgstr "邮箱/密码"
+msgstr "电子邮箱/密码"
 
 msgctxt "#30342"
 msgid "Authentication key"
@@ -1012,10 +1005,9 @@ msgstr "认证密钥文件已过期"
 
 msgctxt "#30345"
 msgid "Enter PIN"
-msgstr "输入PIN"
+msgstr "输入PIN码"
 
 # Unused 30346 to 30398
-
 msgctxt "#30399"
 msgid "Sort history by"
 msgstr "历史记录排序依据"
@@ -1053,19 +1045,27 @@ msgid "No matches found"
 msgstr "未找到匹配项"
 
 # Unused 30408, 30409
-
 msgctxt "#30410"
 msgid "By term"
-msgstr "按条款"
+msgstr "按关键词"
 
 msgctxt "#30411"
 msgid "By audio language"
-msgstr "通过音频语言"
+msgstr "按音频语言"
 
 msgctxt "#30412"
 msgid "By subtitles language"
-msgstr "通过字幕语言"
+msgstr "按字幕语言"
 
 msgctxt "#30413"
 msgid "By genre/subgenre ID"
 msgstr "按类型/子类型ID"
+
+# Unused 30414 to 30499
+msgctxt "#30500"
+msgid "Prefer the audio/subtitle language with country code (if available)"
+msgstr "根据地区代码首选音频/字幕语言（如果可用）"
+
+msgctxt "#30501"
+msgid "Prefer stereo audio tracks by default"
+msgstr "默认首选立体声音轨"

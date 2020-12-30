@@ -213,7 +213,12 @@ def getURL(url, useCookie=False, silent=False, headers=None, rjson=True, attempt
                 sleep(wait)
             return getURL(url, useCookie, silent, headers, rjson, attempt, check, postdata, binary)
         return retval
-    res = json.loads(response) if rjson else response
+    res = response
+    if rjson:
+        try:
+            res = json.loads(response)
+        except ValueError:
+            res = retval
     duration = timer()
     duration -= starttime
     addNetTime(duration)
@@ -801,7 +806,7 @@ def GrabJSON(url, postData=None):
             np = np._replace(path='/gp/video/api' + np.path, query=urlencode([(k, v) for k, l in qs.items() for v in l]))
             url = np.geturl()
 
-        r = getURL(FQify(url), silent=True, useCookie=True, rjson=False, postdata=postData)
+        r = getURL(FQify(url), silent=True, useCookie=True, rjson=False, postdata=postData, binary=(not g.UsePrimeVideo))
         if not r:
             return None
         try:

@@ -1,0 +1,11 @@
+.DS*
+._DS*
+*.pyo
+*.pyc
+*.db
+__pycache__
+/Filmliste-*
+/.vscode
+/venv
+/.pydevproject
+/.project

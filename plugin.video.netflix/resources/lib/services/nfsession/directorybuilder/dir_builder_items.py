@@ -15,9 +15,10 @@ import resources.lib.common as common
 from resources.lib.database.db_utils import (TABLE_MENU_DATA)
 from resources.lib.globals import G
 from resources.lib.kodi.context_menu import generate_context_menu_items, generate_context_menu_profile
-from resources.lib.kodi.infolabels import get_art, get_color_name, add_info_dict_item, set_watched_status
+from resources.lib.kodi.infolabels import get_color_name, add_info_dict_item, set_watched_status
 from resources.lib.services.nfsession.directorybuilder.dir_builder_utils import (get_param_watched_status_by_profile,
-                                                                                 add_items_previous_next_page)
+                                                                                 add_items_previous_next_page,
+                                                                                 get_availability_message)
 from resources.lib.utils.logging import measure_exec_time_decorator
 
 try:  # Python 2
@@ -75,6 +76,7 @@ def build_mainmenu_listing(loco_list):
         'art': {'icon': 'DefaultUser.png'},
         'is_folder': True
     })
+    G.CACHE_MANAGEMENT.execute_pending_db_ops()
     return directory_items, {}
 
 
@@ -141,6 +143,7 @@ def build_season_listing(season_list, tvshowid, pathitems=None):
                        in iteritems(season_list.seasons)]
     # add_items_previous_next_page use the new value of perpetual_range_selector
     add_items_previous_next_page(directory_items, pathitems, season_list.perpetual_range_selector, tvshowid)
+    G.CACHE_MANAGEMENT.execute_pending_db_ops()
     return directory_items, {'title': season_list.tvshow['title'] + ' - ' + common.get_local_string(20366)[2:]}
 
 
@@ -150,10 +153,10 @@ def _create_season_item(tvshowid, seasonid_value, season, season_list, common_da
         'video_id': seasonid_value,
         'media_type': seasonid.mediatype,
         'label': season['summary']['name'],
-        'is_folder': True
+        'is_folder': True,
+        'properties': {'nf_videoid': seasonid.to_string()}
     }
     add_info_dict_item(dict_item, seasonid, season, season_list.data, False, common_data)
-    dict_item['art'] = get_art(tvshowid, season, common_data['profile_language_code'])
     dict_item['url'] = common.build_url(videoid=seasonid, mode=G.MODE_DIRECTORY)
     dict_item['menu_items'] = generate_context_menu_items(seasonid, False, None)
     return dict_item
@@ -166,27 +169,35 @@ def build_episode_listing(episodes_list, seasonid, pathitems=None):
         'params': get_param_watched_status_by_profile(),
         'set_watched_status': G.ADDON.getSettingBool('ProgressManager_enabled'),
         'supplemental_info_color': get_color_name(G.ADDON.getSettingInt('supplemental_info_color')),
-        'profile_language_code': G.LOCAL_DB.get_profile_config('language', '')
+        'profile_language_code': G.LOCAL_DB.get_profile_config('language', ''),
+        'active_profile_guid': G.LOCAL_DB.get_active_profile_guid()
     }
     directory_items = [_create_episode_item(seasonid, episodeid_value, episode, episodes_list, common_data)
                        for episodeid_value, episode
                        in iteritems(episodes_list.episodes)]
     # add_items_previous_next_page use the new value of perpetual_range_selector
     add_items_previous_next_page(directory_items, pathitems, episodes_list.perpetual_range_selector)
+    G.CACHE_MANAGEMENT.execute_pending_db_ops()
     return directory_items, {'title': episodes_list.tvshow['title'] + ' - ' + episodes_list.season['summary']['name']}
 
 
 def _create_episode_item(seasonid, episodeid_value, episode, episodes_list, common_data):
+    is_playable = episode['summary']['isPlayable']
     episodeid = seasonid.derive_episode(episodeid_value)
     dict_item = {'video_id': episodeid_value,
-                 'media_type': episodeid.mediatype,
+                 'media_type': episodeid.mediatype if is_playable else None,
                  'label': episode['title'],
-                 'is_folder': False}
+                 'is_folder': False,
+                 'properties': {'nf_videoid': episodeid.to_string()}}
     add_info_dict_item(dict_item, episodeid, episode, episodes_list.data, False, common_data)
     set_watched_status(dict_item, episode, common_data)
-    dict_item['art'] = get_art(episodeid, episode, common_data['profile_language_code'])
-    dict_item['url'] = common.build_url(videoid=episodeid, mode=G.MODE_PLAY, params=common_data['params'])
-    dict_item['menu_items'] = generate_context_menu_items(episodeid, False, None)
+    if is_playable:
+        dict_item['url'] = common.build_url(videoid=episodeid, mode=G.MODE_PLAY, params=common_data['params'])
+        dict_item['menu_items'] = generate_context_menu_items(episodeid, False, None)
+    else:
+        # The video is not playable, try check if there is a date
+        dict_item['properties']['nf_availability_message'] = get_availability_message(episode)
+        dict_item['url'] = common.build_url(['show_availability_message'], mode=G.MODE_ACTION)
     return dict_item
 
 
@@ -207,12 +218,16 @@ def build_loco_listing(loco_list, menu_data, force_use_videolist_id=False, exclu
         menu_parameters = common.MenuIdParameters(video_list_id)
         if not menu_parameters.is_menu_id:
             continue
-        if exclude_loco_known and menu_parameters.type_id != '28':
-            # Keep only the menus genre
-            continue
         list_id = (menu_parameters.context_id
                    if menu_parameters.context_id and not force_use_videolist_id
                    else video_list_id)
+        # Keep only some type of menus: 28=genre, 101=top 10
+        if exclude_loco_known:
+            if menu_parameters.type_id not in ['28', '101']:
+                continue
+            if menu_parameters.type_id == '101':
+                # Top 10 list can be obtained only with 'video_list' query
+                force_use_videolist_id = True
         # Create dynamic sub-menu info in MAIN_MENU_ITEMS
         sub_menu_data = menu_data.copy()
         sub_menu_data['path'] = [menu_data['path'][0], list_id, list_id]
@@ -222,9 +237,11 @@ def build_loco_listing(loco_list, menu_data, force_use_videolist_id=False, exclu
         sub_menu_data['force_use_videolist_id'] = force_use_videolist_id
         sub_menu_data['title'] = video_list['displayName']
         sub_menu_data['initial_menu_id'] = menu_data.get('initial_menu_id', menu_data['path'][1])
+        sub_menu_data['no_use_cache'] = menu_parameters.type_id == '101'
         G.LOCAL_DB.set_value(list_id, sub_menu_data, TABLE_MENU_DATA)
 
         directory_items.append(_create_videolist_item(list_id, video_list, sub_menu_data, common_data))
+    G.CACHE_MANAGEMENT.execute_pending_db_ops()
     return directory_items, {}
 
 
@@ -241,8 +258,8 @@ def _create_videolist_item(list_id, video_list, menu_data, common_data, static_l
         pathitems = [path, menu_data['path'][1], list_id]
     dict_item = {'label': video_list['displayName'],
                  'is_folder': True}
-    add_info_dict_item(dict_item, video_list.videoid, video_list, video_list.data, False, common_data)
-    dict_item['art'] = get_art(video_list.videoid, video_list.artitem, common_data['profile_language_code'])
+    add_info_dict_item(dict_item, video_list.videoid, video_list, video_list.data, False, common_data,
+                       art_item=video_list.artitem)
     # Add possibility to browse the sub-genres (see build_video_listing)
     sub_genre_id = video_list.get('genreId')
     params = {'sub_genre_id': unicode(sub_genre_id)} if sub_genre_id else None
@@ -265,7 +282,8 @@ def build_video_listing(video_list, menu_data, sub_genre_id=None, pathitems=None
                                 if menu_data['path'][1] != 'myList'
                                 else None),
         'profile_language_code': G.LOCAL_DB.get_profile_config('language', ''),
-        'ctxmenu_remove_watched_status': menu_data['path'][1] == 'continueWatching'
+        'ctxmenu_remove_watched_status': menu_data['path'][1] == 'continueWatching',
+        'active_profile_guid': G.LOCAL_DB.get_active_profile_guid()
     }
     directory_items = [_create_video_item(videoid_value, video, video_list, perpetual_range_start, common_data)
                        for videoid_value, video
@@ -293,25 +311,34 @@ def build_video_listing(video_list, menu_data, sub_genre_id=None, pathitems=None
         directory_items.insert(0, folder_dict_item)
     # add_items_previous_next_page use the new value of perpetual_range_selector
     add_items_previous_next_page(directory_items, pathitems, video_list.perpetual_range_selector, sub_genre_id)
+    G.CACHE_MANAGEMENT.execute_pending_db_ops()
     return directory_items, {}
 
 
 def _create_video_item(videoid_value, video, video_list, perpetual_range_start, common_data):
+    is_playable = video['availability']['isPlayable']
     videoid = common.VideoId.from_videolist_item(video)
     is_folder = videoid.mediatype == common.VideoId.SHOW
     is_in_mylist = videoid in common_data['mylist_items']
     dict_item = {'video_id': videoid_value,
-                 'media_type': videoid.mediatype,
+                 'media_type': videoid.mediatype if is_playable else None,
                  'label': video['title'],
-                 'is_folder': is_folder}
+                 'is_folder': is_folder,
+                 'properties': {'nf_videoid': videoid.to_string(),
+                                'nf_is_in_mylist': str(is_in_mylist),
+                                'nf_perpetual_range_start': perpetual_range_start}}
     add_info_dict_item(dict_item, videoid, video, video_list.data, is_in_mylist, common_data)
     set_watched_status(dict_item, video, common_data)
-    dict_item['art'] = get_art(videoid, video, common_data['profile_language_code'])
-    dict_item['url'] = common.build_url(videoid=videoid,
-                                        mode=G.MODE_DIRECTORY if is_folder else G.MODE_PLAY,
-                                        params=None if is_folder else common_data['params'])
-    dict_item['menu_items'] = generate_context_menu_items(videoid, is_in_mylist, perpetual_range_start,
-                                                          common_data['ctxmenu_remove_watched_status'])
+    if is_playable:
+        dict_item['url'] = common.build_url(videoid=videoid,
+                                            mode=G.MODE_DIRECTORY if is_folder else G.MODE_PLAY,
+                                            params=None if is_folder else common_data['params'])
+        dict_item['menu_items'] = generate_context_menu_items(videoid, is_in_mylist, perpetual_range_start,
+                                                              common_data['ctxmenu_remove_watched_status'])
+    else:
+        # The video is not playable, try check if there is a date
+        dict_item['properties']['nf_availability_message'] = get_availability_message(video)
+        dict_item['url'] = common.build_url(['show_availability_message'], mode=G.MODE_ACTION)
     return dict_item
 
 

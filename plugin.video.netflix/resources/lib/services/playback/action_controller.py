@@ -9,6 +9,7 @@
 """
 from __future__ import absolute_import, division, unicode_literals
 
+import json
 import time
 
 import xbmc
@@ -32,35 +33,35 @@ class ActionController(xbmc.Monitor):
     def __init__(self):
         xbmc.Monitor.__init__(self)
         self._init_data = None
+        self.init_count = 0
         self.tracking = False
-        self.events_workaround = False
+        self.tracking_tick = False
         self.active_player_id = None
         self.action_managers = None
         self._last_player_state = {}
+        self._is_pause_called = False
         common.register_slot(self.initialize_playback, common.Signals.PLAYBACK_INITIATED)
 
     def initialize_playback(self, data):
         """
         Callback for AddonSignal when this add-on has initiated a playback
         """
+        # We convert the videoid only once for all action managers
+        videoid = common.VideoId.from_dict(data['videoid'])
+        data['videoid'] = videoid
+        data['videoid_parent'] = videoid.derive_parent(common.VideoId.SHOW)
+        if data['videoid_next_episode']:
+            data['videoid_next_episode'] = common.VideoId.from_dict(data['videoid_next_episode'])
         self._init_data = data
         self.active_player_id = None
-        # WARNING KODI EVENTS SIDE EFFECTS - TO CONSIDER FOR ACTION MANAGER'S BEHAVIOURS!
-        # If action_managers is not None, means that 'Player.OnStop' event did not happen
-        if self.action_managers is not None:
-            # When you try to play a video while another one is currently in playing, Kodi have some side effects:
-            # - The event "Player.OnStop" not exists. This can happen for example when using context menu
-            #    "Play From Here" or with UpNext add-on, so to fix this we generate manually the stop event
-            #    when Kodi send 'Player.OnPlay' event.
-            # - The event "Player.OnResume" is sent without apparent good reason.
-            #    When you use ctx menu "Play From Here", this happen when click to next button (can not be avoided).
-            #    When you use UpNext add-on, happen a bit after, then can be avoided (by events_workaround).
-            self.events_workaround = True
-        else:
-            self._initialize_am()
+        self.tracking = True
+        self.tracking_tick = False
 
     def _initialize_am(self):
         self._last_player_state = {}
+        self._is_pause_called = False
+        if not self._init_data:
+            return
         self.action_managers = [
             AMPlayback(),
             AMSectionSkipper(),
@@ -68,56 +69,73 @@ class ActionController(xbmc.Monitor):
             AMVideoEvents(),
             AMUpNextNotifier()
         ]
+        self.init_count += 1
         self._notify_all(ActionManager.call_initialize, self._init_data)
-        self.tracking = True
+        self._init_data = None
 
     def onNotification(self, sender, method, data):  # pylint: disable=unused-argument
         """
         Callback for Kodi notifications that handles and dispatches playback events
         """
-        if not self.tracking or 'Player.' not in method:
+        # WARNING: Do not get playerid from 'data',
+        # Because when Up Next add-on play a video while we are inside Netflix add-on and
+        # not externally like Kodi library, the playerid become -1 this id does not exist
+        if not self.tracking or not method.startswith('Player.'):
             return
         try:
             if method == 'Player.OnPlay':
-                if self.events_workaround:
+                if self.init_count > 0:
+                    # In this case the user has chosen to play another video while another one is in playing,
+                    # then we send the missing Stop event for the current video
                     self._on_playback_stopped()
-                    self._initialize_am()
+                self._initialize_am()
             elif method == 'Player.OnAVStart':
-                # WARNING: Do not get playerid from 'data',
-                # Because when Up Next add-on play a video while we are inside Netflix add-on and
-                # not externally like Kodi library, the playerid become -1 this id does not exist
                 self._on_playback_started()
+                self.tracking_tick = True
             elif method == 'Player.OnSeek':
-                self._on_playback_seek()
+                self._on_playback_seek(json.loads(data)['player']['time'])
             elif method == 'Player.OnPause':
+                self._is_pause_called = True
                 self._on_playback_pause()
             elif method == 'Player.OnResume':
-                if self.events_workaround:
-                    LOG.debug('ActionController: Player.OnResume event has been ignored')
+                # Kodi call this event instead the "Player.OnStop" event when you try to play a video
+                # while another one is in playing (also if the current video is in pause)
+                # Can be one of following cases:
+                # - When you use ctx menu "Play From Here", this happen when click to next button
+                # - When you use UpNext add-on
+                # - When you play a non-Netflix video when a Netflix video is in playback in background
+                # - When you play a video over another in playback (back in menus)
+                if not self._is_pause_called:
                     return
+                if self.init_count == 0:
+                    # This should never happen, we have to avoid this event when you try to play a video
+                    # while another non-netflix video is in playing
+                    return
+                self._is_pause_called = False
                 self._on_playback_resume()
             elif method == 'Player.OnStop':
-                # When an error occurs before the video can be played,
-                # Kodi send a Stop event and here the active_player_id is None, then ignore this event
+                self.tracking = False
                 if self.active_player_id is None:
+                    # if playback does not start due to an error in streams initialization
+                    # OnAVStart notification will not be called, then active_player_id will be None
                     LOG.debug('ActionController: Player.OnStop event has been ignored')
-                    LOG.warn('ActionController: Possible problem with video playback, action managers disabled.')
-                    self.tracking = False
+                    LOG.warn('ActionController: Action managers disabled due to a playback initialization error')
                     self.action_managers = None
-                    self.events_workaround = False
+                    self.init_count -= 1
                     return
-                # It should not happen, but we avoid a possible double Stop event when using the workaround
-                if not self.events_workaround:
-                    self._on_playback_stopped()
+                self._on_playback_stopped()
         except Exception:  # pylint: disable=broad-except
             import traceback
             LOG.error(G.py2_decode(traceback.format_exc(), 'latin-1'))
+            self.tracking = False
+            self.tracking_tick = False
+            self.init_count = 0
 
     def on_service_tick(self):
         """
         Notify to action managers that an interval of time has elapsed
         """
-        if self.tracking and self.active_player_id is not None:
+        if self.tracking_tick and self.active_player_id is not None:
             player_state = self._get_player_state()
             if player_state:
                 self._notify_all(ActionManager.call_on_tick, player_state)
@@ -129,46 +147,46 @@ class ActionController(xbmc.Monitor):
             common.json_rpc('Input.ExecuteAction', {'action': 'codecinfo'})
         self.active_player_id = player_id
 
-    def _on_playback_seek(self):
-        if self.tracking and self.active_player_id is not None:
-            player_state = self._get_player_state()
+    def _on_playback_seek(self, time_override):
+        if self.active_player_id is not None:
+            player_state = self._get_player_state(time_override=time_override)
             if player_state:
                 self._notify_all(ActionManager.call_on_playback_seek,
                                  player_state)
 
     def _on_playback_pause(self):
-        if self.tracking and self.active_player_id is not None:
+        if self.active_player_id is not None:
             player_state = self._get_player_state()
             if player_state:
                 self._notify_all(ActionManager.call_on_playback_pause,
                                  player_state)
 
     def _on_playback_resume(self):
-        if self.tracking and self.active_player_id is not None:
+        if self.active_player_id is not None:
             player_state = self._get_player_state()
             if player_state:
                 self._notify_all(ActionManager.call_on_playback_resume,
                                  player_state)
 
     def _on_playback_stopped(self):
-        self.tracking = False
+        self.tracking_tick = False
         self.active_player_id = None
         # Immediately send the request to release the license
         common.send_signal(signal=common.Signals.RELEASE_LICENSE, non_blocking=True)
         self._notify_all(ActionManager.call_on_playback_stopped,
                          self._last_player_state)
         self.action_managers = None
-        self.events_workaround = False
+        self.init_count -= 1
 
     def _notify_all(self, notification, data=None):
         LOG.debug('Notifying all action managers of {} (data={})', notification.__name__, data)
         for manager in self.action_managers:
             _notify_managers(manager, notification, data)
 
-    def _get_player_state(self, player_id=None):
+    def _get_player_state(self, player_id=None, time_override=None):
         try:
             player_state = common.json_rpc('Player.GetProperties', {
-                'playerid': self.active_player_id or player_id,
+                'playerid': self.active_player_id if player_id is None else player_id,
                 'properties': [
                     'audiostreams',
                     'currentaudiostream',
@@ -184,10 +202,17 @@ class ActionController(xbmc.Monitor):
             return {}
 
         # convert time dict to elapsed seconds
-        player_state['elapsed_seconds'] = (
-            player_state['time']['hours'] * 3600 +
-            player_state['time']['minutes'] * 60 +
-            player_state['time']['seconds'])
+        player_state['elapsed_seconds'] = (player_state['time']['hours'] * 3600 +
+                                           player_state['time']['minutes'] * 60 +
+                                           player_state['time']['seconds'])
+
+        if time_override:
+            player_state['time'] = time_override
+            elapsed_seconds = (time_override['hours'] * 3600 +
+                               time_override['minutes'] * 60 +
+                               time_override['seconds'])
+            player_state['percentage'] = player_state['percentage'] / player_state['elapsed_seconds'] * elapsed_seconds
+            player_state['elapsed_seconds'] = elapsed_seconds
 
         # Sometimes may happen that when you stop playback the player status is partial,
         # this is because the Kodi player stop immediately but the stop notification (from the Monitor)

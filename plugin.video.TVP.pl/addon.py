@@ -308,6 +308,7 @@ elif mode[0] == 'favoritesREM':
 	xbmcplugin.addSortMethod(handle=addon_handle, sortMethod=xbmcplugin.SORT_METHOD_NONE)
 	xbmcplugin.endOfDirectory(addon_handle)
 elif mode[0]=='vodTVP_play':	
+
 	stream_url = vod.vodTVP_GetStreamUrl(ex_link)
 	if 'material_niedostepny' in stream_url:
 		if my_addon.getSetting('proxyG')=='true':
@@ -336,8 +337,10 @@ elif mode[0]=='vodTVP_play':
 					dialog.update(int(1.0*len(done)/len(proxies)*100),'Sprawdzam, negatywnie odpowiedziało: %d, proszę czekać'%(len(done)))
 					for t in done:
 						stream_url = t.result
-						if isinstance(stream_url,list) or (stream_url and not 'material_niedostepny' in stream_url):
-							settings_setProxy(t._args[1])
+						#if isinstance(stream_url,list) or (stream_url and not 'material_niedostepny' in stream_url):
+						#	settings_setProxy(t._args[1])
+						#	break
+						if stream_url and not 'material_niedostepny' in stream_url:
 							break
 						else:
 							stream_url=''
@@ -365,7 +368,13 @@ elif mode[0]=='vodTVP_play':
 			listitem.setProperty('inputstream.adaptive.manifest_type', 'mpd')
 			listitem.setProperty('inputstreamaddon', 'inputstream.adaptive')
 			listitem.setMimeType('application/dash+xml')
-			listitem.setContentLookup(False)			
+			listitem.setContentLookup(False)	
+		elif 'm3u8' in stream_url:
+			listitem = xbmcgui.ListItem(path=stream_url)
+			listitem.setProperty('inputstream.adaptive.manifest_type', 'hls')
+			listitem.setProperty('inputstreamaddon', 'inputstream.adaptive')
+			listitem.setMimeType('application/vnd.apple.mpegurl')
+			listitem.setContentLookup(False)	
 		else:
 			listitem = xbmcgui.ListItem(path=stream_url)
 		xbmcplugin.setResolvedUrl(addon_handle, True, listitem)
@@ -422,11 +431,12 @@ elif 'filtr' in mode[0]:
 elif mode[0]=='vodTVP':
 	(katalog,episodes) = vod.vodTVPapi(ex_link,page)
 	for e in episodes:
-		addLinkItem(e.get('title',''), e.get('filename',''), 'vodTVP_play',
-					infoLabels=e,iconimage=e.get('img',None),fanart=e.get('fanart',None))
+		addLinkItem(e.get('title',''), e.get('filename',''), 'vodTVP_play',infoLabels=e,iconimage=e.get('img',None),fanart=e.get('fanart',None))
+		xbmcplugin.setContent(addon_handle, 'videos')
+		xbmcplugin.addSortMethod(addon_handle, sortMethod=xbmcplugin.SORT_METHOD_NONE, label2Mask = "%P, %D")
 	for one in katalog:
 		addDir(one['title'],ex_link=one['id'],page=one.get('page',1),mode='vodTVP',iconImage=one.get('img'))
-	xbmcplugin.addSortMethod(handle=addon_handle, sortMethod=xbmcplugin.SORT_METHOD_NONE)
+		xbmcplugin.addSortMethod(handle=addon_handle, sortMethod=xbmcplugin.SORT_METHOD_NONE)
 	xbmcplugin.endOfDirectory(addon_handle)
 elif mode[0] == 'folder':
 	if fname == 'TVP info Live':

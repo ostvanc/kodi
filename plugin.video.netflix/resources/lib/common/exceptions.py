@@ -21,6 +21,10 @@ class HttpError401(Exception):
     """The request has returned http error 401 unauthorized for url ..."""
 
 
+class HttpErrorTimeout(Exception):
+    """The request has raised timeout"""
+
+
 class WebsiteParsingError(Exception):
     """Parsing info from the Netflix Website failed"""
 
@@ -57,6 +61,10 @@ class MetadataNotAvailable(Exception):
 
 class MSLError(Exception):
     """A specific MSL error"""
+    def __init__(self, message, err_number=None):
+        self.message = message
+        self.err_number = err_number
+        super(MSLError, self).__init__(self.message)
 
 
 class LicenseError(MSLError):

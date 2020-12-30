@@ -7,6 +7,8 @@ import urllib
 import cookielib
 import xbmcgui
 import xbmcaddon
+import xbmc
+
 addon        = xbmcaddon.Addon()
 BRAMKA = 'https://proxiak.eu'
 COOKIEFILE = ''
@@ -47,13 +49,10 @@ def getVideoUrl2(url,proxy={},timeout=TIMEOUT,cookiess=None):
 		)
 	req = urllib2.Request(url)
 	if cookiess:
-	#   headers={'User-Agent': UA,'Upgrade-Insecure-Requests':1,'Cookie':cookiess}
 		req.add_header('User-Agent', UA)
 		req.add_header('Cookie', cookiess)
-	#  headers.update(header)	
 	else:
 		req.add_header('User-Agent', UA)	
-   # req.add_header('User-Agent', UA)
 	try:
 		response = urllib2.urlopen(req,timeout=timeout)
 		link = response.read()
@@ -126,6 +125,34 @@ def getProxies():
 	proxies=[{x[0]: '%s:%s'%(x[2],x[1])} for x in trs]
 	return proxies
 
+def getProxiesccc():
+	import requests
+	headers = {
+		'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:70.0) Gecko/20100101 Firefox/70.0',
+		'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+		'Accept-Language': 'pl,en-US;q=0.7,en;q=0.3',
+		'Connection': 'keep-alive',
+		'Referer': 'https://proxyscrape.com/free-proxy-list',
+		'Upgrade-Insecure-Requests': '1',
+	}
+	
+	params = (
+		('request', 'getproxies'),
+		('proxytype', 'http'),
+		('timeout', '10000'),
+		('country', 'PL'),
+		('ssl', 'all'),
+		('anonymity', 'all'),
+	)
+	
+	response = requests.get('https://api.proxyscrape.com/', headers=headers, params=params).text
+	linie = response.splitlines()
+	linie = response.splitlines()
+	proxies=['%s'%(x) for x in linie]
+	return proxies
+	
+	
+	
 def vodTVP_getApiQuery(parent_id,count=10):	
     listing_url = 'http://www.api.v3.tvp.pl/shared/listing.php?dump=json'
     url = listing_url + '&direct=true&count=%d&parent_id=%s'% (count,parent_id)
@@ -167,9 +194,10 @@ def _getPlayable(episode):
     release_date = episode.get('release_date','')
     release_date_sec = release_date.get('sec','') if release_date else ''
     E['duration'] = episode.get('duration',0)
-    E['code']=getDuration(E['duration']) if episode.get('duration',0) else ''
+   # E['code']=getDuration(E['duration']) if episode.get('duration',0) else ''
     if release_date_sec:
-        E['aired'] =  strftime("%d.%m.%Y %H:%M", localtime(release_date_sec))
+        E['aired'] =  strftime("%d.%m.%Y", localtime(release_date_sec))
+        E['code'] =  E['aired']
         E['plot'] += '\n\nPublikacja: %s'%E['aired']
     else:
         E['aired']= '?'
@@ -297,7 +325,7 @@ def vodTVP_GetStreamTokenizer(channel_id='35959537&mime_type=video/mp4',proxy={}
 	if bramka:
 		content=getVideoUrlh(TOKENIZER_URL+ channel_id)
 		content=getFormat(content)
-		print ('getUrl_GATE(TOKENIZER_URL+ )',channel_id,content)
+		#print ('getUrl_GATE(TOKENIZER_URL+ )',channel_id,content)
 		if not content or 'material_niedostepny' in content:
 			content = getProxy(TOKENIZER_URL+ channel_id)
 			content = getFormat(content)
@@ -334,14 +362,32 @@ def vodTVP_GetStreamTokenizer(channel_id='35959537&mime_type=video/mp4',proxy={}
 				return ''
 		content = getFormat(content)
 		if not content:
-			content = getVideoUrl(SESS_URL+channel_id,proxy,timeout)
+		
+			import time
+			SESS_URL2='https://vod.tvp.pl/sess/TVPlayer2/api.php?id='#46058522&@method=getTvpConfig&@callback=__tp2JSONP2477T1580075016675
+			cdjs = '&@method=getTvpConfig&@callback=__tp2JSONP2477T'+str(int(time.time()))
+			content = getVideoUrl(SESS_URL2+channel_id+cdjs,proxy,timeout)
 			src = re.compile("0:{src:'(.*?)'", re.DOTALL).findall(content)
 			wv = re.compile('"widevine":"(https.+?)"', re.DOTALL).findall(content)
 			wv = wv[0].replace('\\','') if wv else ''
 			if src:
 				video_url = src[0]
-				if wv: video_url +="|"+wv
 				content='{}'
+				if wv: video_url +="|"+wv
+				
+				
+
+			else:
+				content = getVideoUrl(SESS_URL+channel_id,proxy,timeout)
+				src = re.compile("0:{src:'(.*?)'", re.DOTALL).findall(content)
+				wv = re.compile('"widevine":"(https.+?)"', re.DOTALL).findall(content)
+				wv = wv[0].replace('\\','') if wv else ''
+				if src:
+					video_url = src[0]
+					content='{}'
+					if wv: video_url +="|"+wv
+					
+					
 	try:
 		js = json.loads(content)
 	except:
@@ -352,6 +398,8 @@ def vodTVP_GetStreamTokenizer(channel_id='35959537&mime_type=video/mp4',proxy={}
 			video_url=[]
 			for one in formats:
 				if 'application/vnd.ms-ss' in one.get('mimeType',''):
+					continue
+				elif '//sdt-thi' in one.get('url','') or '//sdt-epi' in one.get('url',''):
 					continue
 				totalBitrate =  one.get('totalBitrate','')/100
 				quality = 'SD'
@@ -364,23 +412,22 @@ def vodTVP_GetStreamTokenizer(channel_id='35959537&mime_type=video/mp4',proxy={}
 				video_url.append({'title':label,'url':one.get('url',''),'bitrate':totalBitrate})
 			video_url = sorted(video_url, key=lambda k: k['bitrate'])
 		else:
-			video_url = formats.get('url','')
+			if '//sdt-thi' in one.get('url','') or '//sdt-epi' in one.get('url',''):
+				video_url=''
+			else:
+				video_url = formats.get('url','')
 	return video_url
 
 def vodTVP_GetStreamUrl(channel_id = '35665108', proxy = {}, timeout = TIMEOUT, pgate = False):
 
 	video_url = vodTVP_GetStreamTokenizer(channel_id, proxy, timeout, pgate)
-	
 	if len(video_url) > 0:
 		return video_url
-	
 	js = json.loads(getVideoUrl(VIDEO_LINK+ channel_id,proxy,timeout))
-	
 	if js.has_key('video_url'):
 		return js.get('video_url')
 	else:
 		js = json.loads(getVideoUrl(VIDEO_LINK+ channel_id.split('&')[0],proxy,timeout))
-	
 		if js.has_key('copy_of_object_id'):
 			channel_id = js.get('copy_of_object_id') + '&mime_type'+ js.get('mime_type','video/mp4')
 			video_url = vodTVP_GetStreamTokenizer(channel_id,proxy,timeout)

@@ -12,12 +12,11 @@ from functools import wraps
 from future.utils import raise_from
 
 from xbmc import getCondVisibility, Monitor, getInfoLabel
-from xbmcgui import Window
 
 from resources.lib.common.exceptions import (HttpError401, InputStreamHelperError, MbrStatusNeverMemberError,
                                              MbrStatusFormerMemberError, MissingCredentialsError, LoginError,
-                                             NotLoggedInError, InvalidPathError, BackendNotReady)
-from resources.lib.common import check_credentials, get_current_kodi_profile_name, get_local_string
+                                             NotLoggedInError, InvalidPathError, BackendNotReady, HttpErrorTimeout)
+from resources.lib.common import check_credentials, get_local_string, WndHomeProps
 from resources.lib.globals import G
 from resources.lib.upgrade_controller import check_addon_upgrade
 from resources.lib.utils.logging import LOG
@@ -38,18 +37,20 @@ def catch_exceptions_decorator(func):
         except InputStreamHelperError as exc:
             from resources.lib.kodi.ui import show_ok_dialog
             show_ok_dialog('InputStream Helper Add-on error',
-                           ('The operation has been cancelled.\r\n'
-                            'InputStream Helper has generated an internal error:\r\n{}\r\n\r\n'
+                           ('The operation has been cancelled.[CR]'
+                            'InputStream Helper has generated an internal error:[CR]{}[CR][CR]'
                             'Please report it to InputStream Helper github.'.format(exc)))
-        except HttpError401:  # HTTP error 401 Client Error: Unauthorized for url ...
-            # This is a generic error, can happen when the http request for some reason has failed.
+        except (HttpError401, HttpErrorTimeout) as exc:
+            # HttpError401: This is a generic error, can happen when the http request for some reason has failed.
             # Known causes:
             # - Possible change of data format or wrong data in the http request (also in headers/params)
             # - Some current nf session data are not more valid (authURL/cookies/...)
+            # HttpErrorTimeout: This error is raised by Requests ReadTimeout error, unknown causes
             from resources.lib.kodi.ui import show_ok_dialog
             show_ok_dialog(get_local_string(30105),
-                           ('There was a communication problem with Netflix.\r\n'
-                            'You can try the operation again or exit.'))
+                           ('There was a communication problem with Netflix.[CR]'
+                            'You can try the operation again or exit.[CR]'
+                            '(Error code: {})').format(exc.__class__.__name__))
         except (MbrStatusNeverMemberError, MbrStatusFormerMemberError):
             from resources.lib.kodi.ui import show_error_info
             show_error_info(get_local_string(30008), get_local_string(30180), False, True)
@@ -111,19 +112,22 @@ def lazy_login(func):
 def route(pathitems):
     """Route to the appropriate handler"""
     LOG.debug('Routing navigation request')
-    root_handler = pathitems[0] if pathitems else G.MODE_DIRECTORY
+    if pathitems:
+        if 'extrafanart' in pathitems:
+            LOG.warn('Route: ignoring extrafanart invocation')
+            return False
+        root_handler = pathitems[0]
+    else:
+        root_handler = G.MODE_DIRECTORY
     if root_handler == G.MODE_PLAY:
         from resources.lib.navigation.player import play
         play(videoid=pathitems[1:])
     elif root_handler == G.MODE_PLAY_STRM:
         from resources.lib.navigation.player import play_strm
         play_strm(videoid=pathitems[1:])
-    elif root_handler == 'extrafanart':
-        LOG.warn('Route: ignoring extrafanart invocation')
-        return False
     else:
         nav_handler = _get_nav_handler(root_handler, pathitems)
-        _execute(nav_handler, pathitems[1:], G.REQUEST_PARAMS)
+        _execute(nav_handler, pathitems[1:], G.REQUEST_PARAMS, root_handler)
     return True
 
 
@@ -132,37 +136,44 @@ def _get_nav_handler(root_handler, pathitems):
     if root_handler == G.MODE_DIRECTORY:
         from resources.lib.navigation.directory import Directory
         nav_handler = Directory
-    if root_handler == G.MODE_ACTION:
+    elif root_handler == G.MODE_ACTION:
         from resources.lib.navigation.actions import AddonActionExecutor
         nav_handler = AddonActionExecutor
-    if root_handler == G.MODE_LIBRARY:
+    elif root_handler == G.MODE_LIBRARY:
         from resources.lib.navigation.library import LibraryActionExecutor
         nav_handler = LibraryActionExecutor
+    elif root_handler == G.MODE_KEYMAPS:
+        from resources.lib.navigation.keymaps import KeymapsActionExecutor
+        nav_handler = KeymapsActionExecutor
     if not nav_handler:
         raise InvalidPathError('No root handler for path {}'.format('/'.join(pathitems)))
     return nav_handler
 
 
-def _execute(executor_type, pathitems, params):
+def _execute(executor_type, pathitems, params, root_handler):
     """Execute an action as specified by the path"""
     try:
         executor = executor_type(params).__getattribute__(pathitems[0] if pathitems else 'root')
+        LOG.debug('Invoking action: {}', executor.__name__)
+        executor(pathitems=pathitems)
+        if root_handler == G.MODE_DIRECTORY and not G.IS_ADDON_EXTERNAL_CALL:
+            # Save the method name of current loaded directory
+            WndHomeProps[WndHomeProps.CURRENT_DIRECTORY] = executor.__name__
+            WndHomeProps[WndHomeProps.IS_CONTAINER_REFRESHED] = None
     except AttributeError as exc:
         raise_from(InvalidPathError('Unknown action {}'.format('/'.join(pathitems))), exc)
-    LOG.debug('Invoking action: {}', executor.__name__)
-    executor(pathitems=pathitems)
 
 
-def _get_service_status(window_cls, prop_nf_service_status):
+def _get_service_status():
     from json import loads
     try:
-        status = window_cls.getProperty(prop_nf_service_status)
+        status = WndHomeProps[WndHomeProps.SERVICE_STATUS]
         return loads(status) if status else {}
     except Exception:  # pylint: disable=broad-except
         return {}
 
 
-def _check_addon_external_call(window_cls, prop_nf_service_status):
+def _check_addon_external_call():
     """Check system to verify if the calls to the add-on are originated externally"""
     # The calls that are made from outside do not respect and do not check whether the services required
     # for the add-on are actually working and operational, causing problems with the execution of the frontend.
@@ -191,7 +202,7 @@ def _check_addon_external_call(window_cls, prop_nf_service_status):
     if is_other_plugin_name or not getCondVisibility("Window.IsMedia"):
         monitor = Monitor()
         sec_elapsed = 0
-        while not _get_service_status(window_cls, prop_nf_service_status).get('status') == 'running':
+        while not _get_service_status().get('status') == 'running':
             if sec_elapsed >= limit_sec or monitor.abortRequested() or monitor.waitForAbort(0.5):
                 break
             sec_elapsed += 0.5
@@ -212,12 +223,8 @@ def run(argv):
     LOG.info('URL is {}'.format(G.URL))
     success = True
 
-    window_cls = Window(10000)  # Kodi home window
-
-    # If you use multiple Kodi profiles you need to distinguish the property of current profile
-    prop_nf_service_status = G.py2_encode('nf_service_status_' + get_current_kodi_profile_name())
-    is_external_call = _check_addon_external_call(window_cls, prop_nf_service_status)
-    service_status = _get_service_status(window_cls, prop_nf_service_status)
+    is_external_call = _check_addon_external_call()
+    service_status = _get_service_status()
 
     if service_status.get('status') != 'running':
         if not is_external_call:

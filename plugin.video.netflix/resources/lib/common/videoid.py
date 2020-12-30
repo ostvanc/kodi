@@ -166,6 +166,21 @@ class VideoId(object):
             return VideoId.from_dict(videoid_dict)
         return self
 
+    def to_string(self):
+        """Generate a valid pathitems as string ('show'/tvshowid/...) from this instance"""
+        if self.videoid:
+            return self.videoid
+        if self.movieid:
+            return '/'.join([self.MOVIE, self.movieid])
+        if self.supplementalid:
+            return '/'.join([self.SUPPLEMENTAL, self.supplementalid])
+        pathitems = [self.SHOW, self.tvshowid]
+        if self.seasonid:
+            pathitems.extend([self.SEASON, self.seasonid])
+        if self.episodeid:
+            pathitems.extend([self.EPISODE, self.episodeid])
+        return '/'.join(pathitems)
+
     def to_path(self):
         """Generate a valid pathitems list (['show', tvshowid, ...]) from
         this instance"""
@@ -310,9 +325,7 @@ def _path_to_videoid(kwargs, pathitems_arg, path_offset,
     from the kwargs dict."""
     kwargs['videoid'] = VideoId.from_path(kwargs[pathitems_arg][path_offset:])
     if inject_remaining_pathitems or inject_full_pathitems:
-        if inject_full_pathitems:
-            kwargs[pathitems_arg] = kwargs[pathitems_arg]
-        else:
+        if inject_remaining_pathitems:
             kwargs[pathitems_arg] = kwargs[pathitems_arg][:path_offset]
     else:
         del kwargs[pathitems_arg]

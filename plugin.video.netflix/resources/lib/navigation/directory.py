@@ -9,7 +9,6 @@
 """
 from __future__ import absolute_import, division, unicode_literals
 
-import xbmc
 import xbmcplugin
 
 import resources.lib.common as common
@@ -46,33 +45,31 @@ class Directory(object):
         # After build url the param value is converted as string
         self.perpetual_range_start = (None if self.params.get('perpetual_range_start') == 'None'
                                       else self.params.get('perpetual_range_start'))
-        self.dir_update_listing = bool(self.perpetual_range_start)
+        if 'dir_update_listing' in self.params:
+            self.dir_update_listing = self.params['dir_update_listing'] == 'True'
+        else:
+            self.dir_update_listing = bool(self.perpetual_range_start)
         if self.perpetual_range_start == '0':
             # For cache identifier purpose
             self.perpetual_range_start = None
 
     def root(self, pathitems=None):  # pylint: disable=unused-argument
         """Show profiles or home listing when profile auto-selection is enabled"""
-        # Get the URL parent path of the navigation: xbmc.getInfoLabel('Container.FolderPath')
-        #   it can be found in Kodi log as "ParentPath = [xyz]" but not always return the exact value
-        is_parent_root_path = xbmc.getInfoLabel('Container.FolderPath') == G.BASE_URL + '/'
         # Fetch initial page to refresh all session data
-        if is_parent_root_path and not G.IS_CONTAINER_REFRESHED:
+        current_directory = common.WndHomeProps[common.WndHomeProps.CURRENT_DIRECTORY]
+        if not current_directory:
+            # Note when the profiles are updated to the database (by fetch_initial_page call),
+            # the update sanitize also relative settings to profiles (see _delete_non_existing_profiles in website.py)
             common.make_call('fetch_initial_page')
-        # Note when the profiles are updated to the database (by fetch_initial_page call),
-        #   the update sanitize also relative settings to profiles (see _delete_non_existing_profiles in website.py)
-        autoselect_profile_guid = G.LOCAL_DB.get_value('autoselect_profile_guid', '')
-        if autoselect_profile_guid and not G.IS_CONTAINER_REFRESHED:
-            if is_parent_root_path:
-                LOG.info('Performing auto-selection of profile {}', autoselect_profile_guid)
-            # Do not perform the profile switch if navigation come from a page that is not the root url,
-            # prevents profile switching when returning to the main menu from one of the sub-menus
-            if not is_parent_root_path or activate_profile(autoselect_profile_guid):
-                self.home(None, True)
+        # When the add-on is used in a browser window, we do not have to execute the auto profile selection
+        if not G.IS_ADDON_EXTERNAL_CALL:
+            autoselect_profile_guid = G.LOCAL_DB.get_value('autoselect_profile_guid', '')
+            if autoselect_profile_guid and not common.WndHomeProps[common.WndHomeProps.IS_CONTAINER_REFRESHED]:
+                if not current_directory:
+                    LOG.info('Performing auto-selection of profile {}', autoselect_profile_guid)
+                    self.params['switch_profile_guid'] = autoselect_profile_guid
+                self.home(None)
                 return
-        # IS_CONTAINER_REFRESHED is temporary set from the profiles context menu actions
-        #   to avoid perform the fetch_initial_page/auto-selection every time when the container will be refreshed
-        G.IS_CONTAINER_REFRESHED = False
         list_data, extra_data = common.make_call('get_profiles', {'request_update': False})
         self._profiles(list_data, extra_data)
 
@@ -91,11 +88,16 @@ class Directory(object):
 
     @measure_exec_time_decorator()
     @custom_viewmode(G.VIEW_MAINMENU)
-    def home(self, pathitems=None, is_autoselect_profile=False):  # pylint: disable=unused-argument
+    def home(self, pathitems=None):  # pylint: disable=unused-argument
         """Show home listing"""
-        if not is_autoselect_profile and 'switch_profile_guid' in self.params:
-            # This is executed only when you have selected a profile from the profile list
-            if not activate_profile(self.params['switch_profile_guid']):
+        if 'switch_profile_guid' in self.params:
+            if G.IS_ADDON_EXTERNAL_CALL:
+                # Profile switch/ask PIN only once
+                ret = not self.params['switch_profile_guid'] == G.LOCAL_DB.get_active_profile_guid()
+            else:
+                # Profile switch/ask PIN every time you come from ...
+                ret = common.WndHomeProps[common.WndHomeProps.CURRENT_DIRECTORY] in ['', 'root', 'profiles']
+            if ret and not activate_profile(self.params['switch_profile_guid']):
                 xbmcplugin.endOfDirectory(G.PLUGIN_HANDLE, succeeded=False)
                 return
         LOG.debug('Showing home listing')

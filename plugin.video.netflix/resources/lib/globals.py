@@ -26,6 +26,7 @@ except ImportError:  # Python 2
 from future.utils import iteritems
 
 import xbmcaddon
+from xbmcgui import Window
 
 try:  # Kodi >= 19
     from xbmcvfs import translatePath  # pylint: disable=ungrouped-imports
@@ -77,6 +78,7 @@ class GlobalVariables(object):
     content_type        Override the default content type (CONTENT_SHOW)
     has_show_setting    Means that the menu has the show/hide settings, by default is True
     has_sort_setting    Means that the menu has the sort settings, by default is False
+    no_use_cache        The cache will not be used to store the contents of the menu
 
     Explanation of function names in the 'path' key:
         video_list        Automatically gets the list_id by making a loco request,
@@ -115,7 +117,8 @@ class GlobalVariables(object):
                            'loco_known': True}),
         ('mostWatched', {'path': ['video_list', 'mostWatched'],  # Top 10 menu
                          'loco_contexts': ['mostWatched'],
-                         'loco_known': True}),
+                         'loco_known': True,
+                         'no_use_cache': True}),
         ('mostViewed', {'path': ['video_list', 'mostViewed'],
                         'loco_contexts': ['popularTitles'],
                         'loco_known': True}),
@@ -203,6 +206,7 @@ class GlobalVariables(object):
     MODE_PLAY = 'play'
     MODE_PLAY_STRM = 'play_strm'
     MODE_LIBRARY = 'library'
+    MODE_KEYMAPS = 'keymaps'
 
     def __init__(self):
         """Do nothing on constructing the object"""
@@ -210,6 +214,7 @@ class GlobalVariables(object):
         # on subsequent add-on invocations (invoked by reuseLanguageInvoker) will have no effect.
         # Define here also any other variables necessary for the correct loading of the other project modules
         self.PY_IS_VER2 = sys.version_info.major == 2
+        self.WND_KODI_HOME = Window(10000)  # Kodi home window
         self.IS_ADDON_FIRSTRUN = None
         self.ADDON = None
         self.ADDON_DATA_PATH = None
@@ -219,7 +224,6 @@ class GlobalVariables(object):
         self.CACHE_TTL = None
         self.CACHE_MYLIST_TTL = None
         self.CACHE_METADATA_TTL = None
-        self.IS_CONTAINER_REFRESHED = False
 
     def init_globals(self, argv, reinitialize_database=False, reload_settings=False):
         """Initialized globally used module variables. Needs to be called at start of each plugin instance!"""

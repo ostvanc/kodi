@@ -39,7 +39,6 @@ class AddonActionExecutor(object):
         """Save the GUID for profile auto-selection"""
         G.LOCAL_DB.set_value('autoselect_profile_guid', self.params['profile_guid'])
         profile_name = G.LOCAL_DB.get_profile_config('profileName', '???', self.params['profile_guid'])
-        G.IS_CONTAINER_REFRESHED = True
         common.container_refresh()
         ui.show_notification(profile_name, title=common.get_local_string(30055))
 
@@ -47,7 +46,6 @@ class AddonActionExecutor(object):
         """Remove the GUID from auto-selection"""
         G.LOCAL_DB.set_value('autoselect_profile_guid', '')
         profile_name = G.LOCAL_DB.get_profile_config('profileName', '???', self.params['profile_guid'])
-        G.IS_CONTAINER_REFRESHED = True
         common.container_refresh()
         ui.show_notification(profile_name, title=common.get_local_string(30056))
 
@@ -55,7 +53,6 @@ class AddonActionExecutor(object):
         """Save the GUID for the playback from Kodi library"""
         G.LOCAL_DB.set_value('library_playback_profile_guid', self.params['profile_guid'])
         profile_name = G.LOCAL_DB.get_profile_config('profileName', '???', self.params['profile_guid'])
-        G.IS_CONTAINER_REFRESHED = True
         common.container_refresh()
         ui.show_notification(profile_name, title=common.get_local_string(30052))
 
@@ -63,7 +60,6 @@ class AddonActionExecutor(object):
         """Remove the GUID for the playback from Kodi library"""
         G.LOCAL_DB.set_value('library_playback_profile_guid', '')
         profile_name = G.LOCAL_DB.get_profile_config('profileName', '???', self.params['profile_guid'])
-        G.IS_CONTAINER_REFRESHED = True
         common.container_refresh()
         ui.show_notification(profile_name, title=common.get_local_string(30053))
 
@@ -73,7 +69,8 @@ class AddonActionExecutor(object):
         if not password:
             return
         try:
-            parental_control_data = api.get_parental_control_data(password)
+            parental_control_data = api.get_parental_control_data(self.params['profile_guid'],
+                                                                  password)
             ui.show_modal_dialog(False,
                                  ui.xmldialogs.ParentalControl,
                                  'plugin-video-netflix-ParentalControl.xml',
@@ -121,7 +118,7 @@ class AddonActionExecutor(object):
         """Add or remove an item from my list"""
         operation = pathitems[1]
         api.update_my_list(videoid, operation, self.params)
-        _sync_library(videoid, operation)
+        sync_library(videoid, operation)
         common.container_refresh()
 
     @common.inject_video_id(path_offset=1)
@@ -207,22 +204,8 @@ class AddonActionExecutor(object):
 
     @common.inject_video_id(path_offset=1)
     def change_watched_status(self, videoid):
-        """Change the watched status locally"""
-        # Todo: how get resumetime/playcount of selected item for calculate current watched status?
-
-        profile_guid = G.LOCAL_DB.get_active_profile_guid()
-        current_value = G.SHARED_DB.get_watched_status(profile_guid, videoid.value, None, bool)
-        if current_value:
-            txt_index = 1
-            G.SHARED_DB.set_watched_status(profile_guid, videoid.value, False)
-        elif current_value is not None and not current_value:
-            txt_index = 2
-            G.SHARED_DB.delete_watched_status(profile_guid, videoid.value)
-        else:
-            txt_index = 0
-            G.SHARED_DB.set_watched_status(profile_guid, videoid.value, True)
-        ui.show_notification(common.get_local_string(30237).split('|')[txt_index])
-        common.container_refresh()
+        """Change the watched status of a video, only when sync of watched status with NF is enabled"""
+        change_watched_status_locally(videoid)
 
     def configuration_wizard(self, pathitems=None):  # pylint: disable=unused-argument
         """Run the add-on configuration wizard"""
@@ -252,8 +235,12 @@ class AddonActionExecutor(object):
                 pass
         common.container_refresh()
 
+    def show_availability_message(self, pathitems=None):  # pylint: disable=unused-argument
+        """Show a message to the user to show the date of availability of a video"""
+        ui.show_ok_dialog(xbmc.getInfoLabel('ListItem.Label'),
+                          xbmc.getInfoLabel('ListItem.Property(nf_availability_message)'))
 
-def _sync_library(videoid, operation):
+def sync_library(videoid, operation):
     if operation and G.ADDON.getSettingBool('lib_sync_mylist') and G.ADDON.getSettingInt('lib_auto_upd_mode') == 2:
         sync_mylist_profile_guid = G.SHARED_DB.get_value('sync_mylist_profile_guid',
                                                          G.LOCAL_DB.get_guid_owner_profile())
@@ -265,3 +252,21 @@ def _sync_library(videoid, operation):
             get_library_cls().export_to_library(videoid, False)
         elif operation == 'remove':
             get_library_cls().remove_from_library(videoid, False)
+
+
+def change_watched_status_locally(videoid):
+    """Change the watched status locally"""
+    # Todo: how get resumetime/playcount of selected item for calculate current watched status?
+    profile_guid = G.LOCAL_DB.get_active_profile_guid()
+    current_value = G.SHARED_DB.get_watched_status(profile_guid, videoid.value, None, bool)
+    if current_value:
+        txt_index = 1
+        G.SHARED_DB.set_watched_status(profile_guid, videoid.value, False)
+    elif current_value is not None and not current_value:
+        txt_index = 2
+        G.SHARED_DB.delete_watched_status(profile_guid, videoid.value)
+    else:
+        txt_index = 0
+        G.SHARED_DB.set_watched_status(profile_guid, videoid.value, True)
+    ui.show_notification(common.get_local_string(30237).split('|')[txt_index])
+    common.container_refresh()
