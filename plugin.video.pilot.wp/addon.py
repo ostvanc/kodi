@@ -99,7 +99,7 @@ def cookiesToString(cookies):
 
 def login():
     if len(password) > 0 and len(username) > 0:
-        data = {'device': 'AndroidTV', 'login': username, 'password': password}
+        data = {'device': 'android_tv', 'login': username, 'password': password}
 
         response = requests.post(
             login_url,
